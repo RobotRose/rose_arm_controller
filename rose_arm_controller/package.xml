@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package>
+  <name>rose_arm_controller</name>
+  <version>0.0.1</version>
+  <description>Metapackage for the ROS Packages for the rose_arm_controller package</description>
+
+  <author email="langen@robot-rose.nl">Mathijs de Langen</author>
+  <maintainer email="langen@robot-rose.nl">Mathijs de Langen</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>rose_arm_controller_msgs</run_depend>
+  <export>
+    <metapackage />
+  </export>
+</package>
