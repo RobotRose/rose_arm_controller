@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package>
+  <name>arm_controller_base</name>
+  <version>0.0.0</version>
+  <description>The arm_controller_base package< describes the common interface for robot arms.</description>
+
+  <author email="langen@robot-rose.nl">Mathijs de Langen</author>
+  <maintainer email="langen@robot-rose.nl">Mathijs de Langen</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>std_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+
+  <run_depend>std_msgs</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>tf</run_depend>
+  </export>
+</package>
