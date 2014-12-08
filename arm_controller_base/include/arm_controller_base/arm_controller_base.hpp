@@ -97,6 +97,8 @@ class ArmControllerBase{
 
     virtual bool setEndEffectorWrench(const Wrench& Wrench) = 0;
 
+    // virtual bool hasMoveItInterface() = 0;
+
     /**
     * @brief  Virtual destructor for the interface
     */
