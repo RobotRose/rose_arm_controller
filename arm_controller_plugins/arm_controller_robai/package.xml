@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package>
+  <name>arm_controller_robai</name>
+  <version>0.0.1</version>
+  <description>The arm_controller_robai plugin package</description>
+
+  <maintainer email="langen@robot-rose.nl">Mathijs de Langen</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>arm_controller_base</build_depend>
+  <build_depend>rose_arm_controller_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>pluginlib</build_depend>
+  <build_depend>roscpp</build_depend>
+
+  <run_depend>arm_controller_base</run_depend>
+  <run_depend>rose_arm_controller_msgs</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>pluginlib</run_depend>
+  <run_depend>roscpp</run_depend>
+
+  <export>
+     <arm_controller_base plugin="${prefix}/robai_plugin.xml" />
+   </export>
+</package>
