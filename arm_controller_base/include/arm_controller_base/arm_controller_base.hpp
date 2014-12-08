@@ -23,6 +23,7 @@ namespace arm_controller_base {
 using geometry_msgs::PoseStamped;
 using geometry_msgs::Twist;
 using geometry_msgs::Wrench;
+
  /**
   * @brief Provides an interface to interact with each kind of arm.
   */
