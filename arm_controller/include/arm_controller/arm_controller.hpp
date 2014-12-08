@@ -13,7 +13,6 @@
 #ifndef ARM_CONTROLLER_HPP
 #define ARM_CONTROLLER_HPP
 
-
 #include <actionlib/client/simple_action_client.h>  //! @todo MdL: SMC?.
 #include <iostream>
 #include <stdio.h>

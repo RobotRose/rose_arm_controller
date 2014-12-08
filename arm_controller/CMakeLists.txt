@@ -15,6 +15,11 @@ catkin_package(
 #  DEPENDS system_lib
 )
 
+include_directories(
+	${catkin_INCLUDE_DIRS} 
+	include
+)
+
 add_executable(arm_controller
 	src/arm_controller.cpp
 	src/arm_controller_node.cpp
@@ -24,23 +29,19 @@ target_link_libraries(arm_controller
 	${catkin_LIBRARIES}
 )
 
-include_directories(
-	${catkin_INCLUDE_DIRS} 
-)
+# install(
+# 	DIRECTORY 
+# 		launch
+# 	DESTINATION 
+# 		${CATKIN_PACKAGE_SHARE_DESTINATION}
+# 	USE_SOURCE_PERMISSIONS
+# )
 
-install(
-	DIRECTORY 
-		launch
-	DESTINATION 
-		${CATKIN_PACKAGE_SHARE_DESTINATION}
-	USE_SOURCE_PERMISSIONS
-)
-
-install(
-    TARGETS
-        arm_controller
-    LIBRARY DESTINATION 
-    	${CATKIN_PACKAGE_LIB_DESTINATION}
-    RUNTIME DESTINATION 
-    	${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+# install(
+#     TARGETS
+#         arm_controller
+#     LIBRARY DESTINATION 
+#     	${CATKIN_PACKAGE_LIB_DESTINATION}
+#     RUNTIME DESTINATION 
+#     	${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
