@@ -33,9 +33,10 @@ include_directories(
 	${catkin_INCLUDE_DIRS}
 )
 
-add_executable( arm_controller_robai
+add_library( arm_controller_robai
 	src/arm_controller_robai.cpp
 )
+
 target_link_libraries( arm_controller_robai
 	${PROJECT_NAME}
 	${catkin_LIBRARIES}
