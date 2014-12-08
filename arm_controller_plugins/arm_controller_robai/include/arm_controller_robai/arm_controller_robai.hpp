@@ -3,11 +3,11 @@
 *
 * Revision History:
 *   Author: Mathijs de Langen
-*   Date  : 2014/12/05
+*   Date  : 2014/12/08
 *       - File created.
 *
 * Description:
-*   This package describes the common interface for robot arms.
+*   This package describes the robai interface for robot arms.
 * 
 ***********************************************************************************/
 #ifndef ARM_CONTROLLER_ROBAI_HPP
