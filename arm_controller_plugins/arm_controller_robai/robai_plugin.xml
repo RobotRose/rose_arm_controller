@@ -1,5 +1,5 @@
 <library path="lib/libarm_controller">
-  <class type="arm_controller::RobaiArmController" base_class_type="arm_controller_base::ArmControllerBase">
+  <class type="arm_controller_plugins::RobaiArmController" base_class_type="arm_controller_base::ArmControllerBase">
     <description>
       Implementation of the arm_controller for the Robai arm.
     </description>
