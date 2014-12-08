@@ -33,22 +33,25 @@ include_directories(
 	${catkin_INCLUDE_DIRS}
 )
 
-add_executable(arm_controller_robai
-  src/arm_controller_robai.cpp
+add_executable( arm_controller_robai
+	src/arm_controller_robai.cpp
 )
-target_link_libraries(arm_controller_robai
-  ${PROJECT_NAME}
-  ${catkin_LIBRARIES}
+target_link_libraries( arm_controller_robai
+	${PROJECT_NAME}
+	${catkin_LIBRARIES}
 )
 
 install(TARGETS ${PROJECT_NAME} arm_controller_robai
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+	ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+	LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+	RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  PATTERN ".svn" EXCLUDE)
+	DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+	PATTERN ".svn" EXCLUDE
+)
 
 install(FILES robai_plugin.xml
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
