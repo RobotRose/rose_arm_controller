@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <vector>
 
-#include "rose_arm_controller/arm_controller_base.hpp"
-#include "rose_arm_controller/arm_controller.hpp"
+#include "arm_controller_base/arm_controller_base.hpp"
+#include "arm_controller/arm_controller.hpp"
 
 #endif // ARM_CONTROLLER_NODE_HPP

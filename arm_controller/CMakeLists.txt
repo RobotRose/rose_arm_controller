@@ -3,6 +3,9 @@ project(arm_controller)
 
 find_package(catkin REQUIRED
 	COMPONENTS
+		arm_controller_base
+		rose_arm_controller_msgs
+		rose20_common
 		pluginlib
         tf
 )

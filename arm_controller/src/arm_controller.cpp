@@ -18,21 +18,39 @@ ArmController::ArmController( std::string name, ros::NodeHandle n )
     , sh_emergency_(SharedVariable<bool>("emergency"))
     , velocity_watchdog_("arm_velocity_watchdog", n, VELOCITY_TIMEOUT, boost::bind(&ArmController::cancelVelocityForArms, this))
 {
-	// get param
-    std::string arm_controller_plugin = "arm_controller_plugins::ArmControllerRobai";
-
-    pluginlib::ClassLoader<arm_controller_plugin> arm_controller("arm_controller_plugins", "arm_controller_base::ArmControllerBase");
-
-	try
-	{
-		boost::shared_ptr<arm_controller_plugin> triangle = arm_controller.createInstance(arm_controller_plugin);
-	}
-		catch(pluginlib::PluginlibException& ex)
-	{
-		ROS_ERROR("The plugin failed to load for some reason. Error: %s", ex.what());
-	}
-
     ROS_INFO_NAMED(ROS_NAME, "Starting arm controller...");
+
+    // Load all parameters
+    int                         number_of_arms;
+    std::vector<std::string>    arm_plugins;
+    
+    n_.param("/arm_controller/number_of_arms", number_of_arms, 1);
+    for ( int i = 0 ; i < number_of_arms ; i++ )
+    {
+        std::string plugin_name;
+        n_.param("/arm_controller/plugin"+i, plugin_name, "arm_controller_plugins::ArmControllerRobai");
+        arm_plugins.push_back(plugin_name);
+    }
+    
+    // Load plugins
+    std::vector<pluginlib::ClassLoader> arm_controllers;
+    for ( int i = 0 ; i < number_of_arms ; i++)
+    {
+        pluginlib::ClassLoader<arm_plugins[i]> arm_controller("arm_controller_plugins", "arm_controller_base::ArmControllerBase");
+
+    	try
+    	{
+    		boost::shared_ptrarm_plugins[i]> arm = arm_controller.createInstance(arm_plugins[i]);
+    	}
+    		catch(pluginlib::PluginlibException& ex)
+    	{
+    		ROS_ERROR("The plugin failed to load for some reason. Error: %s", ex.what());
+    	}
+
+        arm_controllers.push_back(arm_controller);
+    }
+
+    // Create SMC
     smc_ = new SMC(n_, name_, boost::bind(&ArmController::CB_receiveGoal, this, _1, _2),
                               boost::bind(&ArmController::CB_serverCancel, this, _1));
     // Init member variables
