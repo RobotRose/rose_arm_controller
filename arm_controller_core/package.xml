@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<package>
+  <name>arm_controller_core</name>
+  <version>0.0.1</version>
+  <description>The main arm_controller package</description>
+
+  <maintainer email="langen@robot-rose.nl">Mathijs de Langen</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+</package>
