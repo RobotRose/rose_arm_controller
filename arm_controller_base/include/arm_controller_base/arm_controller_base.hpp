@@ -28,7 +28,7 @@ using geometry_msgs::Wrench;
   */
 class ArmControllerBase{
   public:
-    
+
     /**
      * @brief   Cancels the current interaction of the arm. 
      * @details Cancelling only stopts the current interaction. The arm will respond again to new input.
@@ -58,7 +58,9 @@ class ArmControllerBase{
 
     virtual bool setEndEffectorVelocity(const Twist& velocity) = 0;
 
-    virtual bool setContraint(const Twist& contraint) = 0;
+    virtual bool setContraints(const Twist& contraint) = 0;
+
+    virtual bool resetContraints() = 0;
 
     virtual bool setGripperWidth(const double required_width) = 0; // required_width in [m]
 
