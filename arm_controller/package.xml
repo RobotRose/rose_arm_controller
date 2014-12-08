@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>arm_controller_core</name>
+  <name>arm_controller</name>
   <version>0.0.1</version>
   <description>The main arm_controller package</description>
 

@@ -12,7 +12,7 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <run_depend>rose_arm_controller_msgs</run_depend>
-  <run_depend>arm_controller_core</run_depend>
+  <run_depend>arm_controller</run_depend>
   <run_depend>arm_controller_base</run_depend>
   <run_depend>arm_controller_plugins</run_depend>
   <export>

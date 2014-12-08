@@ -27,7 +27,7 @@ using geometry_msgs::Wrench;
  /**
   * @brief Provides an interface to interact with each kind of arm.
   */
-class ArmControllerBase{
+class ArmControllerBase {
   public:
 
     /**

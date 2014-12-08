@@ -15,11 +15,11 @@
 
 #include <iostream>
 #include <pluginlib/class_loader.h>
-#include <pluginlib_tutorials_/polygon_base.h>
 #include <ros/ros.h>
 #include <stdio.h>
 #include <vector>
 
 #include "rose_arm_controller/arm_controller_base.hpp"
+#include "rose_arm_controller/arm_controller.hpp"
 
 #endif // ARM_CONTROLLER_NODE_HPP
