@@ -75,25 +75,27 @@ class ArmController
      */
     ~ArmController();
 
+  private:
     void CB_receivePositionGoal(const rose_arm_controller_msgs::set_positionGoalConstPtr& goal, SMC_position* smc);
     void CB_receivePositionCancel(SMC_position* smc);
     void CB_receiveVelocityGoal(const rose_arm_controller_msgs::set_velocityGoalConstPtr& goal, SMC_velocity* smc);
     void CB_receiveVelocityCancel(SMC_velocity* smc);
     void CB_receiveGripperGoal(const rose_arm_controller_msgs::set_gripper_widthGoalConstPtr& goal, SMC_gripper* smc);
     void CB_receiveGripperCancel(SMC_gripper* smc);
-    
-    SMC_position*  set_position_smc_;
-    SMC_velocity*  set_velocity_smc_;
-    SMC_gripper*   set_gripper_width_smc_;
 
-  private:
     void CB_cancelVelocityForArms();
-    void CB_emergencyCancel(const bool& new_value);
+    void CB_emergency(const bool& emergency);
+
+    bool stopArmMovement(const boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller);
 
     std::string         name_;
     ros::NodeHandle     n_;
 
     int                 nr_of_arms_;
+
+    SMC_position*  set_position_smc_;
+    SMC_velocity*  set_velocity_smc_;
+    SMC_gripper*   set_gripper_width_smc_;
 
     pluginlib::ClassLoader<arm_controller_base::ArmControllerBase>          arm_controller_plugin_loader_;
     std::vector<boost::shared_ptr<arm_controller_base::ArmControllerBase>>  arm_controllers_;

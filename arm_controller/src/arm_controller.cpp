@@ -63,15 +63,12 @@ ArmController::ArmController( std::string name, ros::NodeHandle n )
         }
     }
 
+    // Initialize all arm controllers
     for (const auto& arm_controller : arm_controllers_ )
     {
         if ( not arm_controller->initialize() )
             ROS_ERROR("Could not initialize arm controller" ); //! @todo MdL: Add name of the controller / arm.
     }
-    // Init member variables
-    // obstacle_map_ = map<Manipulators, Pose>();
-
-    // attached_items = map<Arms, std::string>();
 
     // // Enable services / clients / publishers
     // toggle_service_         = n_.advertiseService("/" + name_ + "/toggle_visual_correction", &ArmController::CB_toggle, this);
@@ -81,7 +78,7 @@ ArmController::ArmController( std::string name, ros::NodeHandle n )
 
     // Monitor the emergency button state
     sh_emergency_.connect(ros::Duration(0.1));
-    sh_emergency_.registerChangeCallback(boost::bind(&ArmController::CB_emergencyCancel, this,  _1));
+    sh_emergency_.registerChangeCallback(boost::bind(&ArmController::CB_emergency, this,  _1));
 
     ROS_INFO_NAMED(ROS_NAME, "Starting all servers");
     set_position_smc_->startServer();
@@ -100,42 +97,126 @@ ArmController::~ArmController()
 
 void ArmController::CB_receivePositionGoal(const rose_arm_controller_msgs::set_positionGoalConstPtr& goal, SMC_position* smc)
 {
+    if(sh_emergency_)
+    {
+        ROS_WARN_NAMED(ROS_NAME, "Will not move arm due to emergency state.");
+        return;
+    }
 
+    //! @todo MdL: Transform both to arm base link.
+    Pose goal_pose =        goal->required_pose.pose;
+    Twist goal_constraint = goal->constraint.twist;
+
+    arm_controllers_[goal->arm]->setContraints(goal_constraint);
+    arm_controllers_[goal->arm]->setEndEffectorPose(goal_pose);
 }
 
 void ArmController::CB_receivePositionCancel(SMC_position* smc)
 {
+    rose_arm_controller_msgs::set_positionGoalConstPtr goal;
+    if(smc->hasActiveGoal())
+        goal = smc->getLastGoal();
+    else
+    {
+        ROS_WARN_NAMED(ROS_NAME, "Setting arm position cancelled, but there was no active goal.");
+        return;
+    }
 
+    //! @todo MdL: Cancel movement.
 }
 
 void ArmController::CB_receiveVelocityGoal(const rose_arm_controller_msgs::set_velocityGoalConstPtr& goal, SMC_velocity* smc)
 {
+    if(sh_emergency_)
+    {
+        ROS_WARN_NAMED(ROS_NAME, "Will not set arm velocity to emergency state.");
+        return;
+    }
 
+    velocity_watchdog_.reset();
+
+    //! @todo MdL: Transform both to arm base link.
+    Twist goal_twist = goal->required_velocity.twist;
+    Twist goal_constraint = goal->constraint.twist;
+
+    arm_controllers_[goal->arm]->setContraints(goal_constraint);
+    arm_controllers_[goal->arm]->setEndEffectorVelocity(goal_twist);
 }
 
 void ArmController::CB_receiveVelocityCancel(SMC_velocity* smc)
 {
+    rose_arm_controller_msgs::set_velocityGoalConstPtr goal;
+    if(smc->hasActiveGoal())
+        goal = smc->getLastGoal();
+    else
+    {
+        ROS_WARN_NAMED(ROS_NAME, "Arm velocity cancelled, but there was no active goal.");
+        return;
+    }
 
+    if ( not stopArmMovement(arm_controllers_[goal->arm]))
+        ROS_ERROR("Could not stop arm movement");
 }
 
 void ArmController::CB_receiveGripperGoal(const rose_arm_controller_msgs::set_gripper_widthGoalConstPtr& goal, SMC_gripper* smc)
 {
+    if(sh_emergency_)
+    {
+        ROS_WARN_NAMED(ROS_NAME, "Will not move arm gripper due to emergency state.");
+        return;
+    }
 
+    arm_controllers_[goal->arm]->setGripperWidth(goal->required_width);
 }
 
 void ArmController::CB_receiveGripperCancel(SMC_gripper* smc)
 {
+    rose_arm_controller_msgs::set_gripper_widthGoalConstPtr goal;
+    if(smc->hasActiveGoal())
+        goal = smc->getLastGoal();
+    else
+    {
+        ROS_WARN_NAMED(ROS_NAME, "Setting arm gripper width cancelled, but there was no active goal.");
+        return;
+    }
 
+    //! @todo MdL: Cancel setting gripper width.
 }
 
 void ArmController::CB_cancelVelocityForArms()
 {
-
+    // Stop all arm velocities
+    for ( const auto& arm_controller : arm_controllers_ )
+        if ( not stopArmMovement(arm_controller))
+            ROS_ERROR("Could not stop arm movement");
 }
 
-void ArmController::CB_emergencyCancel(const bool& new_value)
+void ArmController::CB_emergency(const bool& emergency)
 {
+    if(emergency)
+        for ( const auto& arm_controller : arm_controllers_ )
+            arm_controller->emergencyStop();
+    else
+        for ( const auto& arm_controller : arm_controllers_ )
+            arm_controller->resetEmergencyStop();
+}
 
+bool ArmController::stopArmMovement(const boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller)
+{
+    geometry_msgs::Twist twist;
+    twist.linear.x = 0.0;
+    twist.linear.y = 0.0;
+    twist.linear.z = 0.0;
+    twist.angular.x = 0.0;
+    twist.angular.y = 0.0;
+    twist.angular.z = 0.0;
+
+    velocity_watchdog_.stop();
+
+    if(arm_controller->setEndEffectorVelocity(twist))
+        return true;
+    else
+        return false;
 }
 
 }; // namespace
