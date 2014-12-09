@@ -142,13 +142,12 @@ double ArmControllerRobai::getGripperWidth()
 
 bool ArmControllerRobai::setGripperWidth(const double required_width)
 {
-	//! @todo MdL: Implement.
 	return false;
 }
 
 Wrench ArmControllerRobai::getEndEffectorWrench()
 {
-	//! @todo MdL: Implement.
+	ROS_ERROR("Robai does not support reading force/torque values");
 	Wrench wrench;
 	return wrench;
 }
@@ -156,6 +155,7 @@ Wrench ArmControllerRobai::getEndEffectorWrench()
 bool ArmControllerRobai::setEndEffectorWrench(const Wrench& Wrench)
 {
 	//! @todo MdL: Implement.
+	ROS_ERROR("Robai does not support force/torque control");
 	return false;
 }
 
