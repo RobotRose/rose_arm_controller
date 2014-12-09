@@ -5,6 +5,7 @@ find_package(catkin REQUIRED
 	COMPONENTS
 		arm_controller_base
 		rose_arm_controller_msgs
+		rose_watchdogs
 		rose20_common
 		pluginlib
         tf
@@ -17,6 +18,8 @@ catkin_package(
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
 )
+
+set(CMAKE_CXX_FLAGS "-std=c++0x -g") # TODO OH: -g is DEBUG FLAG
 
 include_directories(
 	${catkin_INCLUDE_DIRS} 
