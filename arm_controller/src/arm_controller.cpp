@@ -18,8 +18,8 @@ ArmController::ArmController( std::string name, ros::NodeHandle n )
     : name_ ( name )
     , n_ ( n )
     , arm_controller_plugin_loader_("arm_controller_base", "arm_controller_base::ArmControllerBase")
-    // , sh_emergency_(SharedVariable<bool>("emergency"))
-    // , velocity_watchdog_("arm_velocity_watchdog", n, VELOCITY_TIMEOUT, boost::bind(&ArmController::cancelVelocityForArms, this))
+    , sh_emergency_(SharedVariable<bool>("emergency"))
+    , velocity_watchdog_("arm_velocity_watchdog", n, VELOCITY_TIMEOUT, boost::bind(&ArmController::cancelVelocityForArms, this))
 {
     set_position_smc_ = new SMC_position(n_, name_+"/position",
             boost::bind(&ArmController::CB_receivePositionGoal, this, _1, _2),
@@ -79,9 +79,9 @@ ArmController::ArmController( std::string name, ros::NodeHandle n )
     // attach_item_service_    = n_.advertiseService("/" + name_ + "/set_item_attachment",      &ArmController::CB_attach_item,  this);
     // query_attached_items_service_    = n_.advertiseService("/" + name_ + "/get_item_attachment",      &ArmController::CB_query_attached_items,  this);
 
-    // // Monitor the emergency button state
-    // sh_emergency_.connect(ros::Duration(0.1));
-    // sh_emergency_.registerChangeCallback(boost::bind(&ArmController::CB_emergencyCancel, this,  _1));
+    // Monitor the emergency button state
+    sh_emergency_.connect(ros::Duration(0.1));
+    sh_emergency_.registerChangeCallback(boost::bind(&ArmController::CB_emergencyCancel, this,  _1));
 
     ROS_INFO_NAMED(ROS_NAME, "Starting all servers");
     set_position_smc_->startServer();
@@ -128,5 +128,9 @@ void ArmController::CB_receiveGripperCancel(SMC_gripper* smc)
 
 }
 
+void ArmController::cancelVelocityForArms()
+{
+
+}
 
 }; // namespace

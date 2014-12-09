@@ -8,6 +8,7 @@ find_package(catkin REQUIRED
 		rose_watchdogs
 		rose20_common
 		pluginlib
+		shared_variables
         tf
 )
 

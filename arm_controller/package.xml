@@ -15,6 +15,7 @@
   <build_depend>rose_arm_controller_msgs</build_depend>
   <build_depend>rose_watchdogs</build_depend>
   <build_depend>rose20_common</build_depend>
+  <build_depend>shared_variables</build_depend>
   <build_depend>tf</build_depend>
 
   <run_depend>pluginlib</run_depend>
@@ -22,5 +23,6 @@
   <run_depend>rose_arm_controller_msgs</run_depend>
   <run_depend>rose_watchdogs</run_depend>
   <run_depend>rose20_common</run_depend>
+  <run_depend>shared_variables</run_depend>
   <run_depend>tf</run_depend>
 </package>

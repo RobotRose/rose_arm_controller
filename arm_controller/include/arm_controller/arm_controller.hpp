@@ -36,6 +36,7 @@
 // #include "action_result_message.hpp"
 
 #include "rose_watchdogs/watchdog.hpp"
+#include "shared_variables/shared_variable.hpp"
 
 namespace arm_controller_core {
 
@@ -85,6 +86,8 @@ class ArmController
     SMC_gripper*   set_gripper_width_smc_;
 
   private:
+    void cancelVelocityForArms();
+
     std::string         name_;
     ros::NodeHandle     n_;
 
