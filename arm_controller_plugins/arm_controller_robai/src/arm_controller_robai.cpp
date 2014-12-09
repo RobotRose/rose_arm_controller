@@ -44,13 +44,13 @@ bool ArmControllerRobai::resetEmergencyStop()
 	return false;
 }
 
-PoseStamped ArmControllerRobai::getEndEffectorPose()
+Pose ArmControllerRobai::getEndEffectorPose()
 {
 	PoseStamped pose_stamped;
 	return pose_stamped;
 }
 
-bool ArmControllerRobai::setEndEffectorPose(const PoseStamped& end_effector_pose)
+bool ArmControllerRobai::setEndEffectorPose(const Pose& end_effector_pose)
 {
 	return false;
 }

@@ -65,7 +65,7 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
      * @details A stamped pose of the gripper tip.
      * @return The end effector pose.
      */
-    PoseStamped getEndEffectorPose();
+    Pose getEndEffectorPose();
 
     /**
      * @brief Sets the end effector pose.
@@ -74,7 +74,7 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
      * @param end_effector_pose The required end effector pose.
      * @return If the action was successful.
      */
-    bool setEndEffectorPose(const PoseStamped& end_effector_pose);
+    bool setEndEffectorPose(const Pose& end_effector_pose);
 
     /**
      * @brief Retrieves the end effector velocity.
