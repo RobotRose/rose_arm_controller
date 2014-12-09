@@ -1,11 +1,11 @@
 # Goal
-int32                   arm
-geometry_msgs/Twist     required_velocity
-geometry_msgs/Twist     constraint
+int32                          arm
+geometry_msgs/TwistStamped     required_velocity
+geometry_msgs/TwistStamped     constraint
 ---
 # Result
-geometry_msgs/Twist     end_velocity
+geometry_msgs/TwistStamped     end_velocity
 ---
 # Feedback
-geometry_msgs/Twist     current_velocity
-geometry_msgs/Twist     current_constraint
+geometry_msgs/TwistStamped     current_velocity
+geometry_msgs/TwistStamped     current_constraint
