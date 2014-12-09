@@ -14,11 +14,9 @@
 #define ARM_CONTROLLER_ROBAI_HPP
 
 #include <pluginlib/class_list_macros.h>
-#include <rose_arm_controller/arm_controller_base.hpp>
+#include "arm_controller_base/arm_controller_base.hpp"
 
-PLUGINLIB_EXPORT_CLASS(polygon_plugins::Triangle, polygon_base::RegularPolygon)
-
-namespace arm_controller_plugins {
+namespace arm_controller_plugins {    
 
 using geometry_msgs::PoseStamped;
 using geometry_msgs::Twist;
@@ -27,36 +25,47 @@ using geometry_msgs::Wrench;
  /**
   * @brief Provides an interface to interact with each kind of arm.
   */
-class ArmControllerRobai{
+class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
   public:
+    /**
+    * @brief  Constructor
+    */
+
+    ArmControllerRobai();
+    /**
+    * @brief  Destructor
+    */
+    ~ArmControllerRobai();
+
+    bool initialize();
 
     /**
      * @brief   Cancels the current interaction of the arm. 
      * @details Cancelling only stopts the current interaction. The arm will respond again to new input.
      * @return  If the interaction was successfully cancelled.
      */
-    virtual bool cancel() = 0;
+    bool cancel();
 
     /**
      * @brief   Stops the current interaction of the arm. 
      * @details The arm wil not respond to new inputs until resetEmergencyStop() has been called.
      * @return  If the interaction was successfully stopped.
      */
-    virtual bool emergencyStop() = 0;
+    bool emergencyStop();
 
     /**
      * @brief   Resets the emergency state to allow for new inputs.
      * @details Does not do anything if there is no emergency state.
      * @return  If the emergency state was successfully recoverd.
      */
-    virtual bool resetEmergencyStop() = 0;
+    bool resetEmergencyStop();
 
     /**
      * @brief Retrieves the position of the end effector.
      * @details A stamped pose of the gripper tip.
      * @return The end effector pose.
      */
-    virtual PoseStamped getEndEffectorPose() = 0;
+    PoseStamped getEndEffectorPose();
 
     /**
      * @brief Sets the end effector pose.
@@ -65,14 +74,14 @@ class ArmControllerRobai{
      * @param end_effector_pose The required end effector pose.
      * @return If the action was successful.
      */
-    virtual bool setEndEffectorPose(const PoseStamped& end_effector_pose) = 0;
+    bool setEndEffectorPose(const PoseStamped& end_effector_pose);
 
     /**
      * @brief Retrieves the end effector velocity.
      * @details Twist msg.
      * @return The end effector velocity in ROS twist message.
      */
-    virtual Twist getEndEffectorVelocity() = 0;
+    Twist getEndEffectorVelocity();
 
     /**
      * @brief Sets the end effector velicity.
@@ -81,31 +90,26 @@ class ArmControllerRobai{
      * @param velocity The required velocity.
      * @return Is the action was successful.
      */
-    virtual bool setEndEffectorVelocity(const Twist& velocity) = 0;
+    bool setEndEffectorVelocity(const Twist& velocity);
 
-    virtual Twist getContraints() = 0;
+    Twist getContraints();
 
-    virtual bool setContraints(const Twist& contraint) = 0;
+    bool setContraints(const Twist& contraint);
 
-    virtual bool resetContraints() = 0;
+    bool resetContraints();
 
-    virtual double getGripperWidth() = 0; // required_width in [m]
+    double getGripperWidth();
 
-    virtual bool setGripperWidth(const double required_width) = 0; // required_width in [m]
+    bool setGripperWidth(const double required_width);
 
-    virtual Wrench getEndEffectorWrench() = 0;
+    Wrench getEndEffectorWrench();
 
-    virtual bool setEndEffectorWrench(const Wrench& Wrench) = 0;
+    bool setEndEffectorWrench(const Wrench& Wrench);
 
-    // virtual bool hasMoveItInterface() = 0;
-
-    /**
-    * @brief  Virtual destructor for the interface
-    */
-    virtual ~ArmControllerBase(){}
+    // bool hasMoveItInterface();
 
   protected:
-      ArmControllerBase(){}
+      
 };
 };
 
