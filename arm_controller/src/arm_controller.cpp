@@ -59,10 +59,15 @@ ArmController::ArmController( std::string name, ros::NodeHandle n )
         }
             catch(pluginlib::PluginlibException& ex)
         {
-            ROS_ERROR("The plugin failed to load for some reason. Arm controller not added. Error received: %s", ex.what());
+            ROS_ERROR("Arm controller was not added, the plugin failed to load: %s", ex.what());
         }
     }
 
+    for (const auto& arm_controller : arm_controllers_ )
+    {
+        if ( not arm_controller->initialize() )
+            ROS_ERROR("Could not initialize arm controller" ); //! @todo MdL: Add name of the controller / arm.
+    }
     // Init member variables
     // obstacle_map_ = map<Manipulators, Pose>();
 
@@ -77,6 +82,11 @@ ArmController::ArmController( std::string name, ros::NodeHandle n )
     // // Monitor the emergency button state
     // sh_emergency_.connect(ros::Duration(0.1));
     // sh_emergency_.registerChangeCallback(boost::bind(&ArmController::CB_emergencyCancel, this,  _1));
+
+    ROS_INFO_NAMED(ROS_NAME, "Starting all servers");
+    set_position_smc_->startServer();
+    set_velocity_smc_->startServer();
+    set_gripper_width_smc_->startServer();
 
     ROS_INFO_NAMED(ROS_NAME, "Arm controller ready");
 }
