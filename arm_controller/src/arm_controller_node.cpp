@@ -15,11 +15,11 @@
 int main(int argc, char** argv)
 {
     ros::NodeHandle n;
-    ros::Rate r(100);
+    ros::Rate r(30);
 
     ros::init(argc, argv, "arm_controller");
 
-    arm_controller_core::ArmController arm_controller = new arm_controller_core::ArmController("arm_controller");
+    arm_controller_core::ArmController arm_controller = new arm_controller_core::ArmController("arm_controller", n);
 
     while (n.ok())
     {
