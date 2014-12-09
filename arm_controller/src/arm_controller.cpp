@@ -18,22 +18,21 @@ ArmController::ArmController( std::string name, ros::NodeHandle n )
     : name_ ( name )
     , n_ ( n )
     , arm_controller_plugin_loader_("arm_controller_base", "arm_controller_base::ArmControllerBase")
-    , set_position_smc_(n_, name_+"/position",
-            boost::bind(&ArmController::CB_receivePositionGoal, this, _1, _2),
-            boost::bind(&ArmController::CB_receivePositionCancel, this, _1)
-    )
-    , set_velocity_smc_(n_, name_+"/velocity",
-            boost::bind(&ArmController::CB_receiveVelocityGoal, this, _1, _2),
-            boost::bind(&ArmController::CB_receiveVelocityCancel, this, _1)
-    )
-    , set_gripper_width_smc_(n_, name_+"/gripper_width",
-            boost::bind(&ArmController::CB_receiveGripperGoal, this, _1, _2),
-            boost::bind(&ArmController::CB_receiveGripperCancel, this, _1)
-    )
     // , sh_emergency_(SharedVariable<bool>("emergency"))
     // , velocity_watchdog_("arm_velocity_watchdog", n, VELOCITY_TIMEOUT, boost::bind(&ArmController::cancelVelocityForArms, this))
 {
-    ROS_INFO_NAMED(ROS_NAME, "Starting arm controller...");
+    set_position_smc_ = new SMC_position(n_, name_+"/position",
+            boost::bind(&ArmController::CB_receivePositionGoal, this, _1, _2),
+            boost::bind(&ArmController::CB_receivePositionCancel, this, _1)
+    );
+    set_velocity_smc_ = new SMC_velocity(n_, name_+"/velocity",
+            boost::bind(&ArmController::CB_receiveVelocityGoal, this, _1, _2),
+            boost::bind(&ArmController::CB_receiveVelocityCancel, this, _1)
+    );
+    set_gripper_width_smc_ = new SMC_gripper(n_, name_+"/gripper_width",
+            boost::bind(&ArmController::CB_receiveGripperGoal, this, _1, _2),
+            boost::bind(&ArmController::CB_receiveGripperCancel, this, _1)
+    );
 
     // Load all parameters
     std::vector<std::string>    arm_plugins;
@@ -51,17 +50,17 @@ ArmController::ArmController( std::string name, ros::NodeHandle n )
     arm_controllers_.clear();
     for ( int i = 0 ; i < nr_of_arms_ ; i++)
     {
-        boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller;
-    	try
-    	{
-    		arm_controller = arm_controller_plugin_loader_.createInstance(arm_plugins[i]);
-    	}
-    		catch(pluginlib::PluginlibException& ex)
-    	{
-    		ROS_ERROR("The plugin failed to load for some reason. Error: %s", ex.what());
-    	}
+        try
+        {
+            boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller;
 
-        arm_controllers_.push_back(arm_controller);
+    		arm_controller = arm_controller_plugin_loader_.createInstance(arm_plugins[i]);
+            arm_controllers_.push_back(arm_controller);
+        }
+            catch(pluginlib::PluginlibException& ex)
+        {
+            ROS_ERROR("The plugin failed to load for some reason. Arm controller not added. Error received: %s", ex.what());
+        }
     }
 
     // Init member variables

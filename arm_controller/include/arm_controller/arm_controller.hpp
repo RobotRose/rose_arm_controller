@@ -80,9 +80,9 @@ class ArmController
     void CB_receiveGripperGoal(const rose_arm_controller_msgs::set_gripper_widthGoalConstPtr& goal, SMC_gripper* smc);
     void CB_receiveGripperCancel(SMC_gripper* smc);
 
-    SMC_position  set_position_smc_;
-    SMC_velocity  set_velocity_smc_;
-    SMC_gripper   set_gripper_width_smc_;
+    SMC_position*  set_position_smc_;
+    SMC_velocity*  set_velocity_smc_;
+    SMC_gripper*   set_gripper_width_smc_;
 
   private:
     std::string         name_;
