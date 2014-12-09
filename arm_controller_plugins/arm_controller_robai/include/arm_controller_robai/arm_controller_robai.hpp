@@ -124,7 +124,7 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
 
     // bool hasMoveItInterface();
 
-  protected:
+  private:
     enum EndEffectorMode
     {
         POINT_EE = 0,   //!< End effector is free to move in every direction
@@ -137,6 +137,12 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
                         // instance)
     };
 
+    enum ControlMode
+    {
+        POSITION,
+        VELOCITY,
+    };
+
     bool setEndEffectorMode ( const EndEffectorMode& end_effector_mode );
     EndEffectorMode getEndEffectorMode();
 
@@ -147,7 +153,11 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
     bool resetEndEffectorSet();
     bool disallowArmMovement();
 
+    void setPositionControl();
+    void setVelocityControl();
+
     EndEffectorMode end_effector_mode_;
+    ControlMode     control_mode_;
       
 };
 };

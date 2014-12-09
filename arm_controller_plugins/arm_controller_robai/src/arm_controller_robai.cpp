@@ -15,6 +15,8 @@
 namespace arm_controller_plugins {
 
 ArmControllerRobai::ArmControllerRobai()
+	: end_effector_mode_(POINT_EE)
+	, control_mode_(POSITION)
 {
 
 }
@@ -193,6 +195,36 @@ int ArmControllerRobai::getRobaiArmIndex()
 int ArmControllerRobai::getRobaiGripperIndex()
 {
     return 1;
+}
+
+void ArmControllerRobai::setPositionControl()
+{
+    if (control_mode_ == POSITION) 
+    	return;
+
+    // Control mode to set (0 for position control and 1 for velocity control)
+    if (not setControlMode(0, getRobaiArmIndex()))
+    {
+        ROS_ERROR("Could not set control mode to velocity control");
+        return;
+    }
+
+    control_mode_ = POSITION;
+}
+
+void ArmControllerRobai::setVelocityControl()
+{
+    if (control_mode_ == VELOCITY) 
+    	return;
+
+    // Control mode to set (0 for position control and 1 for velocity control)
+    if (not setControlMode(1, getRobaiArmIndex()))
+    {
+        ROS_ERROR("Could not set control mode to velocity control");
+        return;
+    }
+
+    control_mode_ = VELOCITY;
 }
 
 }; // namespace
