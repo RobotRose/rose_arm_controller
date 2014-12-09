@@ -26,81 +26,134 @@ ArmControllerRobai::~ArmControllerRobai()
 
 bool ArmControllerRobai::initialize()
 {
+	//! @todo MdL: Implement.
 	return false;
 }
 
 bool ArmControllerRobai::cancel()
 {
+	//! @todo MdL: Implement.
 	return false;
 }
 
 bool ArmControllerRobai::emergencyStop()
 {
+	//! @todo MdL: Implement.
 	return false;
 }
 
 bool ArmControllerRobai::resetEmergencyStop()
 {
+	//! @todo MdL: Implement.
 	return false;
 }
 
 Pose ArmControllerRobai::getEndEffectorPose()
 {
+	//! @todo MdL: Implement.
 	Pose pose;
 	return pose;
 }
 
 bool ArmControllerRobai::setEndEffectorPose(const Pose& end_effector_pose)
 {
+	//! @todo MdL: Implement.
 	return false;
 }
 
 Twist ArmControllerRobai::getEndEffectorVelocity()
 {
+	//! @todo MdL: Implement.
 	Twist twist;
 	return twist;
 }
 
 bool ArmControllerRobai::setEndEffectorVelocity(const Twist& velocity)
 {
+	//! @todo MdL: Implement.
 	return false;
 }
 
 Twist ArmControllerRobai::getContraints()
 {
+	//! @todo MdL: Implement.
 	Twist twist;
 	return twist;
 }
 
 bool ArmControllerRobai::setContraints(const Twist& contraint)
 {
+	//! @todo MdL: Implement.
 	return false;
 }
 
 bool ArmControllerRobai::resetContraints()
 {
+	//! @todo MdL: Implement.
 	return false;
 }
 
 double ArmControllerRobai::getGripperWidth()
 {
+	//! @todo MdL: Implement.
 	return 0.0;
 }
 
 bool ArmControllerRobai::setGripperWidth(const double required_width)
 {
+	//! @todo MdL: Implement.
 	return false;
 }
 
 Wrench ArmControllerRobai::getEndEffectorWrench()
 {
+	//! @todo MdL: Implement.
 	Wrench wrench;
 	return wrench;
 }
 
 bool ArmControllerRobai::setEndEffectorWrench(const Wrench& Wrench)
 {
+	//! @todo MdL: Implement.
 	return false;
+}
+
+bool ArmControllerRobai::setEndEffectorMode ( const ArmController::EndEffectorMode& end_effector_mode )
+{
+    ROS_DEBUG_NAMED(ROS_NAME, "Setting new end effector mode");
+    end_effector_mode_ = end_effector_mode;
+
+    return setEndEffectorSet(end_effector_mode, 0);
+}
+
+ArmController::EndEffectorMode ArmControllerRobai::getEndEffectorMode()
+{
+    return end_effector_mode_;
+}
+
+int ArmControllerRobai::getCurrentRobaiEndEffectorMode()
+{
+    return static_cast<int>(end_effector_mode_);
+}
+
+bool ArmControllerRobai::resetEndEffectorSet()
+{
+    return setEndEffectorMode(end_effector_mode_);
+}
+
+bool ArmControllerRobai::disallowArmMovement()
+{
+    return setEndEffectorMode(NO_MOVEMENT_ARM_ALLOWED);
+}
+
+int ArmControllerRobai::getRobaiArmIndex(const ArmController::Arms& arm)
+{
+    return 0;
+}
+
+int ArmControllerRobai::getRobaiGripperIndex(const ArmController::Arms& arm)
+{
+    return 1;
 }
 
 }; // namespace

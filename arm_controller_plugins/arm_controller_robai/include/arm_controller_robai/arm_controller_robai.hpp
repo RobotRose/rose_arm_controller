@@ -31,7 +31,7 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
     * @brief  Constructor
     */
     ArmControllerRobai();
-    
+
     /**
     * @brief  Destructor
     */
@@ -109,6 +109,29 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
     // bool hasMoveItInterface();
 
   protected:
+    enum EndEffectorMode
+    {
+        POINT_EE = 0,   //!< End effector is free to move in every direction
+        FREE_SPIN = 1,  //!< End effector needs to be horizontally, but can move
+                        // in the horizontal plane
+        FRAME_EE = 2,   //!< End effector must keep its end effector in the same
+                        // orientation
+        NO_MOVEMENT_ARM_ALLOWED = 3,
+        count           //!< To count all possible end effectors (used in loops for
+                        // instance)
+    };
+
+    bool setEndEffectorMode ( const EndEffectorMode& end_effector_mode );
+    EndEffectorMode getEndEffectorMode();
+
+    int getRobaiArmIndex();
+    int getRobaiGripperIndex();
+    int getCurrentRobaiEndEffectorMode();
+
+    bool resetEndEffectorSet();
+    bool disallowArmMovement();
+
+    EndEffectorMode end_effector_mode_;
       
 };
 };
