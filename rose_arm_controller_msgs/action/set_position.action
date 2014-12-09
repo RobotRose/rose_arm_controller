@@ -8,4 +8,4 @@ geometry_msgs/Pose      end_pose
 ---
 # Feedback
 geometry_msgs/Pose      current_pose
-gemetry_msgs/Twist      current_constraint
+geometry_msgs/Twist     current_constraint
