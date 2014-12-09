@@ -75,10 +75,6 @@ ArmController::ArmController( std::string name, ros::NodeHandle n )
     // attach_item_service_    = n_.advertiseService("/" + name_ + "/set_item_attachment",      &ArmController::CB_attach_item,  this);
     // query_attached_items_service_    = n_.advertiseService("/" + name_ + "/get_item_attachment",      &ArmController::CB_query_attached_items,  this);
 
-    // gaze_client_        = new GazeClient("gaze_controller", true);
-
-    // vis_pub_ = n.advertise<visualization_msgs::Marker>("visualization_marker", 0);
-
     // // Monitor the emergency button state
     // sh_emergency_.connect(ros::Duration(0.1));
     // sh_emergency_.registerChangeCallback(boost::bind(&ArmController::CB_emergencyCancel, this,  _1));
