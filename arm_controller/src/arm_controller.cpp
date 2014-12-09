@@ -19,17 +19,17 @@ ArmController::ArmController( std::string name, ros::NodeHandle n )
     , n_ ( n )
     , arm_controller_plugin_loader_("arm_controller_base", "arm_controller_base::ArmControllerBase")
     , set_position_smc_(n_, name_+"/position",
-                                    boost::bind(&ArmController::CB_receivePositionGoal, this, _1, _2),
-                                    boost::bind(&ArmController::CB_receivePositionCancel, this, _1)
-                        )
+            boost::bind(&ArmController::CB_receivePositionGoal, this, _1, _2),
+            boost::bind(&ArmController::CB_receivePositionCancel, this, _1)
+    )
     , set_velocity_smc_(n_, name_+"/velocity",
-                                    boost::bind(&ArmController::CB_receiveVelocityGoal, this, _1, _2),
-                                    boost::bind(&ArmController::CB_receiveVelocityCancel, this, _1)
-                        )
+            boost::bind(&ArmController::CB_receiveVelocityGoal, this, _1, _2),
+            boost::bind(&ArmController::CB_receiveVelocityCancel, this, _1)
+    )
     , set_gripper_width_smc_(n_, name_+"/gripper_width",
-                                    boost::bind(&ArmController::CB_receiveGripperGoal, this, _1, _2),
-                                    boost::bind(&ArmController::CB_receiveGripperCancel, this, _1)
-                        )
+            boost::bind(&ArmController::CB_receiveGripperGoal, this, _1, _2),
+            boost::bind(&ArmController::CB_receiveGripperCancel, this, _1)
+    )
     // , sh_emergency_(SharedVariable<bool>("emergency"))
     // , velocity_watchdog_("arm_velocity_watchdog", n, VELOCITY_TIMEOUT, boost::bind(&ArmController::cancelVelocityForArms, this))
 {
