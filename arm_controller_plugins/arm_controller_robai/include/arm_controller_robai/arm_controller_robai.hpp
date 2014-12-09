@@ -110,7 +110,7 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
 
     Twist getContraints();
 
-    bool setContraints(const Twist& contraint);
+    bool setContraints(const Twist& constraint);
 
     bool resetContraints();
 

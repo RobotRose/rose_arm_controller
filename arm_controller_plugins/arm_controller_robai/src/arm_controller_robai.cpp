@@ -76,21 +76,60 @@ bool ArmControllerRobai::setEndEffectorVelocity(const Twist& velocity)
 
 Twist ArmControllerRobai::getContraints()
 {
-	//! @todo MdL: Implement.
 	Twist twist;
+	if (getEndEffectorMode() == FRAME_EE)
+	{
+		//! @todo MdL: Verify.
+		twist.angular.x = 1.0;
+		twist.angular.y = 1.0;
+		twist.angular.z = 1.0;
+	}
+	else if (getEndEffectorMode() == FREE_SPIN)
+	{
+		//! @todo MdL: Verify.
+		twist.angular.x = 1.0;
+		twist.angular.y = 1.0;
+	}
+	else if (getEndEffectorMode() == POINT_EE)
+	{
+		// Do nothing (all zero values)
+	}
+	else
+		ROS_ERROR("Could not get constraints");
+	
 	return twist;
 }
 
-bool ArmControllerRobai::setContraints(const Twist& contraint)
+bool ArmControllerRobai::setContraints(const Twist& constraint)
 {
-	//! @todo MdL: Implement.
+	if (constraint.linear.x > 0)
+		ROS_WARN("The robai arm does not allow for setting linear constraints");
+	if (constraint.linear.y > 0)
+		ROS_WARN("The robai arm does not allow for setting linear constraints");
+	if (constraint.linear.z > 0)
+		ROS_WARN("The robai arm does not allow for setting linear constraints");
+	if (constraint.angular.x > 0)
+		if (constraint.angular.y > 0)
+			if (constraint.angular.z > 0)
+				return setEndEffectorMode(FRAME_EE);
+			else
+				return setEndEffectorMode(FREE_SPIN); //! @todo MdL: Verify.
+		else // angular.y == 0
+			ROS_WARN("No mode possible for angular constraint: (%f, %f, %f)", constraint.angular.x, constraint.angular.y, constraint.angular.z);
+	else
+		if (constraint.angular.y > 0)
+			ROS_WARN("No mode possible for angular constraint: (%f, %f, %f)", constraint.angular.x, constraint.angular.y, constraint.angular.z);	
+		if (constraint.angular.z > 0)
+			ROS_WARN("No mode possible for angular constraint: (%f, %f, %f)", constraint.angular.x, constraint.angular.y, constraint.angular.z);
+		return setEndEffectorMode(POINT_EE);
+
 	return false;
 }
 
 bool ArmControllerRobai::resetContraints()
 {
 	//! @todo MdL: Implement.
-	return false;
+	return setEndEffectorMode(POINT_EE);
 }
 
 double ArmControllerRobai::getGripperWidth()
