@@ -46,8 +46,8 @@ bool ArmControllerRobai::resetEmergencyStop()
 
 Pose ArmControllerRobai::getEndEffectorPose()
 {
-	PoseStamped pose_stamped;
-	return pose_stamped;
+	Pose pose;
+	return pose;
 }
 
 bool ArmControllerRobai::setEndEffectorPose(const Pose& end_effector_pose)

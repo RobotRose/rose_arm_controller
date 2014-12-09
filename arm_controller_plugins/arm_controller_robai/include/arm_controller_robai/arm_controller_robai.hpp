@@ -18,7 +18,7 @@
 
 namespace arm_controller_plugins {    
 
-using geometry_msgs::PoseStamped;
+using geometry_msgs::Pose;
 using geometry_msgs::Twist;
 using geometry_msgs::Wrench;
 
@@ -30,8 +30,8 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
     /**
     * @brief  Constructor
     */
-
     ArmControllerRobai();
+    
     /**
     * @brief  Destructor
     */
