@@ -118,15 +118,15 @@ bool ArmControllerRobai::setEndEffectorWrench(const Wrench& Wrench)
 	return false;
 }
 
-bool ArmControllerRobai::setEndEffectorMode ( const ArmController::EndEffectorMode& end_effector_mode )
+bool ArmControllerRobai::setEndEffectorMode ( const ArmControllerRobai::EndEffectorMode& end_effector_mode )
 {
-    ROS_DEBUG_NAMED(ROS_NAME, "Setting new end effector mode");
+    ROS_DEBUG("Setting new end effector mode");
     end_effector_mode_ = end_effector_mode;
 
     return setEndEffectorSet(end_effector_mode, 0);
 }
 
-ArmController::EndEffectorMode ArmControllerRobai::getEndEffectorMode()
+ArmControllerRobai::EndEffectorMode ArmControllerRobai::getEndEffectorMode()
 {
     return end_effector_mode_;
 }
@@ -146,12 +146,12 @@ bool ArmControllerRobai::disallowArmMovement()
     return setEndEffectorMode(NO_MOVEMENT_ARM_ALLOWED);
 }
 
-int ArmControllerRobai::getRobaiArmIndex(const ArmController::Arms& arm)
+int ArmControllerRobai::getRobaiArmIndex()
 {
     return 0;
 }
 
-int ArmControllerRobai::getRobaiGripperIndex(const ArmController::Arms& arm)
+int ArmControllerRobai::getRobaiGripperIndex()
 {
     return 1;
 }
