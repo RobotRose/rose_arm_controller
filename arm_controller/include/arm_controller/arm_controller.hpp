@@ -65,8 +65,8 @@ class ArmController
 
     /**
      * Constructor
-     * @param name Node name
-     * @param n Node handle
+     * @param name  Node name
+     * @param n     Node handle
      */
     ArmController(std::string name, ros::NodeHandle n);
 
