@@ -16,6 +16,7 @@
 #include <iostream>
 #include <stdio.h>
 
+#include <boost/lexical_cast.hpp>
 #include <pluginlib/class_loader.h>
 #include <ros/ros.h>
 #include <tf/transform_listener.h>
@@ -23,7 +24,14 @@
 #include "arm_controller_base/arm_controller_base.hpp"
 
 #include "rose20_common/common.hpp"
-// #include "rose20_common/server_multiple_client/server_multiple_client.hpp"
+#include "rose20_common/server_multiple_client/server_multiple_client.hpp"
+
+#include "rose_arm_controller_msgs/set_positionAction.h"
+#include "rose_arm_controller_msgs/set_positionGoal.h"
+#include "rose_arm_controller_msgs/set_velocityAction.h"
+#include "rose_arm_controller_msgs/set_velocityGoal.h"
+#include "rose_arm_controller_msgs/set_gripper_widthAction.h"
+#include "rose_arm_controller_msgs/set_gripper_widthGoal.h"
 
 // #include "action_result_message.hpp"
 
@@ -49,6 +57,9 @@ using std::vector;
 class ArmController
 {
   public:
+    typedef ServerMultipleClient<rose_arm_controller_msgs::set_positionAction>      SMC_position;
+    typedef ServerMultipleClient<rose_arm_controller_msgs::set_velocityAction>      SMC_velocity;
+    typedef ServerMultipleClient<rose_arm_controller_msgs::set_gripper_widthAction> SMC_gripper;
 
     /**
      * Constructor
@@ -62,16 +73,26 @@ class ArmController
      */
     ~ArmController();
 
-    // ServerMultipleClient<arm_controller::manipulateAction>             set_position_smc_;
-    // ServerMultipleClient<arm_controller::manipulateAction>             set_velocity_smc_;
-    // ServerMultipleClient<arm_controller::manipulateAction>             set_gripper_width_smc_;
+    void CB_receivePositionGoal(const rose_arm_controller_msgs::set_positionGoalConstPtr& goal, SMC_position* smc);
+    void CB_receivePositionCancel(SMC_position* smc);
+    void CB_receiveVelocityGoal(const rose_arm_controller_msgs::set_velocityGoalConstPtr& goal, SMC_velocity* smc);
+    void CB_receiveVelocityCancel(SMC_velocity* smc);
+    void CB_receiveGripperGoal(const rose_arm_controller_msgs::set_gripper_widthGoalConstPtr& goal, SMC_gripper* smc);
+    void CB_receiveGripperCancel(SMC_gripper* smc);
+
+    SMC_position  set_position_smc_;
+    SMC_velocity  set_velocity_smc_;
+    SMC_gripper   set_gripper_width_smc_;
 
   private:
     std::string         name_;
     ros::NodeHandle     n_;
 
-    pluginlib::ClassLoader<arm_controller_base::ArmControllerBase> arm_controller_plugin_loader_;
-    
+    int                 nr_of_arms_;
+
+    pluginlib::ClassLoader<arm_controller_base::ArmControllerBase>          arm_controller_plugin_loader_;
+    std::vector<boost::shared_ptr<arm_controller_base::ArmControllerBase>>  arm_controllers_;
+
     // rose::Watchdog      velocity_watchdog_;
 }; // ArmController
 }; //namespace
