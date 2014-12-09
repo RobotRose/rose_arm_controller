@@ -23,14 +23,17 @@ add_message_files(
 
 # Generate services in the 'srv' folder
 add_service_files(
-  FILES
-  #Service1.srv
+	FILES
+		emergency_stop.srv
+		reset_emergency_stop.srv
 )
 
 # Generate actions in the 'action' folder
 add_action_files(
-  FILES
-  #Action1.action
+	FILES
+		set_position.action
+		set_velocity.action
+		set_gripper_width.action
 )
 
 # Generate added messages and services with any dependencies listed here

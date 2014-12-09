@@ -1,0 +1,11 @@
+# Goal
+int32                   arm
+geometry_msgs/Pose      required_pose
+geometry_msgs/Twist     constraint
+---
+# Result
+geometry_msgs/Pose      end_pose
+---
+# Feedback
+geometry_msgs/Pose      current_pose
+gemetry_msgs/Twist      current_constraint

@@ -1,0 +1,9 @@
+# Goal
+int32                   arm
+float64                 required_width
+---
+# Result
+float64                 end_width
+---
+# Feedback
+float64                 current_width

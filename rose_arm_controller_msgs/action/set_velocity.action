@@ -1,0 +1,11 @@
+# Goal
+int32                   arm
+geometry_msgs/Twist     required_velocity
+geometry_msgs/Twist     constraint
+---
+# Result
+geometry_msgs/Twist     end_velocity
+---
+# Feedback
+geometry_msgs/Twist     current_velocity
+geometry_msgs/Twist     current_constraint
