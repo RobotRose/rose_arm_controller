@@ -9,6 +9,7 @@ find_package(catkin
 		message_generation 
 		actionlib_msgs 
 		geometry_msgs
+		std_msgs
 )
 
 ################################################
