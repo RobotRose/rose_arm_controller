@@ -21,6 +21,7 @@
 namespace arm_controller_base {
 
 using geometry_msgs::PoseStamped;
+using geometry_msgs::Pose;
 using geometry_msgs::Twist;
 using geometry_msgs::Wrench;
 
@@ -62,7 +63,7 @@ class ArmControllerBase {
      * @details A stamped pose of the gripper tip.
      * @return The end effector pose.
      */
-    virtual PoseStamped getEndEffectorPose() = 0;
+    virtual Pose getEndEffectorPose() = 0;
 
     /**
      * @brief Sets the end effector pose.
@@ -71,7 +72,7 @@ class ArmControllerBase {
      * @param end_effector_pose The required end effector pose.
      * @return If the action was successful.
      */
-    virtual bool setEndEffectorPose(const PoseStamped& end_effector_pose) = 0;
+    virtual bool setEndEffectorPose(const Pose& end_effector_pose) = 0;
 
     /**
      * @brief Retrieves the end effector velocity.
