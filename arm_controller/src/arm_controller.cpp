@@ -19,7 +19,7 @@ ArmController::ArmController( std::string name, ros::NodeHandle n )
     , n_ ( n )
     , arm_controller_plugin_loader_("arm_controller_base", "arm_controller_base::ArmControllerBase")
     , sh_emergency_(SharedVariable<bool>("emergency"))
-    , velocity_watchdog_("arm_velocity_watchdog", n, VELOCITY_TIMEOUT, boost::bind(&ArmController::cancelVelocityForArms, this))
+    , velocity_watchdog_("arm_velocity_watchdog", n, VELOCITY_TIMEOUT, boost::bind(&ArmController::CB_cancelVelocityForArms, this))
 {
     set_position_smc_ = new SMC_position(n_, name_+"/position",
             boost::bind(&ArmController::CB_receivePositionGoal, this, _1, _2),
@@ -128,7 +128,12 @@ void ArmController::CB_receiveGripperCancel(SMC_gripper* smc)
 
 }
 
-void ArmController::cancelVelocityForArms()
+void ArmController::CB_cancelVelocityForArms()
+{
+
+}
+
+void ArmController::CB_emergencyCancel(const bool& new_value)
 {
 
 }

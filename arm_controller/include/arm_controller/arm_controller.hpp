@@ -47,6 +47,7 @@ namespace arm_controller_core {
 using geometry_msgs::Pose;
 using geometry_msgs::Vector3;
 using geometry_msgs::Twist;
+using shared_variables::SharedVariable;
 using std::find;
 using std::map;
 using std::vector;
@@ -80,13 +81,14 @@ class ArmController
     void CB_receiveVelocityCancel(SMC_velocity* smc);
     void CB_receiveGripperGoal(const rose_arm_controller_msgs::set_gripper_widthGoalConstPtr& goal, SMC_gripper* smc);
     void CB_receiveGripperCancel(SMC_gripper* smc);
-
+    
     SMC_position*  set_position_smc_;
     SMC_velocity*  set_velocity_smc_;
     SMC_gripper*   set_gripper_width_smc_;
 
   private:
-    void cancelVelocityForArms();
+    void CB_cancelVelocityForArms();
+    void CB_emergencyCancel(const bool& new_value);
 
     std::string         name_;
     ros::NodeHandle     n_;
@@ -96,7 +98,9 @@ class ArmController
     pluginlib::ClassLoader<arm_controller_base::ArmControllerBase>          arm_controller_plugin_loader_;
     std::vector<boost::shared_ptr<arm_controller_base::ArmControllerBase>>  arm_controllers_;
 
-    // rose::Watchdog      velocity_watchdog_;
+    SharedVariable<bool>    sh_emergency_;      //!< Shared variable
+    rose::Watchdog          velocity_watchdog_; //!< Watchdog for velocities
+
 }; // ArmController
 }; //namespace
 #endif  // ARM_CONTROLLER_HPP
