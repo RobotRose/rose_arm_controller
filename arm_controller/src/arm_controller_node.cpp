@@ -15,15 +15,15 @@
 int main(int argc, char** argv)
 {
     ROS_INFO("Starting arm controller...");
+    ros::init(argc, argv, "arm_controller");
+    
     ros::NodeHandle n;
     ros::Rate r(30);
-
-    ros::init(argc, argv, "arm_controller");
 
     arm_controller_core::ArmController* arm_controller = new arm_controller_core::ArmController("arm_controller", n);
 
     ROS_INFO("Arm controller started.");
-    
+
     while (n.ok())
     {
         ros::spinOnce();
