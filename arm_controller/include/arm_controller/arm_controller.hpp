@@ -88,6 +88,8 @@ class ArmController
 
     bool stopArmMovement(const boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller);
 
+    void testMovementGrippers();
+
     std::string         name_;
     ros::NodeHandle     n_;
 

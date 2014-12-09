@@ -45,6 +45,9 @@ ArmController::ArmController( std::string name, ros::NodeHandle n )
         n_.param<std::string>(parameter, plugin_name, "arm_controller_plugins::ArmControllerRobai");
         arm_plugins.push_back(plugin_name);
     }
+
+    bool allow_first_movement;
+    n_.param("/arm_controller/allow_first_movement", allow_first_movement, true);
     
     // Load plugins, add arm controllers
     arm_controllers_.clear();
@@ -84,6 +87,9 @@ ArmController::ArmController( std::string name, ros::NodeHandle n )
     set_position_smc_->startServer();
     set_velocity_smc_->startServer();
     set_gripper_width_smc_->startServer();
+
+    if (allow_first_movement)
+        testMovementGrippers();
 
     ROS_INFO_NAMED(ROS_NAME, "Arm controller ready");
 }
@@ -217,6 +223,16 @@ bool ArmController::stopArmMovement(const boost::shared_ptr<arm_controller_base:
         return true;
     else
         return false;
+}
+
+void ArmController::testMovementGrippers()
+{
+    // Open and close the grippers
+    for ( const auto& arm_controller : arm_controllers_ )
+    {
+        arm_controller->setGripperWidth(0.02); //0.02 m
+        arm_controller->setGripperWidth(0.08); //0.08 m
+    }
 }
 
 }; // namespace
