@@ -32,19 +32,19 @@ target_link_libraries(arm_controller
 	${catkin_LIBRARIES}
 )
 
-# install(
-# 	DIRECTORY 
-# 		launch
-# 	DESTINATION 
-# 		${CATKIN_PACKAGE_SHARE_DESTINATION}
-# 	USE_SOURCE_PERMISSIONS
-# )
+install(
+	DIRECTORY 
+		launch
+	DESTINATION 
+		${CATKIN_PACKAGE_SHARE_DESTINATION}
+	USE_SOURCE_PERMISSIONS
+)
 
-# install(
-#     TARGETS
-#         arm_controller
-#     LIBRARY DESTINATION 
-#     	${CATKIN_PACKAGE_LIB_DESTINATION}
-#     RUNTIME DESTINATION 
-#     	${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(
+    TARGETS
+        arm_controller
+    LIBRARY DESTINATION 
+    	${CATKIN_PACKAGE_LIB_DESTINATION}
+    RUNTIME DESTINATION 
+    	${CATKIN_PACKAGE_BIN_DESTINATION}
+)
