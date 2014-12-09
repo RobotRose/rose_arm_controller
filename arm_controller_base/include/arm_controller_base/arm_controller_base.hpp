@@ -31,6 +31,12 @@ class ArmControllerBase {
   public:
 
     /**
+     * @brief Initializes all that is needed to control the arm
+     * @details For instance: A Robai arm should connect to a certain ip address.
+     * @return If initialization was successful.
+     */
+    virtual bool initialize() = 0;
+    /**
      * @brief   Cancels the current interaction of the arm. 
      * @details Cancelling only stopts the current interaction. The arm will respond again to new input.
      * @return  If the interaction was successfully cancelled.
