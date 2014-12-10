@@ -102,11 +102,11 @@ class ArmControllerBase {
      */
     virtual bool setEndEffectorVelocity(const Twist& velocity) = 0;
 
-    virtual Twist getContraints() = 0;
+    virtual Twist getConstraints() = 0;
 
-    virtual bool setContraints(const Twist& contraint) = 0;
+    virtual bool setConstraints(const Twist& contraint) = 0;
 
-    virtual bool resetContraints() = 0;
+    virtual bool resetConstraints() = 0;
 
     virtual double getGripperWidth() = 0; // required_width in [m]
 

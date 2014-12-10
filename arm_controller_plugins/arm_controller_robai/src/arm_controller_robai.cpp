@@ -107,7 +107,7 @@ bool ArmControllerRobai::setEndEffectorVelocity(const Twist& velocity)
 	return true;
 }
 
-Twist ArmControllerRobai::getContraints()
+Twist ArmControllerRobai::getConstraints()
 {
 	Twist twist;
 	if (getEndEffectorMode() == FRAME_EE)
@@ -133,10 +133,10 @@ Twist ArmControllerRobai::getContraints()
 	return twist;
 }
 
-bool ArmControllerRobai::setContraints(const Twist& constraint)
+bool ArmControllerRobai::setConstraints(const Twist& constraint)
 {
-	ROS_INFO("ArmControllerRobai::setContraints");
-	
+	ROS_INFO("setConstraints request received");
+
 	if (constraint.linear.x > 0)
 		ROS_WARN("The robai arm does not allow for setting linear constraints");
 	if (constraint.linear.y > 0)
@@ -161,7 +161,7 @@ bool ArmControllerRobai::setContraints(const Twist& constraint)
 	return false;
 }
 
-bool ArmControllerRobai::resetContraints()
+bool ArmControllerRobai::resetConstraints()
 {
 	return setEndEffectorMode(POINT_EE);
 }

@@ -230,7 +230,7 @@ void ArmController::CB_receivePositionGoal(const rose_arm_controller_msgs::set_p
     Pose goal_pose =        goal->required_pose.pose;
     Twist goal_constraint = goal->constraint.twist;
 
-    arm_controller->setContraints(goal_constraint);
+    arm_controller->setConstraints(goal_constraint);
     arm_controller->setEndEffectorPose(goal_pose);
 }
 
@@ -269,7 +269,7 @@ void ArmController::CB_receiveVelocityGoal(const rose_arm_controller_msgs::set_v
     Twist goal_twist        = goal->required_velocity.twist;
     Twist goal_constraint   = goal->constraint.twist;
 
-    arm_controller->setContraints(goal_constraint);
+    arm_controller->setConstraints(goal_constraint);
     arm_controller->setEndEffectorVelocity(goal_twist);
 }
 

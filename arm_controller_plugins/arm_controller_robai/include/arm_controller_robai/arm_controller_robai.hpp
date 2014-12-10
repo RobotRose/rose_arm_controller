@@ -106,11 +106,11 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
      */
     bool setEndEffectorVelocity(const Twist& velocity);
 
-    Twist getContraints();
+    Twist getConstraints();
 
-    bool setContraints(const Twist& constraint);
+    bool setConstraints(const Twist& constraint);
 
-    bool resetContraints();
+    bool resetConstraints();
 
     double getGripperWidth();
 
