@@ -112,9 +112,12 @@ void ArmController::loadArmPlugins()
 
 void ArmController::initializeArmControllers()
 {
+    ROS_INFO("Initializing arm controllers...");
     for (const auto& arm_controller : arm_controllers_ )
         if ( not arm_controller->initialize() )
             ROS_ERROR("Could not initialize arm controller" ); //! @todo MdL: Add name of the controller / arm.
+
+    ROS_INFO("Done.");
 }
 
 void ArmController::registerSharedVariables()
