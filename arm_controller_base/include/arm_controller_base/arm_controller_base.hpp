@@ -13,10 +13,13 @@
 #ifndef ARM_CONTROLLER_BASE_HPP
 #define ARM_CONTROLLER_BASE_HPP
 
+#include <ros/ros.h>
+
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/Wrench.h>
-#include <costmap_2d/costmap_2d_ros.h>
+#include <sensor_msgs/JointState.h>
 
 namespace arm_controller_base {
 
@@ -24,6 +27,7 @@ using geometry_msgs::PoseStamped;
 using geometry_msgs::Pose;
 using geometry_msgs::Twist;
 using geometry_msgs::Wrench;
+using sensor_msgs::JointState;
 
  /**
   * @brief Provides an interface to interact with each kind of arm.
@@ -111,6 +115,8 @@ class ArmControllerBase {
     virtual Wrench getEndEffectorWrench() = 0;
 
     virtual bool setEndEffectorWrench(const Wrench& Wrench) = 0;
+
+    virtual JointState getJointStates() = 0;
 
     // virtual bool hasMoveItInterface() = 0;
 

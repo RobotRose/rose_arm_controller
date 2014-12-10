@@ -30,8 +30,9 @@ bool ArmControllerRobai::initialize()
 {
 	ROS_INFO("Initializing Robai arm...");
 
+	connectToArms();
+
 	ROS_INFO("Done");
-	//! @todo MdL: Implement.
 	return false;
 }
 
@@ -168,20 +169,58 @@ bool ArmControllerRobai::setEndEffectorWrench(const Wrench& Wrench)
 	return false;
 }
 
+JointState ArmControllerRobai::getJointStates()
+{
+	//! @todo MdL: Implement.
+	JointState joint_states;
+	return joint_states;
+}
+
+void ArmControllerRobai::connectToArms(const std::string ip)
+{
+    ROS_INFO("Connecting to arms...");
+
+    ros::Rate r(1);
+
+    bool connected = false;
+    while (not connected)
+    {
+        try
+        {
+            if (init(ip))
+            {
+                connected = true;
+                ROS_DEBUG("Connected to ip %s", ip.c_str());
+            }
+        }
+        catch (const boost::thread_interrupted& ex)
+        {
+            ROS_ERROR("Received a boost::thread_interrupted exception");
+
+            ROS_DEBUG("Could not connect to ip %s", ip.c_str());
+            ROS_DEBUG("Retrying");
+        }
+
+        r.sleep();
+    }
+    ROS_INFO("Connected!");
+}
+
 bool ArmControllerRobai::setEndEffectorMode ( const ArmControllerRobai::EndEffectorMode& end_effector_mode )
 {
     ROS_DEBUG("Setting new end effector mode");
 
 	if (end_effector_mode_ == end_effector_mode) 
-    	return;
+    	return true;
     
     if ( not setEndEffectorSet(end_effector_mode, getRobaiArmIndex()))
     {
      	ROS_ERROR("Could not set end effector mode");
-        return;
+        return false;
     }
     
     end_effector_mode_ = end_effector_mode;
+    return true;
 }
 
 ArmControllerRobai::EndEffectorMode ArmControllerRobai::getEndEffectorMode()
@@ -189,7 +228,7 @@ ArmControllerRobai::EndEffectorMode ArmControllerRobai::getEndEffectorMode()
     return end_effector_mode_;
 }
 
-int ArmControllerRobai::getCurrentRobaiEndEffectorMode()
+int ArmControllerRobai::getRobaiEndEffectorMode()
 {
     return static_cast<int>(end_effector_mode_);
 }
@@ -214,34 +253,36 @@ int ArmControllerRobai::getRobaiGripperIndex()
     return 1;
 }
 
-void ArmControllerRobai::setPositionControl()
+bool ArmControllerRobai::setPositionControl()
 {
     if (control_mode_ == POSITION) 
-    	return;
+    	return true;
 
     // Control mode to set (0 for position control and 1 for velocity control)
     if (not setControlMode(0, getRobaiArmIndex()))
     {
         ROS_ERROR("Could not set control mode to velocity control");
-        return;
+        return false;
     }
 
     control_mode_ = POSITION;
+    return true;
 }
 
-void ArmControllerRobai::setVelocityControl()
+bool ArmControllerRobai::setVelocityControl()
 {
     if (control_mode_ == VELOCITY) 
-    	return;
+    	return true;
 
     // Control mode to set (0 for position control and 1 for velocity control)
     if (not setControlMode(1, getRobaiArmIndex()))
     {
         ROS_ERROR("Could not set control mode to velocity control");
-        return;
+        return false;
     }
 
     control_mode_ = VELOCITY;
+    return true;
 }
 
 }; // namespace

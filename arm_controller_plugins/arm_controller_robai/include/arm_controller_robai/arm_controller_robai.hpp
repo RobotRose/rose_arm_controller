@@ -17,18 +17,6 @@
 #include "arm_controller_base/arm_controller_base.hpp"
 
 //robai
-// #include <manipulationActionExecPlugin/manipulationActionExecPlugin.h>
-// #include <plugins/ecIOParams.h>
-// #include <xml/ecXmlObjectReaderWriter.h>
-// #include "control/ecEndEffectorSet.h"
-// #include "control/ecFrameEndEffector.h"
-// #include "control/ecManipEndEffectorPlace.h"
-// #include "foundCommon/ecCoordSysXForm.h"
-// #include "foundCore/ecApplication.h"
-// #include "foundCore/ecMacros.h"
-// #include "foundCore/ecTypes.h"
-// #include "manipulation/ecManipulationActionManager.h"
-// #include "manipulation/ecPathAction.h"
 #include "remoteCommand/ecRemoteCommand.h"
 #include "remoteCommandClientPlugin/remoteCommandPlugin.h"
 
@@ -37,6 +25,8 @@ namespace arm_controller_plugins {
 using geometry_msgs::Pose;
 using geometry_msgs::Twist;
 using geometry_msgs::Wrench;
+using sensor_msgs::JointState;
+
 using namespace Ec;
  /**
   * @brief Provides an interface to interact with each kind of arm.
@@ -129,6 +119,8 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
 
     bool setEndEffectorWrench(const Wrench& Wrench);
 
+    JointState getJointStates();
+
     // bool hasMoveItInterface();
 
   private:
@@ -150,18 +142,20 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
         VELOCITY,
     };
 
-    bool setEndEffectorMode ( const EndEffectorMode& end_effector_mode );
+    void connectToArms(const std::string ip = "127.0.0.1");
+
     EndEffectorMode getEndEffectorMode();
+    bool setEndEffectorMode ( const EndEffectorMode& end_effector_mode );
 
     int getRobaiArmIndex();
     int getRobaiGripperIndex();
-    int getCurrentRobaiEndEffectorMode();
+    int getRobaiEndEffectorMode();
 
     bool resetEndEffectorSet();
     bool disallowArmMovement();
 
-    void setPositionControl();
-    void setVelocityControl();
+    bool setPositionControl();
+    bool setVelocityControl();
 
     EndEffectorMode end_effector_mode_;
     ControlMode     control_mode_;
