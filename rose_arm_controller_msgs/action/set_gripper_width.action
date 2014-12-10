@@ -1,5 +1,5 @@
 # Goal
-int32                   arm
+string                  arm
 float64                 required_width
 ---
 # Result

@@ -81,40 +81,51 @@ void ArmController::loadArmParameters()
 {
     arm_plugins_.clear();
 
-    n_.param("/arm_controller/number_of_arms", nr_of_arms_, 1);
-    for ( int i = 0 ; i < nr_of_arms_ ; i++ )
+    if (n_.hasParam("plugins"))
     {
-        std::string plugin_name;
-        std::string parameter = "/arm_controller/plugin"+boost::lexical_cast<std::string>(i);
-        n_.param<std::string>(parameter, plugin_name, "arm_controller_plugins::ArmControllerRobai");
-        arm_plugins_.push_back(plugin_name);
+        XmlRpc::XmlRpcValue parameter_list;
+        n_.getParam("plugins", parameter_list);
+        for (int32_t i = 0; i < parameter_list.size(); ++i)
+        {
+            std::string plugin_name = static_cast<std::string>(parameter_list[i]["name"]);
+            std::string plugin_type = static_cast<std::string>(parameter_list[i]["type"]);
+            ROS_INFO("Using plugin %s with type %s", plugin_name.c_str(), plugin_type.c_str());
+
+            arm_plugins_[plugin_name] = plugin_type;
+        }
     }
+    else
+        ROS_ERROR("Could not retrieve plugins parameter");
 }
 
 void ArmController::loadArmPlugins()
 {
+    ROS_INFO("Loading %d plugins", (int)arm_plugins_.size());
+
     arm_controllers_.clear();
-    for ( int i = 0 ; i < nr_of_arms_ ; i++)
+    for( const auto& arm_plugin : arm_plugins_ ) 
     {
         try
         {
             boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller;
 
-            arm_controller = arm_controller_plugin_loader_.createInstance(arm_plugins_[i]);
-            arm_controllers_.push_back(arm_controller);
+            arm_controller = arm_controller_plugin_loader_.createInstance(arm_plugin.second);
+            arm_controllers_[arm_plugin.first] = arm_controller;
         }
         catch(pluginlib::PluginlibException& ex)
         {
             ROS_ERROR("Arm controller was not added, the plugin failed to load: %s", ex.what());
         }
     }
+
+    ROS_INFO("Loaded %d arm_controllers", (int)arm_controllers_.size());
 }
 
 void ArmController::initializeArmControllers()
 {
     ROS_INFO("Initializing arm controllers...");
     for (const auto& arm_controller : arm_controllers_ )
-        if ( not arm_controller->initialize() )
+        if ( not arm_controller.second->initialize() )
             ROS_ERROR("Could not initialize arm controller" ); //! @todo MdL: Add name of the controller / arm.
 
     ROS_INFO("Done.");
@@ -130,7 +141,7 @@ void ArmController::registerSharedVariables()
 void ArmController::testArmMovement()
 {
     bool allow_first_movement;
-    n_.param("/arm_controller/allow_first_movement", allow_first_movement, true);
+    n_.param("/allow_first_movement", allow_first_movement, true);
 
     if (allow_first_movement)
         testMovementGrippers();
@@ -139,7 +150,7 @@ void ArmController::testArmMovement()
 void ArmController::closeAllArmControllers()
 {
     for (const auto& arm_controller : arm_controllers_ )
-        if ( not arm_controller->close() )
+        if ( not arm_controller.second->close() )
             ROS_ERROR("Could not close arm controller" ); //! @todo MdL: Add name of the controller / arm.
 }
 
@@ -166,8 +177,8 @@ void ArmController::testMovementGrippers()
     // Open and close the grippers
     for ( const auto& arm_controller : arm_controllers_ )
     {
-        arm_controller->setGripperWidth(0.02); //0.02 m
-        arm_controller->setGripperWidth(0.08); //0.08 m
+        arm_controller.second->setGripperWidth(0.02); //0.02 m
+        arm_controller.second->setGripperWidth(0.08); //0.08 m
     }
 }
 
@@ -265,7 +276,7 @@ void ArmController::CB_cancelVelocityForArms()
 {
     // Stop all arm velocities
     for ( const auto& arm_controller : arm_controllers_ )
-        if ( not stopArmMovement(arm_controller))
+        if ( not stopArmMovement(arm_controller.second))
             ROS_ERROR("Could not stop arm movement");
 }
 
@@ -273,10 +284,10 @@ void ArmController::CB_emergency(const bool& emergency)
 {
     if(emergency)
         for ( const auto& arm_controller : arm_controllers_ )
-            arm_controller->emergencyStop();
+            arm_controller.second->emergencyStop();
     else
         for ( const auto& arm_controller : arm_controllers_ )
-            arm_controller->resetEmergencyStop();
+            arm_controller.second->resetEmergencyStop();
 }
 
 }; // namespace

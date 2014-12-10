@@ -1,0 +1,5 @@
+allow_first_movement: true
+plugins: 
+  - {name: robai_left,  type: "arm_controller_plugins::ArmControllerRobai"}
+  - {name: robai_right, type: "arm_controller_plugins::ArmControllerRobai"}
+  # - {name: mico,   type: "arm_controller_plugins::ArmControllerMico"}

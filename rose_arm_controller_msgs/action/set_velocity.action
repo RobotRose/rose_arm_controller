@@ -1,5 +1,5 @@
 # Goal
-int32                          arm
+string                         arm
 geometry_msgs/TwistStamped     required_velocity
 geometry_msgs/TwistStamped     constraint
 ---

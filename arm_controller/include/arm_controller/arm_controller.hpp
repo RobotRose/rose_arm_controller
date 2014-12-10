@@ -104,15 +104,15 @@ class ArmController
     std::string         name_;
     ros::NodeHandle     n_;
 
-    int                         nr_of_arms_;
-    std::vector<std::string>    arm_plugins_;
+    int                                     nr_of_arms_;
+    std::map<std::string, std::string>      arm_plugins_;
 
     SMC_position*  set_position_smc_;
     SMC_velocity*  set_velocity_smc_;
     SMC_gripper*   set_gripper_width_smc_;
 
     pluginlib::ClassLoader<arm_controller_base::ArmControllerBase>          arm_controller_plugin_loader_;
-    std::vector<boost::shared_ptr<arm_controller_base::ArmControllerBase>>  arm_controllers_;
+    std::map<std::string, boost::shared_ptr<arm_controller_base::ArmControllerBase>>  arm_controllers_;
 
     SharedVariable<bool>    sh_emergency_;      //!< Shared variable
     rose::Watchdog          velocity_watchdog_; //!< Watchdog for velocities
