@@ -14,7 +14,9 @@
   <run_depend>rose_arm_controller_msgs</run_depend>
   <run_depend>arm_controller</run_depend>
   <run_depend>arm_controller_base</run_depend>
-  <run_depend>arm_controller_plugins</run_depend>
+  <run_depend>arm_controller_robai</run_depend>
+  <!-- <run_depend>arm_controller_mico</run_depend> -->
+
   <export>
     <metapackage />
   </export>
