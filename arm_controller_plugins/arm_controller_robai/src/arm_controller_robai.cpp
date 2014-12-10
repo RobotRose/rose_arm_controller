@@ -82,8 +82,33 @@ Twist ArmControllerRobai::getEndEffectorVelocity()
 
 bool ArmControllerRobai::setEndEffectorVelocity(const Twist& velocity)
 {
-	//! @todo MdL: Implement.
-	return false;
+	ROS_DEBUG("ArmControllerRobai::setVelocity: (%f,%f,%f):(%f,%f,%f)",
+                    velocity.linear.x, velocity.linear.y, velocity.linear.z, velocity.angular.x,
+                    velocity.angular.y, velocity.angular.z);
+
+    if ( not setVelocityControl())
+    	return false;
+
+    if (getEndEffectorMode() != FRAME_EE) 
+    	if ( not setEndEffectorMode(FRAME_EE))
+    		return false;
+
+    std::vector<double> velocity_vector;
+    velocity_vector.push_back(velocity.linear.x);
+    velocity_vector.push_back(velocity.linear.y);
+    velocity_vector.push_back(velocity.linear.z);
+
+    velocity_vector.push_back(velocity.angular.x);
+    velocity_vector.push_back(velocity.angular.y);
+    velocity_vector.push_back(velocity.angular.z);
+
+    if (not setDesiredVelocity(velocity_vector, ARM, getRobaiArmIndex()))
+    {
+        ROS_ERROR("Could not set desired velocity");
+        return false;
+    }
+
+	return true;
 }
 
 Twist ArmControllerRobai::getContraints()

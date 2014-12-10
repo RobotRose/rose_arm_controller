@@ -124,6 +124,7 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
     // bool hasMoveItInterface();
 
   private:
+    // Robai modes, one-to-one mapping with the cyton file
     enum EndEffectorMode
     {
         POINT_EE = 0,   //!< End effector is free to move in every direction
@@ -134,6 +135,16 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
         NO_MOVEMENT_ARM_ALLOWED = 3,
         count           //!< To count all possible end effectors (used in loops for
                         // instance)
+    };
+
+    // Robai manipulators, one-to-one mapping with the cyton file
+    enum Manipulators
+    {
+        ARM = 0,    //!< Arm manipulator
+        BODY = 1,   //!< Body manipulator
+        TABLE = 2,  //!< Table manipulator
+        BOX = 3,    //!< Box manipulator
+        last
     };
 
     enum ControlMode
