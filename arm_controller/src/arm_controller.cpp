@@ -21,6 +21,48 @@ ArmController::ArmController( std::string name, ros::NodeHandle n )
     , sh_emergency_(SharedVariable<bool>("emergency"))
     , velocity_watchdog_("arm_velocity_watchdog", n, VELOCITY_TIMEOUT, boost::bind(&ArmController::CB_cancelVelocityForArms, this))
 {
+    ROS_INFO_NAMED(ROS_NAME, "Starting arm controller...");
+
+    // Create server multiple clients
+    createSMCs();
+
+    // Load all parameters    
+    loadArmParameters();
+
+    // Load plugins filling arm_controllers
+    loadArmPlugins();
+
+    // Initialize all arm controllers
+    initializeArmControllers();
+
+    // // Enable services / clients / publishers
+    // toggle_service_         = n_.advertiseService("/" + name_ + "/toggle_visual_correction", &ArmController::CB_toggle, this);
+    // reset_service_          = n_.advertiseService("/" + name_ + "/reset_visual_correction",  &ArmController::CB_reset,  this);
+    // attach_item_service_    = n_.advertiseService("/" + name_ + "/set_item_attachment",      &ArmController::CB_attach_item,  this);
+    // query_attached_items_service_    = n_.advertiseService("/" + name_ + "/get_item_attachment",      &ArmController::CB_query_attached_items,  this);
+
+    // Register all shared variables
+    registerSharedVariables();
+
+    // Test arm movement. Only if enabled by config file
+    testArmMovement();
+
+    // Start all SMCs
+    ROS_INFO_NAMED(ROS_NAME, "Starting all servers");
+    set_position_smc_->startServer();
+    set_velocity_smc_->startServer();
+    set_gripper_width_smc_->startServer();
+
+    ROS_INFO_NAMED(ROS_NAME, "Arm controller ready");
+}
+
+ArmController::~ArmController()
+{
+    closeAllArmControllers();
+}
+
+void ArmController::createSMCs()
+{
     set_position_smc_ = new SMC_position(n_, name_+"/position",
             boost::bind(&ArmController::CB_receivePositionGoal, this, _1, _2),
             boost::bind(&ArmController::CB_receivePositionCancel, this, _1)
@@ -33,23 +75,24 @@ ArmController::ArmController( std::string name, ros::NodeHandle n )
             boost::bind(&ArmController::CB_receiveGripperGoal, this, _1, _2),
             boost::bind(&ArmController::CB_receiveGripperCancel, this, _1)
     );
+}
 
-    // Load all parameters
-    std::vector<std::string>    arm_plugins;
-    
+void ArmController::loadArmParameters()
+{
+    arm_plugins_.clear();
+
     n_.param("/arm_controller/number_of_arms", nr_of_arms_, 1);
     for ( int i = 0 ; i < nr_of_arms_ ; i++ )
     {
         std::string plugin_name;
         std::string parameter = "/arm_controller/plugin"+boost::lexical_cast<std::string>(i);
         n_.param<std::string>(parameter, plugin_name, "arm_controller_plugins::ArmControllerRobai");
-        arm_plugins.push_back(plugin_name);
+        arm_plugins_.push_back(plugin_name);
     }
+}
 
-    bool allow_first_movement;
-    n_.param("/arm_controller/allow_first_movement", allow_first_movement, true);
-    
-    // Load plugins, add arm controllers
+void ArmController::loadArmPlugins()
+{
     arm_controllers_.clear();
     for ( int i = 0 ; i < nr_of_arms_ ; i++)
     {
@@ -57,47 +100,73 @@ ArmController::ArmController( std::string name, ros::NodeHandle n )
         {
             boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller;
 
-    		arm_controller = arm_controller_plugin_loader_.createInstance(arm_plugins[i]);
+            arm_controller = arm_controller_plugin_loader_.createInstance(arm_plugins_[i]);
             arm_controllers_.push_back(arm_controller);
         }
-            catch(pluginlib::PluginlibException& ex)
+        catch(pluginlib::PluginlibException& ex)
         {
             ROS_ERROR("Arm controller was not added, the plugin failed to load: %s", ex.what());
         }
     }
+}
 
-    // Initialize all arm controllers
+void ArmController::initializeArmControllers()
+{
     for (const auto& arm_controller : arm_controllers_ )
-    {
         if ( not arm_controller->initialize() )
             ROS_ERROR("Could not initialize arm controller" ); //! @todo MdL: Add name of the controller / arm.
-    }
+}
 
-    // // Enable services / clients / publishers
-    // toggle_service_         = n_.advertiseService("/" + name_ + "/toggle_visual_correction", &ArmController::CB_toggle, this);
-    // reset_service_          = n_.advertiseService("/" + name_ + "/reset_visual_correction",  &ArmController::CB_reset,  this);
-    // attach_item_service_    = n_.advertiseService("/" + name_ + "/set_item_attachment",      &ArmController::CB_attach_item,  this);
-    // query_attached_items_service_    = n_.advertiseService("/" + name_ + "/get_item_attachment",      &ArmController::CB_query_attached_items,  this);
-
+void ArmController::registerSharedVariables()
+{
     // Monitor the emergency button state
     sh_emergency_.connect(ros::Duration(0.1));
     sh_emergency_.registerChangeCallback(boost::bind(&ArmController::CB_emergency, this,  _1));
+}
 
-    ROS_INFO_NAMED(ROS_NAME, "Starting all servers");
-    set_position_smc_->startServer();
-    set_velocity_smc_->startServer();
-    set_gripper_width_smc_->startServer();
+void ArmController::testArmMovement()
+{
+    bool allow_first_movement;
+    n_.param("/arm_controller/allow_first_movement", allow_first_movement, true);
 
     if (allow_first_movement)
         testMovementGrippers();
-
-    ROS_INFO_NAMED(ROS_NAME, "Arm controller ready");
 }
 
-ArmController::~ArmController()
+void ArmController::closeAllArmControllers()
 {
+    for (const auto& arm_controller : arm_controllers_ )
+        if ( not arm_controller->close() )
+            ROS_ERROR("Could not close arm controller" ); //! @todo MdL: Add name of the controller / arm.
 }
 
+bool ArmController::stopArmMovement(const boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller)
+{
+    geometry_msgs::Twist twist;
+    twist.linear.x = 0.0;
+    twist.linear.y = 0.0;
+    twist.linear.z = 0.0;
+    twist.angular.x = 0.0;
+    twist.angular.y = 0.0;
+    twist.angular.z = 0.0;
+
+    velocity_watchdog_.stop();
+
+    if(arm_controller->setEndEffectorVelocity(twist))
+        return true;
+    else
+        return false;
+}
+
+void ArmController::testMovementGrippers()
+{
+    // Open and close the grippers
+    for ( const auto& arm_controller : arm_controllers_ )
+    {
+        arm_controller->setGripperWidth(0.02); //0.02 m
+        arm_controller->setGripperWidth(0.08); //0.08 m
+    }
+}
 
 // Callback functions
 
@@ -205,34 +274,6 @@ void ArmController::CB_emergency(const bool& emergency)
     else
         for ( const auto& arm_controller : arm_controllers_ )
             arm_controller->resetEmergencyStop();
-}
-
-bool ArmController::stopArmMovement(const boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller)
-{
-    geometry_msgs::Twist twist;
-    twist.linear.x = 0.0;
-    twist.linear.y = 0.0;
-    twist.linear.z = 0.0;
-    twist.angular.x = 0.0;
-    twist.angular.y = 0.0;
-    twist.angular.z = 0.0;
-
-    velocity_watchdog_.stop();
-
-    if(arm_controller->setEndEffectorVelocity(twist))
-        return true;
-    else
-        return false;
-}
-
-void ArmController::testMovementGrippers()
-{
-    // Open and close the grippers
-    for ( const auto& arm_controller : arm_controllers_ )
-    {
-        arm_controller->setGripperWidth(0.02); //0.02 m
-        arm_controller->setGripperWidth(0.08); //0.08 m
-    }
 }
 
 }; // namespace

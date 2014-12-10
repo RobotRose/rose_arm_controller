@@ -76,6 +76,21 @@ class ArmController
     ~ArmController();
 
   private:
+    // All startup procedures
+    void createSMCs();
+    void loadArmParameters();
+    void loadArmPlugins();
+    void initializeArmControllers();
+    void registerSharedVariables();
+    void testArmMovement();
+
+    // Closing procedure
+    void closeAllArmControllers();
+
+    // Arm movements
+    bool stopArmMovement(const boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller);
+    void testMovementGrippers();
+
     void CB_receivePositionGoal(const rose_arm_controller_msgs::set_positionGoalConstPtr& goal, SMC_position* smc);
     void CB_receivePositionCancel(SMC_position* smc);
     void CB_receiveVelocityGoal(const rose_arm_controller_msgs::set_velocityGoalConstPtr& goal, SMC_velocity* smc);
@@ -86,14 +101,11 @@ class ArmController
     void CB_cancelVelocityForArms();
     void CB_emergency(const bool& emergency);
 
-    bool stopArmMovement(const boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller);
-
-    void testMovementGrippers();
-
     std::string         name_;
     ros::NodeHandle     n_;
 
-    int                 nr_of_arms_;
+    int                         nr_of_arms_;
+    std::vector<std::string>    arm_plugins_;
 
     SMC_position*  set_position_smc_;
     SMC_velocity*  set_velocity_smc_;
