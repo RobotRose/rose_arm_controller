@@ -175,7 +175,7 @@ bool ArmControllerRobai::setEndEffectorMode ( const ArmControllerRobai::EndEffec
 	if (end_effector_mode_ == end_effector_mode) 
     	return;
     
-    if ( not setEndEffectorSet(end_effector_mode, 0))
+    if ( not setEndEffectorSet(end_effector_mode, getRobaiArmIndex()))
     {
      	ROS_ERROR("Could not set end effector mode");
         return;
