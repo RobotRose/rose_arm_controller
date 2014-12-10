@@ -15,6 +15,7 @@
 
 #include <pluginlib/class_list_macros.h>
 #include "arm_controller_base/arm_controller_base.hpp"
+#include "arm_controller_robai/robai_manipulation_action.hpp"
 
 //robai
 #include "remoteCommand/ecRemoteCommand.h"
@@ -167,6 +168,8 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
 
     bool setPositionControl();
     bool setVelocityControl();
+
+    arm_controller_robai::RobaiManipulationAction manipulation_action_manager_;
 
     EndEffectorMode end_effector_mode_;
     ControlMode     control_mode_;

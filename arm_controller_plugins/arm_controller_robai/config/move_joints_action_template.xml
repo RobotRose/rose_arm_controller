@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<manipulationActionManager xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.energid.com/namespace/ct
+  move_joints.ct.xsd" xmlns="http://www.energid.com/namespace/ct" version="3.0.0">
+ <actionMap>
+  <element>
+   <key>Set joint angles action</key>
+   <value>
+    <jointPathPlanningAction>
+     <activeControlDescription>0</activeControlDescription>
+     <goalIndex>0</goalIndex>
+     <labelledGoalVector size="1">
+      <element>
+       <first>State 1</first>
+       <second>
+        <cr:coordinateSystemTransform xmlns:cr="http://www.energid.com/namespace/cr">
+         <cr:orientation q0="1" q1="0" q2="0" q3="0"/>
+         <cr:translation x="0" y="0" z="0"/>
+        </cr:coordinateSystemTransform>
+        <mn:jointPositions xmlns:mn="http://www.energid.com/namespace/mn" size="18">
+         <mn:group>
+          0
+         </mn:group>
+        </mn:jointPositions>
+       </second>
+      </element>
+     </labelledGoalVector>
+     <tolerance>0.0001</tolerance>
+    </jointPathPlanningAction>
+   </value>
+  </element>
+ </actionMap>
+ <actionOrder size="1">
+  <element>Set joint angles action</element>
+ </actionOrder>
+</manipulationActionManager>

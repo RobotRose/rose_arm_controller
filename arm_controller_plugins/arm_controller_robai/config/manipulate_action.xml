@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manipulationActionManager xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.energid.com/namespace/ct
+  manipulation_action.ct.xsd" xmlns="http://www.energid.com/namespace/ct" version="3.0.0">
+    <actionMap>
+        <element>
+            <key>Gripper Action</key>
+            <value>
+                <gripperAction>
+                    <activeEndEffectorSet>2</activeEndEffectorSet>
+                    <endEffectorIndex>1</endEffectorIndex>
+                    <gripperClosedPosition>0.0060000000000000001249</gripperClosedPosition>
+                    <gripperDesiredPositionPercentage>55</gripperDesiredPositionPercentage>
+                    <gripperMode>setMode</gripperMode>
+                    <gripperOpenPosition>0.012999999999999999403</gripperOpenPosition>
+                </gripperAction>
+            </value>
+        </element>
+    </actionMap>
+    <actionOrder size="1">
+        <element>Gripper Action</element>
+    </actionOrder>
+</manipulationActionManager>

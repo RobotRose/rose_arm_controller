@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manipulationActionManager xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.energid.com/namespace/ct
+  manipulation_action.ct.xsd" xmlns="http://www.energid.com/namespace/ct" version="3.0.0">
+    <actionMap>
+        <element>
+            <key>End Effector Path Planning</key>
+            <value>
+                <endEffectorPathPlanningAction>
+                    <activeControlDescription>0</activeControlDescription>
+                    <activeEndEffectorSet>0</activeEndEffectorSet>
+                    <endEffectorIndex>0</endEffectorIndex>
+                    <goal>
+                        <cr:endEffectorPlacementData xmlns:cr="http://www.energid.com/namespace/cr" size="0"/>
+                        <cr:orientation xmlns:cr="http://www.energid.com/namespace/cr" q0="0.0" q1="0.0" q2="0.0" q3="0.0"/>
+                        <cr:translation xmlns:cr="http://www.energid.com/namespace/cr" x="0.0" y="-0.0" z="0.0"/>
+                    </goal>
+                    <pose/>
+                    <roleName/>
+                    <tolerance>0.001</tolerance>
+                </endEffectorPathPlanningAction>
+            </value>
+        </element>
+    </actionMap>
+    <actionOrder size="1">
+        <element>End Effector Path Planning</element>
+    </actionOrder>
+</manipulationActionManager>

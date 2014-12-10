@@ -47,6 +47,7 @@ include_directories(
 
 add_library( arm_controller_robai
 	src/arm_controller_robai.cpp
+	src/robai_manipulation_action.cpp
 )
 
 target_link_libraries( arm_controller_robai

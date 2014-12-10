@@ -17,6 +17,7 @@ namespace arm_controller_plugins {
 ArmControllerRobai::ArmControllerRobai()
 	: end_effector_mode_(POINT_EE)
 	, control_mode_(POSITION)
+	, manipulation_action_manager_()
 {
 
 }
@@ -69,8 +70,7 @@ Pose ArmControllerRobai::getEndEffectorPose()
 
 bool ArmControllerRobai::setEndEffectorPose(const Pose& end_effector_pose)
 {
-	//! @todo MdL: Implement.
-	return false;
+	return manipulation_action_manager_.executePoseManipulation(getRobaiArmIndex(), getRobaiEndEffectorMode(), end_effector_pose);
 }
 
 Twist ArmControllerRobai::getEndEffectorVelocity()
@@ -165,7 +165,6 @@ bool ArmControllerRobai::setContraints(const Twist& constraint)
 
 bool ArmControllerRobai::resetContraints()
 {
-	//! @todo MdL: Implement.
 	return setEndEffectorMode(POINT_EE);
 }
 
@@ -176,8 +175,11 @@ double ArmControllerRobai::getGripperWidth()
 }
 
 bool ArmControllerRobai::setGripperWidth(const double required_width)
-{
-	return false;
+{	
+	//! @todo MdL: Map width to percentage min/max width min_gripper width and max gripper width.
+	// For now: Smaller than 0.01 is closed, more than 0.0 is open
+	int percentage_open = (required_width < 0.01 ? 0: 100);
+	return manipulation_action_manager_.executeGripperManipulation(getRobaiArmIndex(), getRobaiEndEffectorMode(), percentage_open);
 }
 
 Wrench ArmControllerRobai::getEndEffectorWrench()

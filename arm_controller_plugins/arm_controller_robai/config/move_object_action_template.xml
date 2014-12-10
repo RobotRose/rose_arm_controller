@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<manipulationActionManager xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.energid.com/namespace/ct
+  move_object_action_template.ct.xsd" xmlns="http://www.energid.com/namespace/ct" version="3.0.0">
+ <actionMap>
+  <element>
+   <key>Move object action</key>
+   <value>
+    <waypointSequence>
+     <activeControlDescription>0</activeControlDescription>
+     <activeEndEffectorSet>0</activeEndEffectorSet>
+     <endEffectorIndex>0</endEffectorIndex>
+     <manipulationWaypointVector size="1">
+      <element>
+       <activeControlMethod>0</activeControlMethod>
+       <angularZone>0.10000000000000000555</angularZone>
+       <endEffectorAcceleration>8</endEffectorAcceleration>
+       <endEffectorDeceleration>8</endEffectorDeceleration>
+       <endEffectorSpeed>10</endEffectorSpeed>
+       <extendedZoneRadius>0.020000000000000000416</extendedZoneRadius>
+       <goal>
+        <cr:orientation xmlns:cr="http://www.energid.com/namespace/cr" q0="0.99994131848322909129" q1="-0.0038827538163447002442" q2="-0.0082828588234009920682" q3="0.0058032803253495000156"/>
+        <cr:translation xmlns:cr="http://www.energid.com/namespace/cr" x="0.094726847165874678014" y="-0.19208626991761870717" z="1.0066037171744275369"/>
+       </goal>
+       <interpolate>0</interpolate>
+       <isRelative>0</isRelative>
+       <name></name>
+       <roleName></roleName>
+       <stopPoint>0</stopPoint>
+       <tolerance>0.00010000000000000000479</tolerance>
+       <waypointInterpolatorContainer>
+        <bezierInterpolator xsi:nil="true"/>
+       </waypointInterpolatorContainer>
+       <zoneRadius>0.020000000000000000416</zoneRadius>
+      </element>
+     </manipulationWaypointVector>
+    </waypointSequence>
+   </value>
+  </element>
+ </actionMap>
+ <actionOrder size="1">
+  <element>Move object action</element>
+ </actionOrder>
+</manipulationActionManager>
