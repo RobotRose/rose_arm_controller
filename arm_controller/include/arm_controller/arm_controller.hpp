@@ -93,6 +93,10 @@ class ArmController
     bool stopArmMovement(const boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller);
     void testMovementGrippers();
 
+    // Helper functions
+    bool armControllerExists(const std::string name);
+    bool getArmController(const std::string name, boost::shared_ptr<arm_controller_base::ArmControllerBase>& arm_controller);
+
     void CB_receivePositionGoal(const rose_arm_controller_msgs::set_positionGoalConstPtr& goal, SMC_position* smc);
     void CB_receivePositionCancel(SMC_position* smc);
     void CB_receiveVelocityGoal(const rose_arm_controller_msgs::set_velocityGoalConstPtr& goal, SMC_velocity* smc);

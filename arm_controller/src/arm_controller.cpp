@@ -186,9 +186,29 @@ void ArmController::testMovementGrippers()
     // Open and close the grippers
     for ( const auto& arm_controller : arm_controllers_ )
     {
-        arm_controller.second->setGripperWidth(0.02); //0.02 m
+        arm_controller.second->setGripperWidth(0.001); //0.02 m
         arm_controller.second->setGripperWidth(0.08); //0.08 m
     }
+}
+
+bool ArmController::armControllerExists(const std::string name)
+{
+    if ( arm_controllers_.find(name) == arm_controllers_.end())
+    {
+        ROS_ERROR("Arm controller \'%s\' does not exist", name.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+bool ArmController::getArmController(const std::string name, boost::shared_ptr<arm_controller_base::ArmControllerBase>& arm_controller)
+{
+    if ( not armControllerExists(name))
+        return false;
+
+    arm_controller = arm_controllers_[name];
+    return true;
 }
 
 // Callback functions
@@ -201,12 +221,17 @@ void ArmController::CB_receivePositionGoal(const rose_arm_controller_msgs::set_p
         return;
     }
 
+    // get arm controller. 
+    boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller;
+    if ( not getArmController(goal->arm, arm_controller))
+        return;
+
     //! @todo MdL: Transform both to arm base link.
     Pose goal_pose =        goal->required_pose.pose;
     Twist goal_constraint = goal->constraint.twist;
 
-    arm_controllers_[goal->arm]->setContraints(goal_constraint);
-    arm_controllers_[goal->arm]->setEndEffectorPose(goal_pose);
+    arm_controller->setContraints(goal_constraint);
+    arm_controller->setEndEffectorPose(goal_pose);
 }
 
 void ArmController::CB_receivePositionCancel(SMC_position* smc)
@@ -231,14 +256,21 @@ void ArmController::CB_receiveVelocityGoal(const rose_arm_controller_msgs::set_v
         return;
     }
 
+    ROS_INFO("Received velocity request for arm %s", goal->arm.c_str());
+
+    // get arm controller. 
+    boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller;
+    if ( not getArmController(goal->arm, arm_controller))
+        return;
+
     velocity_watchdog_.reset();
 
     //! @todo MdL: Transform both to arm base link.
-    Twist goal_twist = goal->required_velocity.twist;
-    Twist goal_constraint = goal->constraint.twist;
+    Twist goal_twist        = goal->required_velocity.twist;
+    Twist goal_constraint   = goal->constraint.twist;
 
-    arm_controllers_[goal->arm]->setContraints(goal_constraint);
-    arm_controllers_[goal->arm]->setEndEffectorVelocity(goal_twist);
+    arm_controller->setContraints(goal_constraint);
+    arm_controller->setEndEffectorVelocity(goal_twist);
 }
 
 void ArmController::CB_receiveVelocityCancel(SMC_velocity* smc)
@@ -251,8 +283,13 @@ void ArmController::CB_receiveVelocityCancel(SMC_velocity* smc)
         ROS_WARN_NAMED(ROS_NAME, "Arm velocity cancelled, but there was no active goal.");
         return;
     }
+    
+    // get arm controller. 
+    boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller;
+    if ( not getArmController(goal->arm, arm_controller))
+        return;
 
-    if ( not stopArmMovement(arm_controllers_[goal->arm]))
+    if ( not stopArmMovement(arm_controller))
         ROS_ERROR("Could not stop arm movement");
 }
 
@@ -264,7 +301,12 @@ void ArmController::CB_receiveGripperGoal(const rose_arm_controller_msgs::set_gr
         return;
     }
 
-    arm_controllers_[goal->arm]->setGripperWidth(goal->required_width);
+    // get arm controller. 
+    boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller;
+    if ( not getArmController(goal->arm, arm_controller))
+        return;
+
+    arm_controller->setGripperWidth(goal->required_width);
 }
 
 void ArmController::CB_receiveGripperCancel(SMC_gripper* smc)
