@@ -65,7 +65,9 @@ Pose ArmControllerRobai::getEndEffectorPose()
 }
 
 bool ArmControllerRobai::setEndEffectorPose(const Pose& end_effector_pose)
-{
+{	
+	ROS_INFO("ArmControllerRobai::setEndEffectorPose: (%f,%f,%f)",
+                    end_effector_pose.position.x, end_effector_pose.position.y, end_effector_pose.position.z);
 	return manipulation_action_manager_.executePoseManipulation(getRobaiArmIndex(), getRobaiEndEffectorMode(), end_effector_pose);
 }
 
@@ -78,7 +80,7 @@ Twist ArmControllerRobai::getEndEffectorVelocity()
 
 bool ArmControllerRobai::setEndEffectorVelocity(const Twist& velocity)
 {
-	ROS_DEBUG("ArmControllerRobai::setVelocity: (%f,%f,%f):(%f,%f,%f)",
+	ROS_INFO("ArmControllerRobai::setVelocity: (%f,%f,%f):(%f,%f,%f)",
                     velocity.linear.x, velocity.linear.y, velocity.linear.z, velocity.angular.x,
                     velocity.angular.y, velocity.angular.z);
 
