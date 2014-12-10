@@ -28,14 +28,17 @@ ArmControllerRobai::~ArmControllerRobai()
 
 bool ArmControllerRobai::initialize()
 {
+	ROS_INFO("Initializing Robai arm...");
+
+	ROS_INFO("Done");
 	//! @todo MdL: Implement.
 	return false;
 }
 
 bool ArmControllerRobai::close()
 {
-	//! @todo MdL: Implement.
-	return false;
+	shutdown();
+	return true;
 }
 
 bool ArmControllerRobai::cancel()
@@ -168,9 +171,17 @@ bool ArmControllerRobai::setEndEffectorWrench(const Wrench& Wrench)
 bool ArmControllerRobai::setEndEffectorMode ( const ArmControllerRobai::EndEffectorMode& end_effector_mode )
 {
     ROS_DEBUG("Setting new end effector mode");
-    end_effector_mode_ = end_effector_mode;
 
-    return setEndEffectorSet(end_effector_mode, 0);
+	if (end_effector_mode_ == end_effector_mode) 
+    	return;
+    
+    if ( not setEndEffectorSet(end_effector_mode, 0))
+    {
+     	ROS_ERROR("Could not set end effector mode");
+        return;
+    }
+    
+    end_effector_mode_ = end_effector_mode;
 }
 
 ArmControllerRobai::EndEffectorMode ArmControllerRobai::getEndEffectorMode()
