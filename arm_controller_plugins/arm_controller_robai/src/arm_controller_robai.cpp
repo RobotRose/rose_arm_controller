@@ -30,11 +30,7 @@ ArmControllerRobai::~ArmControllerRobai()
 bool ArmControllerRobai::initialize()
 {
 	ROS_INFO("Initializing Robai arm...");
-
-	connectToArms();
-
-	ROS_INFO("Done");
-	return false;
+	return connectToArms();
 }
 
 bool ArmControllerRobai::close()
@@ -139,6 +135,8 @@ Twist ArmControllerRobai::getContraints()
 
 bool ArmControllerRobai::setContraints(const Twist& constraint)
 {
+	ROS_INFO("ArmControllerRobai::setContraints");
+	
 	if (constraint.linear.x > 0)
 		ROS_WARN("The robai arm does not allow for setting linear constraints");
 	if (constraint.linear.y > 0)
@@ -179,7 +177,7 @@ bool ArmControllerRobai::setGripperWidth(const double required_width)
 	//! @todo MdL: Map width to percentage min/max width min_gripper width and max gripper width.
 	// For now: Smaller than 0.01 is closed, more than 0.0 is open
 	int percentage_open = (required_width < 0.01 ? 0: 100);
-	return manipulation_action_manager_.executeGripperManipulation(getRobaiArmIndex(), getRobaiEndEffectorMode(), percentage_open);
+	return manipulation_action_manager_.executeGripperManipulation(getRobaiGripperIndex(), getRobaiEndEffectorMode(), percentage_open);
 }
 
 Wrench ArmControllerRobai::getEndEffectorWrench()
@@ -203,7 +201,7 @@ JointState ArmControllerRobai::getJointStates()
 	return joint_states;
 }
 
-void ArmControllerRobai::connectToArms(const std::string ip)
+bool ArmControllerRobai::connectToArms(const std::string ip)
 {
     ROS_INFO("Connecting to arms...");
 
@@ -231,6 +229,7 @@ void ArmControllerRobai::connectToArms(const std::string ip)
         r.sleep();
     }
     ROS_INFO("Connected!");
+    return true;
 }
 
 bool ArmControllerRobai::setEndEffectorMode ( const ArmControllerRobai::EndEffectorMode& end_effector_mode )

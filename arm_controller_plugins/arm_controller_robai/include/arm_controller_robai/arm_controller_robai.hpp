@@ -154,7 +154,7 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
         VELOCITY,
     };
 
-    void connectToArms(const std::string ip = "127.0.0.1");
+    bool connectToArms(const std::string ip = "127.0.0.1");
 
     EndEffectorMode getEndEffectorMode();
     bool setEndEffectorMode ( const EndEffectorMode& end_effector_mode );
