@@ -142,9 +142,10 @@ void ArmController::initializeArmControllers()
 
 void ArmController::registerSharedVariables()
 {
+    //! @todo MdL: Uncomment.
     // Monitor the emergency button state
-    sh_emergency_.connect(ros::Duration(0.1));
-    sh_emergency_.registerChangeCallback(boost::bind(&ArmController::CB_emergency, this,  _1));
+    // sh_emergency_.connect(ros::Duration(0.1));
+    // sh_emergency_.registerChangeCallback(boost::bind(&ArmController::CB_emergency, this,  _1));
 }
 
 void ArmController::testArmMovement()
