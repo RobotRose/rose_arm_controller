@@ -75,6 +75,8 @@ class ArmController
      */
     ~ArmController();
 
+    std::vector<std::string> getArms();
+
   private:
     // All startup procedures
     void createSMCs();

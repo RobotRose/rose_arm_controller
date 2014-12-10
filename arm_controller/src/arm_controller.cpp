@@ -61,6 +61,15 @@ ArmController::~ArmController()
     closeAllArmControllers();
 }
 
+std::vector<std::string> ArmController::getArms()
+{
+    std::vector<std::string> arms;
+    for (const auto& arm_controller : arm_controllers_)
+        arms.push_back(arm_controller.first);
+
+    return arms;
+}
+
 void ArmController::createSMCs()
 {
     set_position_smc_ = new SMC_position(n_, name_+"/position",
