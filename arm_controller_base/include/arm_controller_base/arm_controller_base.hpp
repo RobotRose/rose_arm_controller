@@ -37,6 +37,14 @@ class ArmControllerBase {
      * @return If initialization was successful.
      */
     virtual bool initialize() = 0;
+
+    /**
+     * @brief When closing the arm controller
+     * @details The arm has to shutdown
+     * @return If it was successful
+     */
+    virtual bool close() = 0;
+
     /**
      * @brief   Cancels the current interaction of the arm. 
      * @details Cancelling only stopts the current interaction. The arm will respond again to new input.

@@ -54,6 +54,13 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
     ~ArmControllerRobai();
 
     bool initialize();
+    
+    /**
+     * @brief When closing the arm controller
+     * @details The arm has to shutdown
+     * @return If it was successful
+     */
+    bool close();
 
     /**
      * @brief   Cancels the current interaction of the arm. 

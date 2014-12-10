@@ -32,6 +32,12 @@ bool ArmControllerRobai::initialize()
 	return false;
 }
 
+bool ArmControllerRobai::close()
+{
+	//! @todo MdL: Implement.
+	return false;
+}
+
 bool ArmControllerRobai::cancel()
 {
 	//! @todo MdL: Implement.
