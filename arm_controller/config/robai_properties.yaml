@@ -1,1 +1,14 @@
 # Specific robai properties.
+
+robai_configuration:
+    # Correction from the point that is controlled by the position control to the gripper tip.
+    # The Robai arm is controlled via its wrist joint
+    gripper_tip_correction: 0.155
+
+    # Maximal number of tries for a manipulation action before it returns false
+    # Should be at least 1
+    max_manipulation_tries: 5
+
+    # Whether or not to use the path planning API from Robai
+    # At this time, it is not robust enough.
+    enable_path_planning_function: false
