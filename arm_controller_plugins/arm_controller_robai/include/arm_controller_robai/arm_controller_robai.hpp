@@ -161,7 +161,7 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
     bool loadParameters();
 
     EndEffectorMode getEndEffectorMode();
-    bool setEndEffectorMode ( const EndEffectorMode& end_effector_mode );
+    bool setEndEffectorMode ( const EndEffectorMode& end_effector_mode, const bool save_state = true );
 
     Pose getCorrectedEndEffectorPose(const Pose& pose);
     int getRobaiArmIndex();
@@ -175,6 +175,8 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
     bool setVelocityControl();
 
     ros::NodeHandle n_;
+
+    bool emergency_;
 
     // parameters
     double gripper_tip_correction_parameter_;

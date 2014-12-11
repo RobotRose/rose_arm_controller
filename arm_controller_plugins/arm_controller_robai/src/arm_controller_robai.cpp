@@ -19,6 +19,7 @@ ArmControllerRobai::ArmControllerRobai()
 	, end_effector_mode_(POINT_EE)
 	, control_mode_(POSITION)
 	, manipulation_action_manager_()
+	, emergency_(false)
 {
 
 }
@@ -48,14 +49,16 @@ bool ArmControllerRobai::cancel()
 
 bool ArmControllerRobai::emergencyStop()
 {
-	//! @todo MdL: Implement.
-	return false;
+	emergency_ = true;
+
+	return cancel();
 }
 
 bool ArmControllerRobai::resetEmergencyStop()
 {
-	//! @todo MdL: Implement.
-	return false;
+	emergency_ = false;
+
+	return true;
 }
 
 Pose ArmControllerRobai::getEndEffectorPose()
@@ -67,6 +70,9 @@ Pose ArmControllerRobai::getEndEffectorPose()
 
 bool ArmControllerRobai::setEndEffectorPose(const Pose& end_effector_pose)
 {	
+	if (emergency_)
+		return false;
+
 	ROS_INFO("ArmControllerRobai::setEndEffectorPose: (%f,%f,%f)",
         end_effector_pose.position.x, 
         end_effector_pose.position.y, 
@@ -92,6 +98,9 @@ Twist ArmControllerRobai::getEndEffectorVelocity()
 
 bool ArmControllerRobai::setEndEffectorVelocity(const Twist& velocity)
 {
+	if (emergency_)
+		return false;
+
 	ROS_INFO("ArmControllerRobai::setVelocity: (%f,%f,%f):(%f,%f,%f)",
                     velocity.linear.x, velocity.linear.y, velocity.linear.z, velocity.angular.x,
                     velocity.angular.y, velocity.angular.z);
@@ -149,6 +158,9 @@ Twist ArmControllerRobai::getConstraints()
 
 bool ArmControllerRobai::setConstraints(const Twist& constraint)
 {
+	if(emergency_)
+		return false;
+
 	ROS_INFO("setConstraints request received");
 
 	if (constraint.linear.x > 0)
@@ -188,6 +200,9 @@ double ArmControllerRobai::getGripperWidth()
 
 bool ArmControllerRobai::setGripperWidth(const double required_width)
 {	
+	if(emergency_)
+		return false;
+
 	//! @todo MdL: Map width to percentage min/max width min_gripper width and max gripper width.
 	// For now: Smaller than 0.01 is closed, more than 0.0 is open
 	int percentage_open = (required_width < 0.01 ? 0: 100);
@@ -203,6 +218,9 @@ Wrench ArmControllerRobai::getEndEffectorWrench()
 
 bool ArmControllerRobai::setEndEffectorWrench(const Wrench& Wrench)
 {
+	if(emergency_)
+		return false;
+
 	//! @todo MdL: Implement.
 	ROS_ERROR("Robai does not support force/torque control");
 	return false;
@@ -261,7 +279,7 @@ bool ArmControllerRobai::loadParameters()
     return true;
 }
 
-bool ArmControllerRobai::setEndEffectorMode ( const ArmControllerRobai::EndEffectorMode& end_effector_mode )
+bool ArmControllerRobai::setEndEffectorMode ( const ArmControllerRobai::EndEffectorMode& end_effector_mode, const bool save_state )
 {
     ROS_DEBUG("Setting new end effector mode");
 
@@ -274,7 +292,9 @@ bool ArmControllerRobai::setEndEffectorMode ( const ArmControllerRobai::EndEffec
         return false;
     }
     
-    end_effector_mode_ = end_effector_mode;
+    if (save_state)
+    	end_effector_mode_ = end_effector_mode;
+
     return true;
 }
 
@@ -290,12 +310,18 @@ int ArmControllerRobai::getRobaiEndEffectorMode()
 
 bool ArmControllerRobai::resetEndEffectorSet()
 {
-    return setEndEffectorMode(end_effector_mode_);
+	if ( not setEndEffectorSet(end_effector_mode_, getRobaiArmIndex()))
+    {
+     	ROS_ERROR("Could not set end effector mode");
+        return false;
+    }
+
+    return true;
 }
 
 bool ArmControllerRobai::disallowArmMovement()
 {
-    return setEndEffectorMode(NO_MOVEMENT_ARM_ALLOWED);
+    return setEndEffectorMode(NO_MOVEMENT_ARM_ALLOWED, false);
 }
 
 Pose ArmControllerRobai::getCorrectedEndEffectorPose(const Pose& pose)
