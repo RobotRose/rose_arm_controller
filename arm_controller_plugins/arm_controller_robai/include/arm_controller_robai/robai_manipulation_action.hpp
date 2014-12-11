@@ -60,6 +60,8 @@ class RobaiManipulationAction
 	bool manipulationActive();
 
   private:
+  	bool loadParameters();
+
   	bool loadManipulationActionManager();
 	bool readManipulationManagerFile();
 
@@ -118,10 +120,18 @@ class RobaiManipulationAction
 
     bool waitForManipulationComplete();
 
+    ros::NodeHandle n_;
+
+    // Parameters
+    double 	gripper_tip_correction_parameter_;
+    int 	max_manipulation_tries_parameter_;
+    bool 	enable_path_planning_function_parameter_;
+
     EcManipulationActionManager manager_;
 
     bool cancelled_;
     bool manipulation_active_;
+
 };
 };
 

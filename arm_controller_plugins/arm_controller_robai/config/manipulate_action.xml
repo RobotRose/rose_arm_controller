@@ -3,20 +3,25 @@
   manipulation_action.ct.xsd" xmlns="http://www.energid.com/namespace/ct" version="3.0.0">
     <actionMap>
         <element>
-            <key>Gripper Action</key>
+            <key>End Effector Path Planning</key>
             <value>
-                <gripperAction>
-                    <activeEndEffectorSet>2</activeEndEffectorSet>
-                    <endEffectorIndex>1</endEffectorIndex>
-                    <gripperClosedPosition>0.0060000000000000001249</gripperClosedPosition>
-                    <gripperDesiredPositionPercentage>55</gripperDesiredPositionPercentage>
-                    <gripperMode>setMode</gripperMode>
-                    <gripperOpenPosition>0.012999999999999999403</gripperOpenPosition>
-                </gripperAction>
+                <endEffectorPathPlanningAction>
+                    <activeControlDescription>0</activeControlDescription>
+                    <activeEndEffectorSet>0</activeEndEffectorSet>
+                    <endEffectorIndex>0</endEffectorIndex>
+                    <goal>
+                        <cr:endEffectorPlacementData xmlns:cr="http://www.energid.com/namespace/cr" size="0"/>
+                        <cr:orientation xmlns:cr="http://www.energid.com/namespace/cr" q0="0" q1="0" q2="0" q3="0"/>
+                        <cr:translation xmlns:cr="http://www.energid.com/namespace/cr" x="0" y="0" z="0.85"/>
+                    </goal>
+                    <pose/>
+                    <roleName/>
+                    <tolerance>0.001</tolerance>
+                </endEffectorPathPlanningAction>
             </value>
         </element>
     </actionMap>
     <actionOrder size="1">
-        <element>Gripper Action</element>
+        <element>End Effector Path Planning</element>
     </actionOrder>
 </manipulationActionManager>

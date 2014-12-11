@@ -15,7 +15,8 @@
 namespace arm_controller_plugins {
 
 ArmControllerRobai::ArmControllerRobai()
-	: end_effector_mode_(POINT_EE)
+	: n_("~robai_arm")
+	, end_effector_mode_(POINT_EE)
 	, control_mode_(POSITION)
 	, manipulation_action_manager_()
 {
@@ -67,8 +68,19 @@ Pose ArmControllerRobai::getEndEffectorPose()
 bool ArmControllerRobai::setEndEffectorPose(const Pose& end_effector_pose)
 {	
 	ROS_INFO("ArmControllerRobai::setEndEffectorPose: (%f,%f,%f)",
-                    end_effector_pose.position.x, end_effector_pose.position.y, end_effector_pose.position.z);
-	return manipulation_action_manager_.executePoseManipulation(getRobaiArmIndex(), getRobaiEndEffectorMode(), end_effector_pose);
+        end_effector_pose.position.x, 
+        end_effector_pose.position.y, 
+        end_effector_pose.position.z);
+
+	// Pose correction from gripper to the wrist joint (the wrist joint is controlled by the Robai path planning software)
+	geometry_msgs::Pose corrected_pose = getCorrectedEndEffectorPose(end_effector_pose);
+
+	ROS_INFO("ArmControllerRobai::corrected pose: (%f,%f,%f)",
+        corrected_pose.position.x, 
+        corrected_pose.position.y, 
+        corrected_pose.position.z);
+
+	return manipulation_action_manager_.executePoseManipulation(getRobaiArmIndex(), getRobaiEndEffectorMode(), corrected_pose);
 }
 
 Twist ArmControllerRobai::getEndEffectorVelocity()
@@ -234,6 +246,21 @@ bool ArmControllerRobai::connectToArms(const std::string ip)
     return true;
 }
 
+bool ArmControllerRobai::loadParameters()
+{
+    ROS_INFO("Loading robai arm parameters...");
+
+    //! @todo MdL: Check is parameters are loaded via a file.
+    // if(not )
+    //    ROS_WARN("Gripper tip correction was not set in confugation file, defaulting to %f", gripper_tip_correction_parameter_);
+
+    n_.param("/robai_configuration/gripper_tip_correction", gripper_tip_correction_parameter_, 0.155);
+
+    ROS_INFO("Done.");
+
+    return true;
+}
+
 bool ArmControllerRobai::setEndEffectorMode ( const ArmControllerRobai::EndEffectorMode& end_effector_mode )
 {
     ROS_DEBUG("Setting new end effector mode");
@@ -269,6 +296,86 @@ bool ArmControllerRobai::resetEndEffectorSet()
 bool ArmControllerRobai::disallowArmMovement()
 {
     return setEndEffectorMode(NO_MOVEMENT_ARM_ALLOWED);
+}
+
+Pose ArmControllerRobai::getCorrectedEndEffectorPose(const Pose& pose)
+{
+	ROS_DEBUG("correctedEndEffectorPose on x: %f, y: %f, z: %f", pose.position.x, pose.position.y, pose.position.z);
+
+	//! @todo MdL: Test has to be really tested...
+
+	tf::Quaternion 		base_quaternion(0.0, 0.0, 0.0, 1.0);
+	tf::Vector3 		base_vector(0.0, 0.0, -gripper_tip_correction_parameter_);
+	tf::Transform 		base(base_quaternion, base_vector); 
+
+	tf::Quaternion 		end_effector_quaternion;
+	tf::Vector3 		end_effector_vector(pose.position.x, pose.position.y, pose.position.z);
+	tf::quaternionMsgToTF(pose.orientation, end_effector_quaternion);
+	tf::Transform 		end_effector_pose(end_effector_quaternion, end_effector_vector); 
+
+	geometry_msgs::Quaternion temp_quat;
+	tf::quaternionTFToMsg(base.getRotation(), temp_quat);
+	ROS_DEBUG("Base (%f,%f,%f):(%f,%f,%f,%f)", 
+		base.getOrigin().getX(), 
+		base.getOrigin().getY(), 
+		base.getOrigin().getZ(),
+		temp_quat.x,
+		temp_quat.y,
+		temp_quat.z,
+		temp_quat.w
+
+	);	
+
+	tf::quaternionTFToMsg(end_effector_pose.getRotation(), temp_quat);
+	ROS_DEBUG("End effector required pose(%f,%f,%f):(%f,%f,%f,%f)", 
+		end_effector_pose.getOrigin().getX(), 
+		end_effector_pose.getOrigin().getY(), 
+		end_effector_pose.getOrigin().getZ(),
+		temp_quat.x,
+		temp_quat.y,
+		temp_quat.z,
+		temp_quat.w
+	);
+
+	// From http://answers.ros.org/question/12654/relative-pose-between-two-tftransforms/
+	base.inverseTimes(end_effector_pose);
+
+	tf::quaternionTFToMsg(base.getRotation(), temp_quat);
+	ROS_DEBUG("Base converted to (%f,%f,%f):(%f,%f,%f,%f)", 
+		base.getOrigin().getX(), 
+		base.getOrigin().getY(), 
+		base.getOrigin().getZ(),
+		temp_quat.x,
+		temp_quat.y,
+		temp_quat.z,
+		temp_quat.w
+	);
+
+	//end_effector_pose.inverseTimes(base);
+    //! @todo MdL: Fix this hack for singlehand.
+    // TFHelper* goal_tf = new TFHelper("end_effector_goal", n_, "left_arm", "/end_effector_goal");
+
+	Pose result;
+	result.position.x = base.getOrigin().getX();
+	result.position.y = base.getOrigin().getY();
+	result.position.z = base.getOrigin().getZ();
+
+	result.orientation.x = pose.orientation.x;
+	result.orientation.y = pose.orientation.y;
+	result.orientation.z = pose.orientation.z;
+	result.orientation.w = pose.orientation.w;
+
+	ROS_DEBUG("Result (%f,%f,%f):(%f,%f,%f,%f)", 
+		result.position.x, 
+		result.position.y, 
+		result.position.z,
+		result.orientation.x,
+		result.orientation.y,
+		result.orientation.z,
+		result.orientation.w
+	);
+
+    return result;
 }
 
 int ArmControllerRobai::getRobaiArmIndex()

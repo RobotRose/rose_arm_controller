@@ -10,6 +10,7 @@ find_package(catkin
 		roscpp
 		rose_arm_controller_msgs
 		third_party
+		tf
 )
 
 catkin_package(
@@ -23,6 +24,7 @@ catkin_package(
 		roscpp
 		rose_arm_controller_msgs
 		third_party
+		tf
 #  DEPENDS system_lib
 )
 

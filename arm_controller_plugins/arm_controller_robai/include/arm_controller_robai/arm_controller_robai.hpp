@@ -13,7 +13,10 @@
 #ifndef ARM_CONTROLLER_ROBAI_HPP
 #define ARM_CONTROLLER_ROBAI_HPP
 
+#include <ros/ros.h>
 #include <pluginlib/class_list_macros.h>
+#include <tf/tf.h>
+
 #include "arm_controller_base/arm_controller_base.hpp"
 #include "arm_controller_robai/robai_manipulation_action.hpp"
 
@@ -155,10 +158,12 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
     };
 
     bool connectToArms(const std::string ip = "127.0.0.1");
+    bool loadParameters();
 
     EndEffectorMode getEndEffectorMode();
     bool setEndEffectorMode ( const EndEffectorMode& end_effector_mode );
 
+    Pose getCorrectedEndEffectorPose(const Pose& pose);
     int getRobaiArmIndex();
     int getRobaiGripperIndex();
     int getRobaiEndEffectorMode();
@@ -168,6 +173,11 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
 
     bool setPositionControl();
     bool setVelocityControl();
+
+    ros::NodeHandle n_;
+
+    // parameters
+    double gripper_tip_correction_parameter_;
 
     arm_controller_robai::RobaiManipulationAction manipulation_action_manager_;
 
