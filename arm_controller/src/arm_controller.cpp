@@ -232,11 +232,14 @@ void ArmController::CB_receivePositionGoal(const rose_arm_controller_msgs::set_p
     Twist goal_constraint = goal->constraint.twist;
 
     arm_controller->setConstraints(goal_constraint);
-    arm_controller->setEndEffectorPose(goal_pose);
+
+    rose_arm_controller_msgs::set_positionResult result;
+    smc->sendServerResult<rose_arm_controller_msgs::set_positionAction>(arm_controller->setEndEffectorPose(goal_pose), result );    
 }
 
 void ArmController::CB_receivePositionCancel(SMC_position* smc)
 {
+    ROS_INFO("Position cancel received");
     rose_arm_controller_msgs::set_positionGoalConstPtr goal;
     if(smc->hasActiveGoal())
         goal = smc->getLastGoal();
@@ -246,7 +249,12 @@ void ArmController::CB_receivePositionCancel(SMC_position* smc)
         return;
     }
 
-    //! @todo MdL: Cancel movement.
+    // Cancel arm controller
+    boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller;
+    if ( not getArmController(goal->arm, arm_controller))
+        return;
+
+    arm_controller->cancel();
 }
 
 void ArmController::CB_receiveVelocityGoal(const rose_arm_controller_msgs::set_velocityGoalConstPtr& goal, SMC_velocity* smc)
@@ -270,8 +278,10 @@ void ArmController::CB_receiveVelocityGoal(const rose_arm_controller_msgs::set_v
     Twist goal_twist        = goal->required_velocity.twist;
     Twist goal_constraint   = goal->constraint.twist;
 
-    arm_controller->setConstraints(goal_constraint);
-    arm_controller->setEndEffectorVelocity(goal_twist);
+    //! @todo MdL: Constraint always End Effector?.
+    // arm_controller->setConstraints(goal_constraint);
+    rose_arm_controller_msgs::set_velocityResult result;
+    smc->sendServerResult<rose_arm_controller_msgs::set_velocityAction>(arm_controller->setEndEffectorVelocity(goal_twist), result );
 }
 
 void ArmController::CB_receiveVelocityCancel(SMC_velocity* smc)
@@ -307,7 +317,8 @@ void ArmController::CB_receiveGripperGoal(const rose_arm_controller_msgs::set_gr
     if ( not getArmController(goal->arm, arm_controller))
         return;
 
-    arm_controller->setGripperWidth(goal->required_width);
+    rose_arm_controller_msgs::set_gripper_widthResult result;
+    smc->sendServerResult<rose_arm_controller_msgs::set_gripper_widthAction>(arm_controller->setGripperWidth(goal->required_width), result );
 }
 
 void ArmController::CB_receiveGripperCancel(SMC_gripper* smc)
@@ -321,7 +332,11 @@ void ArmController::CB_receiveGripperCancel(SMC_gripper* smc)
         return;
     }
 
-    //! @todo MdL: Cancel setting gripper width.
+    boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller;
+    if ( not getArmController(goal->arm, arm_controller))
+        return;
+
+    arm_controller->cancel();
 }
 
 void ArmController::CB_cancelVelocityForArms()

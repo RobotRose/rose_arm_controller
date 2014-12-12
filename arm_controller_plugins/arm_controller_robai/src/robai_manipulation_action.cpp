@@ -80,7 +80,13 @@ bool RobaiManipulationAction::executeJointPositionManipulation()
 
 bool RobaiManipulationAction::cancelManipulation()
 {
+    ROS_DEBUG("Setting cancel variable");
 	cancelled_ = true;
+    
+    if (manipulation_active_)
+        if (not stopManipulation()) 
+            ROS_ERROR("Could not stop manipulation");
+
 	return true;
 }
 
@@ -258,7 +264,6 @@ bool RobaiManipulationAction::executeXmlAction()  //! @todo MdL: Remove paramete
 bool RobaiManipulationAction::executeAction()
 {
     manipulation_active_ = true;
-    cancelled_           = false;
 
     ROS_DEBUG("RobaiManipulationAction::executeAction");
     loadManipulationActionManager();

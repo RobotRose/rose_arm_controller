@@ -21,7 +21,8 @@ ArmControllerRobai::ArmControllerRobai()
 	, manipulation_action_manager_()
 	, emergency_(false)
 {
-
+	// Load the parameters that are needed
+	loadParameters();
 }
 
 ArmControllerRobai::~ArmControllerRobai()
@@ -43,8 +44,8 @@ bool ArmControllerRobai::close()
 
 bool ArmControllerRobai::cancel()
 {
-	//! @todo MdL: Implement.
-	return false;
+	ROS_INFO("Cancel received");
+	return manipulation_action_manager_.cancelManipulation();
 }
 
 bool ArmControllerRobai::emergencyStop()
@@ -281,7 +282,7 @@ bool ArmControllerRobai::loadParameters()
 
 bool ArmControllerRobai::setEndEffectorMode ( const ArmControllerRobai::EndEffectorMode& end_effector_mode, const bool save_state )
 {
-    ROS_DEBUG("Setting new end effector mode");
+    ROS_DEBUG("Setting new end effector mode %d", (int)end_effector_mode);
 
 	if (end_effector_mode_ == end_effector_mode) 
     	return true;
@@ -326,70 +327,76 @@ bool ArmControllerRobai::disallowArmMovement()
 
 Pose ArmControllerRobai::getCorrectedEndEffectorPose(const Pose& pose)
 {
-	ROS_DEBUG("correctedEndEffectorPose on x: %f, y: %f, z: %f", pose.position.x, pose.position.y, pose.position.z);
-
+	ROS_DEBUG("Correcting pose (%f,%f,%f):(%f,%f,%f,%f) with length %f", 
+		pose.position.x, 
+		pose.position.y, 
+		pose.position.z,
+		pose.orientation.x,
+		pose.orientation.y,
+		pose.orientation.z,
+		pose.orientation.w,
+		gripper_tip_correction_parameter_
+	);
 	//! @todo MdL: Test has to be really tested...
 
 	tf::Quaternion 		base_quaternion(0.0, 0.0, 0.0, 1.0);
 	tf::Vector3 		base_vector(0.0, 0.0, -gripper_tip_correction_parameter_);
 	tf::Transform 		base(base_quaternion, base_vector); 
 
-	tf::Quaternion 		end_effector_quaternion;
-	tf::Vector3 		end_effector_vector(pose.position.x, pose.position.y, pose.position.z);
+	tf::Quaternion 		end_effector_quaternion(0.0, 0.0, 0.0, 1.0);
 	tf::quaternionMsgToTF(pose.orientation, end_effector_quaternion);
+
+	tf::Vector3 		end_effector_vector(pose.position.x, pose.position.y, pose.position.z);
 	tf::Transform 		end_effector_pose(end_effector_quaternion, end_effector_vector); 
 
-	geometry_msgs::Quaternion temp_quat;
-	tf::quaternionTFToMsg(base.getRotation(), temp_quat);
+	// geometry_msgs::Quaternion temp_quat;
+	// temp_quat.w = 1.0;
+	// tf::quaternionTFToMsg(base.getRotation(), temp_quat);
 	ROS_DEBUG("Base (%f,%f,%f):(%f,%f,%f,%f)", 
 		base.getOrigin().getX(), 
 		base.getOrigin().getY(), 
 		base.getOrigin().getZ(),
-		temp_quat.x,
-		temp_quat.y,
-		temp_quat.z,
-		temp_quat.w
-
+		base.getRotation().getAxis().getX(),
+		base.getRotation().getAxis().getY(),
+		base.getRotation().getAxis().getZ(),
+		base.getRotation().getW()
 	);	
 
-	tf::quaternionTFToMsg(end_effector_pose.getRotation(), temp_quat);
+	// tf::quaternionTFToMsg(end_effector_pose.getRotation(), temp_quat);
 	ROS_DEBUG("End effector required pose(%f,%f,%f):(%f,%f,%f,%f)", 
 		end_effector_pose.getOrigin().getX(), 
 		end_effector_pose.getOrigin().getY(), 
 		end_effector_pose.getOrigin().getZ(),
-		temp_quat.x,
-		temp_quat.y,
-		temp_quat.z,
-		temp_quat.w
+		end_effector_pose.getRotation().getAxis().getX(),
+		end_effector_pose.getRotation().getAxis().getY(),
+		end_effector_pose.getRotation().getAxis().getZ(),
+		end_effector_pose.getRotation().getW()
 	);
 
-	// From http://answers.ros.org/question/12654/relative-pose-between-two-tftransforms/
-	base.inverseTimes(end_effector_pose);
+	tf::Transform result_transform = base*end_effector_pose;
 
-	tf::quaternionTFToMsg(base.getRotation(), temp_quat);
-	ROS_DEBUG("Base converted to (%f,%f,%f):(%f,%f,%f,%f)", 
-		base.getOrigin().getX(), 
-		base.getOrigin().getY(), 
-		base.getOrigin().getZ(),
-		temp_quat.x,
-		temp_quat.y,
-		temp_quat.z,
-		temp_quat.w
+	ROS_DEBUG("End effector pose converted to (%f,%f,%f):(%f,%f,%f,%f)", 
+		result_transform.getOrigin().getX(), 
+		result_transform.getOrigin().getY(), 
+		result_transform.getOrigin().getZ(),
+		result_transform.getRotation().getAxis().getX(),
+		result_transform.getRotation().getAxis().getY(),
+		result_transform.getRotation().getAxis().getZ(),
+		result_transform.getRotation().getW()
 	);
 
-	//end_effector_pose.inverseTimes(base);
     //! @todo MdL: Fix this hack for singlehand.
     // TFHelper* goal_tf = new TFHelper("end_effector_goal", n_, "left_arm", "/end_effector_goal");
 
 	Pose result;
-	result.position.x = base.getOrigin().getX();
-	result.position.y = base.getOrigin().getY();
-	result.position.z = base.getOrigin().getZ();
+	result.position.x = result_transform.getOrigin().getX();
+	result.position.y = result_transform.getOrigin().getY();
+	result.position.z = result_transform.getOrigin().getZ();
 
-	result.orientation.x = pose.orientation.x;
-	result.orientation.y = pose.orientation.y;
-	result.orientation.z = pose.orientation.z;
-	result.orientation.w = pose.orientation.w;
+	result.orientation.x = result_transform.getRotation().getAxis().getX();
+	result.orientation.y = result_transform.getRotation().getAxis().getY();
+	result.orientation.z = result_transform.getRotation().getAxis().getZ();
+	result.orientation.w = result_transform.getRotation().getW();
 
 	ROS_DEBUG("Result (%f,%f,%f):(%f,%f,%f,%f)", 
 		result.position.x, 

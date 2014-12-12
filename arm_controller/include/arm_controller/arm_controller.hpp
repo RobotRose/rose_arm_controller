@@ -28,10 +28,15 @@
 
 #include "rose_arm_controller_msgs/set_positionAction.h"
 #include "rose_arm_controller_msgs/set_positionGoal.h"
+#include "rose_arm_controller_msgs/set_positionResult.h"
+
 #include "rose_arm_controller_msgs/set_velocityAction.h"
 #include "rose_arm_controller_msgs/set_velocityGoal.h"
+#include "rose_arm_controller_msgs/set_velocityResult.h"
+
 #include "rose_arm_controller_msgs/set_gripper_widthAction.h"
 #include "rose_arm_controller_msgs/set_gripper_widthGoal.h"
+#include "rose_arm_controller_msgs/set_gripper_widthResult.h"
 
 // #include "action_result_message.hpp"
 
