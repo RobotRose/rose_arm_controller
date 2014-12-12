@@ -222,7 +222,6 @@ bool ArmControllerRobai::setEndEffectorWrench(const Wrench& Wrench)
 	if(emergency_)
 		return false;
 
-	//! @todo MdL: Implement.
 	ROS_ERROR("Robai does not support force/torque control");
 	return false;
 }
