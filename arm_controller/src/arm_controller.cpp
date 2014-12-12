@@ -35,9 +35,6 @@ ArmController::ArmController( std::string name, ros::NodeHandle n )
     // Initialize all arm controllers
     initializeArmControllers();
 
-    // // Enable services / clients / publishers
-    // toggle_service_         = n_.advertiseService("/" + name_ + "/toggle_visual_correction", &ArmController::CB_toggle, this);
-    // reset_service_          = n_.advertiseService("/" + name_ + "/reset_visual_correction",  &ArmController::CB_reset,  this);
     // attach_item_service_    = n_.advertiseService("/" + name_ + "/set_item_attachment",      &ArmController::CB_attach_item,  this);
     // query_attached_items_service_    = n_.advertiseService("/" + name_ + "/get_item_attachment",      &ArmController::CB_query_attached_items,  this);
 
@@ -135,7 +132,7 @@ void ArmController::initializeArmControllers()
     ROS_INFO("Initializing arm controllers...");
     for (const auto& arm_controller : arm_controllers_ )
         if ( not arm_controller.second->initialize() )
-            ROS_ERROR("Could not initialize arm controller" ); //! @todo MdL: Add name of the controller / arm.
+            ROS_ERROR("Could not initialize arm controller" );
 
     ROS_INFO("Done.");
 }
@@ -278,7 +275,7 @@ void ArmController::CB_receiveVelocityGoal(const rose_arm_controller_msgs::set_v
     Twist goal_twist        = goal->required_velocity.twist;
     Twist goal_constraint   = goal->constraint.twist;
 
-    //! @todo MdL: Constraint always End Effector?.
+    //! @todo MdL: Constraint always Frame End Effector?.
     // arm_controller->setConstraints(goal_constraint);
     rose_arm_controller_msgs::set_velocityResult result;
     smc->sendServerResult<rose_arm_controller_msgs::set_velocityAction>(arm_controller->setEndEffectorVelocity(goal_twist), result );
