@@ -88,6 +88,7 @@ class ArmController
     void loadArmParameters();
     void loadArmPlugins();
     void initializeArmControllers();
+    void initializePublishersAndServices();
     void registerSharedVariables();
     void testArmMovement();
 
@@ -101,6 +102,9 @@ class ArmController
     // Helper functions
     bool armControllerExists(const std::string name);
     bool getArmController(const std::string name, boost::shared_ptr<arm_controller_base::ArmControllerBase>& arm_controller);
+    vector<string> generateJointNames(const std::string arm_name, const int nr_of_joints);
+
+    void updateJointStates();
 
     void CB_receivePositionGoal(const rose_arm_controller_msgs::set_positionGoalConstPtr& goal, SMC_position* smc);
     void CB_receivePositionCancel(SMC_position* smc);
@@ -111,9 +115,11 @@ class ArmController
 
     void CB_cancelVelocityForArms();
     void CB_emergency(const bool& emergency);
+    void CB_updateJointStates();
 
     std::string         name_;
     ros::NodeHandle     n_;
+    ros::Timer          joint_state_timer_;
 
     int                                     nr_of_arms_;
     std::map<std::string, std::string>      arm_plugins_;
@@ -122,8 +128,10 @@ class ArmController
     SMC_velocity*  set_velocity_smc_;
     SMC_gripper*   set_gripper_width_smc_;
 
-    pluginlib::ClassLoader<arm_controller_base::ArmControllerBase>          arm_controller_plugin_loader_;
+    pluginlib::ClassLoader<arm_controller_base::ArmControllerBase>                    arm_controller_plugin_loader_;
+
     std::map<std::string, boost::shared_ptr<arm_controller_base::ArmControllerBase>>  arm_controllers_;
+    std::map<std::string, ros::Publisher>                                             joint_state_publishers_;
 
     SharedVariable<bool>    sh_emergency_;      //!< Shared variable
     rose::Watchdog          velocity_watchdog_; //!< Watchdog for velocities

@@ -28,6 +28,7 @@ using geometry_msgs::Pose;
 using geometry_msgs::Twist;
 using geometry_msgs::Wrench;
 using sensor_msgs::JointState;
+using std::vector;
 
  /**
   * @brief Provides an interface to interact with each kind of arm.
@@ -69,6 +70,8 @@ class ArmControllerBase {
      * @return  If the emergency state was successfully recoverd.
      */
     virtual bool resetEmergencyStop() = 0;
+
+    virtual int getNumberOfJoints() = 0;
 
     /**
      * @brief Retrieves the position of the end effector.
@@ -116,7 +119,11 @@ class ArmControllerBase {
 
     virtual bool setEndEffectorWrench(const Wrench&) = 0;
 
-    virtual bool getJointStates(JointState&) = 0;
+    virtual bool getJointPositions(vector<double>&) = 0;
+
+    virtual bool getJointVelocities(vector<double>&) = 0;
+
+    virtual bool getJointEfforts(vector<double>&) = 0;
 
     // virtual bool hasMoveItInterface() = 0;
 

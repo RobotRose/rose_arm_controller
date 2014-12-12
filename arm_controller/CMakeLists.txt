@@ -4,10 +4,11 @@ project(arm_controller)
 find_package(catkin REQUIRED
 	COMPONENTS
 		arm_controller_base
+		pluginlib
+		roscpp
+		rose20_common
 		rose_arm_controller_msgs
 		rose_watchdogs
-		rose20_common
-		pluginlib
 		shared_variables
         tf
 )

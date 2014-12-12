@@ -37,6 +37,7 @@ ArmController::ArmController( std::string name, ros::NodeHandle n )
 
     // attach_item_service_    = n_.advertiseService("/" + name_ + "/set_item_attachment",      &ArmController::CB_attach_item,  this);
     // query_attached_items_service_    = n_.advertiseService("/" + name_ + "/get_item_attachment",      &ArmController::CB_query_attached_items,  this);
+    initializePublishersAndServices();
 
     // Register all shared variables
     registerSharedVariables();
@@ -137,6 +138,21 @@ void ArmController::initializeArmControllers()
     ROS_INFO("Done.");
 }
 
+void ArmController::initializePublishersAndServices()
+{
+    // attach_item_service_    = n_.advertiseService("/" + name_ + "/set_item_attachment",      &ArmController::CB_attach_item,  this);
+    // query_attached_items_service_    = n_.advertiseService("/" + name_ + "/get_item_attachment",      &ArmController::CB_query_attached_items,  this);
+
+    joint_state_publishers_.clear();
+    for (const auto& arm_controller : arm_controllers_ )
+    {
+        ros::Publisher joint_state_pub = n_.advertise<sensor_msgs::JointState>(name_ + "/" + arm_controller.first + "/joint_states", 1);
+        joint_state_publishers_[arm_controller.first] = joint_state_pub;
+    }
+
+    joint_state_timer_ = n_.createTimer(ros::Duration(0.0333), boost::bind(&ArmController::CB_updateJointStates, this));
+}
+
 void ArmController::registerSharedVariables()
 {
     //! @todo MdL: Uncomment.
@@ -207,6 +223,49 @@ bool ArmController::getArmController(const std::string name, boost::shared_ptr<a
 
     arm_controller = arm_controllers_[name];
     return true;
+}
+vector<string> ArmController::generateJointNames(const std::string arm_name, const int nr_of_joints)
+{
+    vector<string> names;
+    for ( int i = 0 ; i < nr_of_joints ; i++ )
+        names.push_back(arm_name + "_link" + std::to_string(i));
+
+    return names;
+}
+
+void ArmController::updateJointStates()
+{
+    for ( const auto& arm_controller : arm_controllers_ )
+    {
+        sensor_msgs::JointState joint_states;
+        joint_states.header.stamp  = ros::Time::now();
+        joint_states.name          = generateJointNames(arm_controller.first, arm_controller.second->getNumberOfJoints());
+
+        vector<double> joint_positions;
+        vector<double> joint_velocities;
+        vector<double> joint_efforts;
+
+        // Get joint positions
+        if ( arm_controller.second->getJointPositions(joint_positions) )
+            joint_states.position = joint_positions;
+        else
+            ROS_WARN_ONCE("Could not retrieve joint positions for %s", arm_controller.first.c_str());
+
+        // Get joint velocities
+        if ( arm_controller.second->getJointVelocities(joint_velocities) )
+            joint_states.velocity = joint_velocities;
+        else
+            ROS_WARN_ONCE("Could not retrieve joint velocities for %s", arm_controller.first.c_str());
+
+        // Get joint efforts
+        if ( arm_controller.second->getJointEfforts(joint_efforts) )
+            joint_states.effort = joint_efforts;
+        else
+            ROS_WARN_ONCE("Could not retrieve joint efforts for %s", arm_controller.first.c_str());
+
+        // Publish all information
+        joint_state_publishers_[arm_controller.first].publish(joint_states);
+    }
 }
 
 // Callback functions
@@ -353,5 +412,11 @@ void ArmController::CB_emergency(const bool& emergency)
         for ( const auto& arm_controller : arm_controllers_ )
             arm_controller.second->resetEmergencyStop();
 }
+
+void ArmController::CB_updateJointStates()
+{
+    updateJointStates();
+}
+
 
 }; // namespace

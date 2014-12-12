@@ -62,6 +62,11 @@ bool ArmControllerRobai::resetEmergencyStop()
 	return true;
 }
 
+int ArmControllerRobai::getNumberOfJoints() 
+{
+	return getNumJoints();
+}
+
 bool ArmControllerRobai::getEndEffectorPose(Pose& pose)
 {
 	//! @todo MdL: Check function during runtime.
@@ -244,9 +249,26 @@ bool ArmControllerRobai::setEndEffectorWrench(const Wrench& Wrench)
 	return false;
 }
 
-bool ArmControllerRobai::getJointStates(JointState& joint_states)
+bool ArmControllerRobai::getJointPositions(vector<double>& joint_positions)
 {
-	//! @todo MdL: Implement.
+    if (not getJointValues(joint_positions)) 
+    {
+    	ROS_ERROR("Could not get joint values");
+		return false;
+    }
+    
+	return false;
+}
+
+bool ArmControllerRobai::getJointVelocities(vector<double>& joint_velocities)
+{
+	ROS_ERROR("Cannot read joint velocities");
+	return false;
+}
+
+bool ArmControllerRobai::getJointEfforts(vector<double>& joint_angular_forces)
+{
+	ROS_ERROR("Cannot read joint efforts");
 	return false;
 }
 

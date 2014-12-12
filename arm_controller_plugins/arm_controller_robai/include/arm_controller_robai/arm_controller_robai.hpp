@@ -30,6 +30,7 @@ using geometry_msgs::Pose;
 using geometry_msgs::Twist;
 using geometry_msgs::Wrench;
 using sensor_msgs::JointState;
+using std::vector;
 
 using namespace Ec;
  /**
@@ -77,6 +78,8 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
      */
     bool resetEmergencyStop();
 
+    int getNumberOfJoints();
+
     /**
      * @brief Retrieves the position of the end effector.
      * @details A stamped pose of the gripper tip.
@@ -123,7 +126,11 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
 
     bool setEndEffectorWrench(const Wrench& Wrench);
 
-    bool getJointStates(JointState& joint_states);
+    bool getJointPositions(vector<double>& joint_positions);
+
+    bool getJointVelocities(vector<double>& joint_velocities);
+
+    bool getJointEfforts(vector<double>& joint_angular_forces);
 
     // bool hasMoveItInterface();
 

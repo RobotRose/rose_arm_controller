@@ -5,6 +5,7 @@ find_package(catkin
 	REQUIRED
 	COMPONENTS
 		arm_controller_base
+		roscpp
 		geometry_msgs
 		pluginlib
 		roscpp
