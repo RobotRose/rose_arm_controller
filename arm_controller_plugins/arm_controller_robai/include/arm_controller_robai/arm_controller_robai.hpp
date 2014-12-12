@@ -82,7 +82,7 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
      * @details A stamped pose of the gripper tip.
      * @return The end effector pose.
      */
-    Pose getEndEffectorPose();
+    bool getEndEffectorPose(Pose& pose);
 
     /**
      * @brief Sets the end effector pose.
@@ -98,7 +98,7 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
      * @details Twist msg.
      * @return The end effector velocity in ROS twist message.
      */
-    Twist getEndEffectorVelocity();
+    bool getEndEffectorVelocity(Twist& twist);
 
     /**
      * @brief Sets the end effector velicity.
@@ -109,7 +109,7 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
      */
     bool setEndEffectorVelocity(const Twist& velocity);
 
-    Twist getConstraints();
+    bool getConstraints(Twist& twist);
 
     bool setConstraints(const Twist& constraint);
 
@@ -119,11 +119,11 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
 
     bool setGripperWidth(const double required_width);
 
-    Wrench getEndEffectorWrench();
+    bool getEndEffectorWrench(Wrench& wrench);
 
     bool setEndEffectorWrench(const Wrench& Wrench);
 
-    JointState getJointStates();
+    bool getJointStates(JointState& joint_states);
 
     // bool hasMoveItInterface();
 

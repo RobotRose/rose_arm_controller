@@ -75,7 +75,7 @@ class ArmControllerBase {
      * @details A stamped pose of the gripper tip.
      * @return The end effector pose.
      */
-    virtual Pose getEndEffectorPose() = 0;
+    virtual bool getEndEffectorPose(Pose&) = 0;
 
     /**
      * @brief Sets the end effector pose.
@@ -84,14 +84,14 @@ class ArmControllerBase {
      * @param end_effector_pose The required end effector pose.
      * @return If the action was successful.
      */
-    virtual bool setEndEffectorPose(const Pose& end_effector_pose) = 0;
+    virtual bool setEndEffectorPose(const Pose&) = 0;
 
     /**
      * @brief Retrieves the end effector velocity.
      * @details Twist msg.
      * @return The end effector velocity in ROS twist message.
      */
-    virtual Twist getEndEffectorVelocity() = 0;
+    virtual bool getEndEffectorVelocity(Twist&) = 0;
 
     /**
      * @brief Sets the end effector velicity.
@@ -100,11 +100,11 @@ class ArmControllerBase {
      * @param velocity The required velocity.
      * @return Is the action was successful.
      */
-    virtual bool setEndEffectorVelocity(const Twist& velocity) = 0;
+    virtual bool setEndEffectorVelocity(const Twist&) = 0;
 
-    virtual Twist getConstraints() = 0;
+    virtual bool getConstraints(Twist&) = 0;
 
-    virtual bool setConstraints(const Twist& contraint) = 0;
+    virtual bool setConstraints(const Twist&) = 0;
 
     virtual bool resetConstraints() = 0;
 
@@ -112,11 +112,11 @@ class ArmControllerBase {
 
     virtual bool setGripperWidth(const double required_width) = 0; // required_width in [m]
 
-    virtual Wrench getEndEffectorWrench() = 0;
+    virtual bool getEndEffectorWrench(Wrench&) = 0;
 
-    virtual bool setEndEffectorWrench(const Wrench& Wrench) = 0;
+    virtual bool setEndEffectorWrench(const Wrench&) = 0;
 
-    virtual JointState getJointStates() = 0;
+    virtual bool getJointStates(JointState&) = 0;
 
     // virtual bool hasMoveItInterface() = 0;
 

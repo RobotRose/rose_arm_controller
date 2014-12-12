@@ -62,11 +62,29 @@ bool ArmControllerRobai::resetEmergencyStop()
 	return true;
 }
 
-Pose ArmControllerRobai::getEndEffectorPose()
+bool ArmControllerRobai::getEndEffectorPose(Pose& pose)
 {
-	//! @todo MdL: Implement.
-	Pose pose;
-	return pose;
+	//! @todo MdL: Check function during runtime.
+	EcManipulatorEndEffectorPlacement actual_arms_placement;
+	EcCoordinateSystemTransformation  actual_coordinate;
+	
+	if ( not getActualPlacement(actual_arms_placement))
+	{	
+		ROS_ERROR("Could not get end effector pose");
+		return false;
+	}
+
+	actual_coordinate  = actual_arms_placement.offsetTransformations()[getRobaiArmIndex()].coordSysXForm();
+
+    pose.position.x    = actual_coordinate.translation().x();
+    pose.position.y    = actual_coordinate.translation().y();
+    pose.position.z    = actual_coordinate.translation().z();
+    pose.orientation.x = actual_coordinate.orientation().x();
+    pose.orientation.y = actual_coordinate.orientation().y();
+    pose.orientation.z = actual_coordinate.orientation().z();
+    pose.orientation.w = actual_coordinate.orientation().w();
+
+	return true;
 }
 
 bool ArmControllerRobai::setEndEffectorPose(const Pose& end_effector_pose)
@@ -90,11 +108,10 @@ bool ArmControllerRobai::setEndEffectorPose(const Pose& end_effector_pose)
 	return manipulation_action_manager_.executePoseManipulation(getRobaiArmIndex(), getRobaiEndEffectorMode(), corrected_pose);
 }
 
-Twist ArmControllerRobai::getEndEffectorVelocity()
+bool ArmControllerRobai::getEndEffectorVelocity(Twist& twist)
 {
 	//! @todo MdL: Implement.
-	Twist twist;
-	return twist;
+	return false;
 }
 
 bool ArmControllerRobai::setEndEffectorVelocity(const Twist& velocity)
@@ -131,9 +148,8 @@ bool ArmControllerRobai::setEndEffectorVelocity(const Twist& velocity)
 	return true;
 }
 
-Twist ArmControllerRobai::getConstraints()
+bool ArmControllerRobai::getConstraints(Twist& twist)
 {
-	Twist twist;
 	if (getEndEffectorMode() == FRAME_EE)
 	{
 		//! @todo MdL: Verify.
@@ -152,9 +168,12 @@ Twist ArmControllerRobai::getConstraints()
 		// Do nothing (all zero values)
 	}
 	else
+	{
 		ROS_ERROR("Could not get constraints");
+		return false;
+	}
 	
-	return twist;
+	return true;
 }
 
 bool ArmControllerRobai::setConstraints(const Twist& constraint)
@@ -210,11 +229,10 @@ bool ArmControllerRobai::setGripperWidth(const double required_width)
 	return manipulation_action_manager_.executeGripperManipulation(getRobaiGripperIndex(), getRobaiEndEffectorMode(), percentage_open);
 }
 
-Wrench ArmControllerRobai::getEndEffectorWrench()
+bool ArmControllerRobai::getEndEffectorWrench(Wrench& wrench)
 {
 	ROS_ERROR("Robai does not support reading force/torque values");
-	Wrench wrench;
-	return wrench;
+	return false;
 }
 
 bool ArmControllerRobai::setEndEffectorWrench(const Wrench& Wrench)
@@ -226,11 +244,10 @@ bool ArmControllerRobai::setEndEffectorWrench(const Wrench& Wrench)
 	return false;
 }
 
-JointState ArmControllerRobai::getJointStates()
+bool ArmControllerRobai::getJointStates(JointState& joint_states)
 {
 	//! @todo MdL: Implement.
-	JointState joint_states;
-	return joint_states;
+	return false;
 }
 
 bool ArmControllerRobai::connectToArms(const std::string ip)
