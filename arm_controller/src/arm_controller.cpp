@@ -83,7 +83,7 @@ void ArmController::createSMCs()
             boost::bind(&ArmController::CB_receiveGripperGoal, this, _1, _2),
             boost::bind(&ArmController::CB_receiveGripperCancel, this, _1)
     );    
-    set_wrench_smc_ = new SMC_gripper(n_, name_+"/wrench",
+    set_wrench_smc_ = new SMC_wrench(n_, name_+"/wrench",
             boost::bind(&ArmController::CB_receiveWrenchGoal, this, _1, _2),
             boost::bind(&ArmController::CB_receiveWrenchCancel, this, _1)
     );
@@ -414,7 +414,7 @@ void ArmController::CB_receiveWrenchGoal(const rose_arm_controller_msgs::set_wre
         return;
 
     rose_arm_controller_msgs::set_wrenchResult result;
-    smc->sendServerResult<rose_arm_controller_msgs::set_wrenchAction>(arm_controller->setGripperWidth(goal->required_width), result );
+    smc->sendServerResult<rose_arm_controller_msgs::set_wrenchAction>(arm_controller->setEndEffectorWrench(goal->required_wrench), result );
 }
 
 void ArmController::CB_receiveWrenchCancel(SMC_wrench* smc)
