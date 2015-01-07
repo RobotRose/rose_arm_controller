@@ -51,7 +51,7 @@ namespace arm_controller_core {
 
 // #define MAX_ERROR 0.10        // in meters
 // #define MAX_WAITING_TIME 4.5  // in seconds
-#define VELOCITY_TIMEOUT 0.75  // seconds
+#define VELOCITY_TIMEOUT 0.75    // seconds
 
 using geometry_msgs::Pose;
 using geometry_msgs::Vector3;
