@@ -38,6 +38,10 @@
 #include "rose_arm_controller_msgs/set_gripper_widthGoal.h"
 #include "rose_arm_controller_msgs/set_gripper_widthResult.h"
 
+#include "rose_arm_controller_msgs/set_wrenchAction.h"
+#include "rose_arm_controller_msgs/set_wrenchGoal.h"
+#include "rose_arm_controller_msgs/set_wrenchResult.h"
+
 // #include "action_result_message.hpp"
 
 #include "rose_watchdogs/watchdog.hpp"
@@ -67,6 +71,7 @@ class ArmController
     typedef ServerMultipleClient<rose_arm_controller_msgs::set_positionAction>      SMC_position;
     typedef ServerMultipleClient<rose_arm_controller_msgs::set_velocityAction>      SMC_velocity;
     typedef ServerMultipleClient<rose_arm_controller_msgs::set_gripper_widthAction> SMC_gripper;
+    typedef ServerMultipleClient<rose_arm_controller_msgs::set_wrenchAction>        SMC_wrench;
 
     /**
      * Constructor
@@ -111,7 +116,9 @@ class ArmController
     void CB_receiveVelocityGoal(const rose_arm_controller_msgs::set_velocityGoalConstPtr& goal, SMC_velocity* smc);
     void CB_receiveVelocityCancel(SMC_velocity* smc);
     void CB_receiveGripperGoal(const rose_arm_controller_msgs::set_gripper_widthGoalConstPtr& goal, SMC_gripper* smc);
-    void CB_receiveGripperCancel(SMC_gripper* smc);
+    void CB_receiveGripperCancel(SMC_gripper* smc);    
+    void CB_receiveWrenchGoal(const rose_arm_controller_msgs::set_wrenchGoalConstPtr& goal, SMC_wrench* smc);
+    void CB_receiveWrenchCancel(SMC_wrench* smc);
 
     void CB_cancelVelocityForArms();
     void CB_emergency(const bool& emergency);
@@ -127,6 +134,7 @@ class ArmController
     SMC_position*  set_position_smc_;
     SMC_velocity*  set_velocity_smc_;
     SMC_gripper*   set_gripper_width_smc_;
+    SMC_wrench*    set_wrench_smc_;
 
     pluginlib::ClassLoader<arm_controller_base::ArmControllerBase>                    arm_controller_plugin_loader_;
 

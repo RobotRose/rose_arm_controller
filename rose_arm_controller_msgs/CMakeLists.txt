@@ -35,6 +35,7 @@ add_action_files(
 		set_position.action
 		set_velocity.action
 		set_gripper_width.action
+		set_wrench.action
 )
 
 # Generate added messages and services with any dependencies listed here

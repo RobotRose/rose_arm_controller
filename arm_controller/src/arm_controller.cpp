@@ -50,6 +50,7 @@ ArmController::ArmController( std::string name, ros::NodeHandle n )
     set_position_smc_->startServer();
     set_velocity_smc_->startServer();
     set_gripper_width_smc_->startServer();
+    set_wrench_smc_->startServer();
 
     ROS_INFO_NAMED(ROS_NAME, "Arm controller ready");
 }
@@ -81,6 +82,10 @@ void ArmController::createSMCs()
     set_gripper_width_smc_ = new SMC_gripper(n_, name_+"/gripper_width",
             boost::bind(&ArmController::CB_receiveGripperGoal, this, _1, _2),
             boost::bind(&ArmController::CB_receiveGripperCancel, this, _1)
+    );    
+    set_wrench_smc_ = new SMC_gripper(n_, name_+"/wrench",
+            boost::bind(&ArmController::CB_receiveWrenchGoal, this, _1, _2),
+            boost::bind(&ArmController::CB_receiveWrenchCancel, this, _1)
     );
 }
 
@@ -385,6 +390,41 @@ void ArmController::CB_receiveGripperCancel(SMC_gripper* smc)
     else
     {
         ROS_WARN_NAMED(ROS_NAME, "Setting arm gripper width cancelled, but there was no active goal.");
+        return;
+    }
+
+    boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller;
+    if ( not getArmController(goal->arm, arm_controller))
+        return;
+
+    arm_controller->cancel();
+}
+
+void ArmController::CB_receiveWrenchGoal(const rose_arm_controller_msgs::set_wrenchGoalConstPtr& goal, SMC_wrench* smc)
+{
+    if(sh_emergency_)
+    {
+        ROS_WARN_NAMED(ROS_NAME, "Will not set wrench due to emergency state.");
+        return;
+    }
+
+    // get arm controller. 
+    boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller;
+    if ( not getArmController(goal->arm, arm_controller))
+        return;
+
+    rose_arm_controller_msgs::set_wrenchResult result;
+    smc->sendServerResult<rose_arm_controller_msgs::set_wrenchAction>(arm_controller->setGripperWidth(goal->required_width), result );
+}
+
+void ArmController::CB_receiveWrenchCancel(SMC_wrench* smc)
+{
+    rose_arm_controller_msgs::set_wrenchGoalConstPtr goal;
+    if(smc->hasActiveGoal())
+        goal = smc->getLastGoal();
+    else
+    {
+        ROS_WARN_NAMED(ROS_NAME, "Setting arm wrench cancelled, but there was no active goal.");
         return;
     }
 
