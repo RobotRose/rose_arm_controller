@@ -6,7 +6,6 @@ project(rose_arm_controller_msgs)
 ## is used, also find other catkin packages
 find_package(catkin 
 	REQUIRED
-		message_generation 
 		actionlib_msgs 
 		geometry_msgs
 		std_msgs
@@ -52,5 +51,6 @@ catkin_package(
 	CATKIN_DEPENDS 
 		actionlib_msgs 
 		geometry_msgs
+		std_msgs
 #  DEPENDS system_lib
 )
