@@ -1,0 +1,9 @@
+# Goal
+string                         arm
+geometry_msgs/Wrench           required_wrench
+---
+# Result
+geometry_msgs/Wrench           end_wrench
+---
+# Feedback
+geometry_msgs/Wrench           current_wrench
