@@ -138,7 +138,7 @@ bool ArmControllerMico::setEndEffectorVelocity(const Twist& velocity)
 	cartesian_cmd.position 		= false;
 	cartesian_cmd.armCommand 	= true;
 	cartesian_cmd.fingerCommand = false;
-	cartesian_cmd.repeat 		= true; // What happens when you put this to false?
+	cartesian_cmd.repeat 		= false; // What happens when you put this to true?
 	cartesian_cmd.arm 			= velocity;
 
 	arm_velocity_publisher_.publish(cartesian_cmd);
