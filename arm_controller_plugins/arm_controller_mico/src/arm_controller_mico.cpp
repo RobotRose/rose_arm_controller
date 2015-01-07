@@ -20,10 +20,13 @@ ArmControllerMico::ArmControllerMico()
 	, joint_states_initialized_(false)
 	, emergency_(false)
 {
+	// Create all publishers
 	arm_velocity_publisher_				= n_.advertise<wpi_jaco_msgs::CartesianCommand>(ARM_NAME + std::string("/cartesian_cmd"), 1);
 
+	// Create all subscribers
 	joint_state_sub_ 					= n_.subscribe(ARM_NAME + std::string("/joint_states"), 1, &ArmControllerMico::CB_joint_state_received, this);
 
+	// Create all service clients
 	forward_kinematics_service_client_ 	= n_.serviceClient<wpi_jaco_msgs::JacoFK>(ARM_NAME + std::string("/kinematics/fk"));
 }
 
