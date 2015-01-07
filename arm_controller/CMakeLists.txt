@@ -28,14 +28,16 @@ include_directories(
 	include
 )
 
-add_executable(arm_controller
+add_executable(${PROJECT_NAME}
 	src/arm_controller.cpp
 	src/arm_controller_node.cpp
 )
 
-target_link_libraries(arm_controller 
+target_link_libraries(${PROJECT_NAME} 
 	${catkin_LIBRARIES}
 )
+
+add_dependencies(${PROJECT_NAME} rose_arm_controller_msgs_gencpp)
 
 install(
 	DIRECTORY 
