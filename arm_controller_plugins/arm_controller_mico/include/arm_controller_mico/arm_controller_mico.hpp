@@ -25,7 +25,9 @@
 #include "wpi_jaco_msgs/JacoFK.h"
 #include "wpi_jaco_msgs/CartesianCommand.h"
 
-#define ARM_NAME    "jaco_arm"
+#define ARM_NAME            "jaco_arm"
+#define MAX_GRIPPER_WIDTH   0.15 //[m]
+#define NR_FINGERS          2 
 
 namespace arm_controller_plugins {    
 
@@ -142,7 +144,7 @@ class ArmControllerMico : public arm_controller_base::ArmControllerBase {
     ros::NodeHandle     n_;
     ros::Publisher      arm_velocity_publisher_;
     ros::ServiceClient  forward_kinematics_service_client_;
-    
+
     bool                emergency_;
 
     std::mutex          joint_states_mutex_;
