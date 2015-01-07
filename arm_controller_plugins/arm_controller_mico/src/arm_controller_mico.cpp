@@ -1,0 +1,243 @@
+/***********************************************************************************
+* Copyright: Rose B.V. (2014)
+*
+* Revision History:
+*   Author: Mathijs de Langen
+*   Date  : 2015/01/07
+*       - File created.
+*
+* Description:
+*   This package describes the mico interface for robot arms. This plugin uses
+*   the WPI jaco package (http://wiki.ros.org/wpi_jaco)
+* 
+***********************************************************************************/
+#include "arm_controller_mico/arm_controller_mico.hpp"
+
+namespace arm_controller_plugins {
+
+ArmControllerMico::ArmControllerMico()
+	: n_("~mico_arm")
+	, joint_states_initialized_(false)
+	, emergency_(false)
+{
+	arm_velocity_publisher_				= n_.advertise<wpi_jaco_msgs::CartesianCommand>(ARM_NAME + std::string("/cartesian_cmd"), 1);
+
+	joint_state_sub_ 					= n_.subscribe(ARM_NAME + std::string("/joint_states"), 1, &ArmControllerMico::CB_joint_state_received, this);
+
+	forward_kinematics_service_client_ 	= n_.serviceClient<wpi_jaco_msgs::JacoFK>(ARM_NAME + std::string("/kinematics/fk"));
+}
+
+ArmControllerMico::~ArmControllerMico()
+{
+
+}
+
+bool ArmControllerMico::initialize()
+{
+	ROS_INFO("Initializing Mico arm...");
+	//! @todo MdL: Implement.
+	return false;
+}
+
+bool ArmControllerMico::close()
+{
+	//! @todo MdL: Implement.
+	return false;
+}
+
+bool ArmControllerMico::cancel()
+{
+	ROS_INFO("Cancel received");
+	//! @todo MdL: Implement.
+	return false;
+}
+
+bool ArmControllerMico::emergencyStop()
+{
+	emergency_ = true;
+
+	return cancel();
+}
+
+bool ArmControllerMico::resetEmergencyStop()
+{
+	emergency_ = false;
+
+	return true;
+}
+
+int ArmControllerMico::getNumberOfJoints() 
+{
+	//! @todo MdL: Implement.
+	vector<double> joint_positions;
+	if ( not getJointPositions(joint_positions))
+		ROS_ERROR("Could not get number of joints");
+
+	return joint_positions.size();
+}
+
+bool ArmControllerMico::getEndEffectorPose(Pose& pose)
+{
+	wpi_jaco_msgs::JacoFK service_call_message;
+
+	vector<double> joint_positions;
+	if ( not getJointPositions(joint_positions))
+	{
+		ROS_ERROR("Could not get joint positions");
+		return false;
+	}
+	
+	// Double to float 
+	service_call_message.request.joints = vector<float>(joint_positions.begin(), joint_positions.end());
+	if ( not forward_kinematics_service_client_.call(service_call_message))
+	{
+		ROS_ERROR("Could not retrieve forwards kinematics for arm");
+		return false;	
+	}
+	else
+	{
+		pose = service_call_message.response.handPose.pose;
+		return true;
+	}
+
+	// This return statement should never be reached.
+	return false;
+}
+
+bool ArmControllerMico::setEndEffectorPose(const Pose& end_effector_pose)
+{	
+	if (emergency_)
+		return false;
+
+	//! @todo MdL: Implement. MoveIt!
+	return false;
+}
+
+bool ArmControllerMico::getEndEffectorVelocity(Twist& twist)
+{
+	//! @todo MdL: Implement.
+	return false;
+}
+
+bool ArmControllerMico::setEndEffectorVelocity(const Twist& velocity)
+{
+	if (emergency_)
+		return false;
+
+	// bool position             # true for a position command, false for a velocity command
+	// bool armCommand           # true if this command includes arm joint inputs
+	// bool fingerCommand        # true if this command includes finger inputs
+	// bool repeat               # true if the command should be repeatedly sent over a short interval
+	// geometry_msgs/Twist arm   # position (m, rad) or velocity (m/s, rad/s) arm command
+	// float32[] fingers         # position (rad) or velocity (rad/s) finger command
+
+	wpi_jaco_msgs::CartesianCommand cartesian_cmd;
+	cartesian_cmd.position 		= false;
+	cartesian_cmd.armCommand 	= true;
+	cartesian_cmd.fingerCommand = false;
+	cartesian_cmd.repeat 		= true; // What happens when you put this to false?
+	cartesian_cmd.arm 			= velocity;
+
+	arm_velocity_publisher_.publish(cartesian_cmd);
+
+	//! @todo MdL: Implement.
+	return true;
+}
+
+bool ArmControllerMico::getConstraints(Twist& twist)
+{
+	//! @todo MdL: Implement.	
+	return false;
+}
+
+bool ArmControllerMico::setConstraints(const Twist& constraint)
+{
+	if(emergency_)
+		return false;
+
+	//! @todo MdL: Implement.
+	return false;
+}
+
+bool ArmControllerMico::resetConstraints()
+{
+	//! @todo MdL: Implement.
+	return false;
+}
+
+double ArmControllerMico::getGripperWidth()
+{
+	//! @todo MdL: Implement.
+	return 0.0;
+}
+
+bool ArmControllerMico::setGripperWidth(const double required_width)
+{	
+	if(emergency_)
+		return false;
+
+	//! @todo MdL: Implement.
+	return false;
+}
+
+bool ArmControllerMico::getEndEffectorWrench(Wrench& wrench)
+{
+	ROS_ERROR("Mico does not support reading force/torque values");
+	return false;
+}
+
+bool ArmControllerMico::setEndEffectorWrench(const Wrench& Wrench)
+{
+	if(emergency_)
+		return false;
+
+	ROS_ERROR("Mico does not support force/torque control");
+	return false;
+}
+
+bool ArmControllerMico::getJointPositions(vector<double>& joint_positions)
+{
+	joint_states_mutex_.lock();
+	
+	joint_positions = joint_states_.position;
+
+	joint_states_mutex_.unlock();
+
+	return true;
+}
+
+bool ArmControllerMico::getJointVelocities(vector<double>& joint_velocities)
+{
+	joint_states_mutex_.lock();
+	
+	joint_velocities = joint_states_.velocity;
+
+	joint_states_mutex_.unlock();
+
+	return true;
+}
+
+bool ArmControllerMico::getJointEfforts(vector<double>& joint_angular_forces)
+{
+	joint_states_mutex_.lock();
+	
+	joint_angular_forces = joint_states_.effort;
+
+	joint_states_mutex_.unlock();
+
+	return true;
+}
+
+void ArmControllerMico::CB_joint_state_received(const sensor_msgs::JointState::ConstPtr& joint_state)
+{
+	joint_states_mutex_.lock();
+
+	joint_states_initialized_ = true;
+	joint_states_ 			  = *joint_state;
+
+	joint_states_mutex_.unlock();
+}
+
+}; // namespace
+
+PLUGINLIB_EXPORT_CLASS(arm_controller_plugins::ArmControllerMico, arm_controller_base::ArmControllerBase);

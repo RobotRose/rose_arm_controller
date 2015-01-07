@@ -1,0 +1,7 @@
+<library path="lib/libarm_controller_mico">
+  <class type="arm_controller_plugins::ArmControllerMico" base_class_type="arm_controller_base::ArmControllerBase">
+    <description>
+      Implementation of the arm_controller for the Kinova Mico arm.
+    </description>
+  </class>
+</library>
