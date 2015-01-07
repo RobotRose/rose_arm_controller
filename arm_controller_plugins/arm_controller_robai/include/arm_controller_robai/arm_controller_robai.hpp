@@ -18,9 +18,9 @@
 #include <tf/tf.h>
 
 #include "arm_controller_base/arm_controller_base.hpp"
-#include "arm_controller_robai/robai_manipulation_action.hpp"
 
 //robai
+#include "arm_controller_robai/robai_manipulation_action.hpp"
 #include "remoteCommand/ecRemoteCommand.h"
 #include "remoteCommandClientPlugin/remoteCommandPlugin.h"
 
