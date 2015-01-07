@@ -68,7 +68,6 @@ bool ArmControllerMico::resetEmergencyStop()
 
 int ArmControllerMico::getNumberOfJoints() 
 {
-	//! @todo MdL: Implement.
 	vector<double> joint_positions;
 	if ( not getJointPositions(joint_positions))
 		ROS_ERROR("Could not get number of joints");
@@ -124,6 +123,7 @@ bool ArmControllerMico::setEndEffectorVelocity(const Twist& velocity)
 	if (emergency_)
 		return false;
 
+	// wpi_jaco_msgs::CartesianCommand message definition
 	// bool position             # true for a position command, false for a velocity command
 	// bool armCommand           # true if this command includes arm joint inputs
 	// bool fingerCommand        # true if this command includes finger inputs
@@ -176,8 +176,40 @@ bool ArmControllerMico::setGripperWidth(const double required_width)
 	if(emergency_)
 		return false;
 
-	//! @todo MdL: Implement.
-	return false;
+	// The two fingers on the MICO have a range of 
+	// approximately 0 (fully open) to 6400 (fully closed). 
+	// (http://wiki.ros.org/jaco_ros)
+
+	// Limit to the min and max values (0, MAX_GRIPPER_WIDTH)
+	std::min(std::max(required_width, 0.0), MAX_GRIPPER_WIDTH);
+
+	// Calculate the percentage open
+	double percentage_open = required_width/MAX_GRIPPER_WIDTH;
+
+	vector<float> finger_angles;
+	finger_angles.resize(NR_FINGERS);
+	for ( int i = 0 ; i < NR_FINGERS ; i++ )
+		// Since fully closed is 6400, we take the inverse of the percentage open
+		finger_angles[i] = (1.0 - percentage_open)*6400;
+
+	// wpi_jaco_msgs::CartesianCommand message definition
+	// bool position             # true for a position command, false for a velocity command
+	// bool armCommand           # true if this command includes arm joint inputs
+	// bool fingerCommand        # true if this command includes finger inputs
+	// bool repeat               # true if the command should be repeatedly sent over a short interval
+	// geometry_msgs/Twist arm   # position (m, rad) or velocity (m/s, rad/s) arm command
+	// float32[] fingers         # position (rad) or velocity (rad/s) finger command
+
+	wpi_jaco_msgs::CartesianCommand cartesian_cmd;
+	cartesian_cmd.position 		= true;
+	cartesian_cmd.armCommand 	= false;
+	cartesian_cmd.fingerCommand = true;
+	cartesian_cmd.repeat 		= false; 
+	cartesian_cmd.fingers		= finger_angles;
+
+	arm_velocity_publisher_.publish(cartesian_cmd);
+
+	return true;
 }
 
 bool ArmControllerMico::getEndEffectorWrench(Wrench& wrench)
