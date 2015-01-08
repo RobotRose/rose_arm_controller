@@ -21,7 +21,7 @@ ArmControllerMico::ArmControllerMico()
 	, emergency_(false)
 {
 	// Create all publishers
-	arm_cartesian_command_publisher_				= n_.advertise<wpi_jaco_msgs::CartesianCommand>(ARM_NAME + std::string("/cartesian_cmd"), 1);
+	arm_cartesian_command_publisher_	= n_.advertise<wpi_jaco_msgs::CartesianCommand>(ARM_NAME + std::string("/cartesian_cmd"), 1);
 
 	// Create all subscribers
 	joint_state_sub_ 					= n_.subscribe(ARM_NAME + std::string("/joint_states"), 1, &ArmControllerMico::CB_joint_state_received, this);
