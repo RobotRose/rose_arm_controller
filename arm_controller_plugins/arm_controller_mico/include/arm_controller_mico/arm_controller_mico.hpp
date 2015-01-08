@@ -24,6 +24,7 @@
 
 #include "wpi_jaco_msgs/JacoFK.h"
 #include "wpi_jaco_msgs/CartesianCommand.h"
+#include "wpi_jaco_msgs/GetCartesianPosition.h"
 
 #define ARM_NAME            "jaco_arm"
 #define MAX_GRIPPER_WIDTH   0.15 //[m]
@@ -143,7 +144,7 @@ class ArmControllerMico : public arm_controller_base::ArmControllerBase {
 
     ros::NodeHandle     n_;
     ros::Publisher      arm_cartesian_command_publisher_;
-    ros::ServiceClient  forward_kinematics_service_client_;
+    ros::ServiceClient  get_cartesian_position_client_;
 
     bool                emergency_;
 

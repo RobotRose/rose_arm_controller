@@ -27,7 +27,7 @@ ArmControllerMico::ArmControllerMico()
 	joint_state_sub_ 					= n_.subscribe(ARM_NAME + std::string("/joint_states"), 1, &ArmControllerMico::CB_joint_state_received, this);
 
 	// Create all service clients
-	forward_kinematics_service_client_ 	= n_.serviceClient<wpi_jaco_msgs::JacoFK>(ARM_NAME + std::string("/kinematics/fk"));
+	get_cartesian_position_client_ 		= n_.serviceClient<wpi_jaco_msgs::GetCartesianPosition>(ARM_NAME + std::string("/get_cartesian_position"));
 }
 
 ArmControllerMico::~ArmControllerMico()
@@ -80,25 +80,23 @@ int ArmControllerMico::getNumberOfJoints()
 
 bool ArmControllerMico::getEndEffectorPose(Pose& pose)
 {
-	wpi_jaco_msgs::JacoFK service_call_message;
+	wpi_jaco_msgs::GetCartesianPosition get_cartesian_position_message;
 
-	vector<double> joint_positions;
-	if ( not getJointPositions(joint_positions))
+	if ( not get_cartesian_position_client_.call(get_cartesian_position_message))
 	{
-		ROS_ERROR("Could not get joint positions");
-		return false;
-	}
-	
-	// Double to float 
-	service_call_message.request.joints = vector<float>(joint_positions.begin(), joint_positions.end());
-	if ( not forward_kinematics_service_client_.call(service_call_message))
-	{
-		ROS_ERROR("Could not retrieve forwards kinematics for arm");
+		ROS_ERROR("Could not retrieve end effector position");
 		return false;	
 	}
 	else
 	{
-		pose = service_call_message.response.handPose.pose;
+		pose.position.x 	= get_cartesian_position_message.response.pos.linear.x;
+		pose.position.y 	= get_cartesian_position_message.response.pos.linear.y;
+		pose.position.z 	= get_cartesian_position_message.response.pos.linear.z; 
+		pose.orientation 	= tf::createQuaternionMsgFromRollPitchYaw(
+			get_cartesian_position_message.response.pos.angular.x,
+			get_cartesian_position_message.response.pos.angular.y,
+			get_cartesian_position_message.response.pos.angular.z
+		);
 		return true;
 	}
 
