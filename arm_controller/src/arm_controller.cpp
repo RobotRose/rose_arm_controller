@@ -185,9 +185,9 @@ void ArmController::closeAllArmControllers()
 bool ArmController::stopArmMovement(const boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller)
 {
     geometry_msgs::Twist twist;
-    twist.linear.x = 0.0;
-    twist.linear.y = 0.0;
-    twist.linear.z = 0.0;
+    twist.linear.x  = 0.0;
+    twist.linear.y  = 0.0;
+    twist.linear.z  = 0.0;
     twist.angular.x = 0.0;
     twist.angular.y = 0.0;
     twist.angular.z = 0.0;
