@@ -170,8 +170,21 @@ bool ArmControllerMico::resetConstraints()
 
 double ArmControllerMico::getGripperWidth()
 {
-	//! @todo MdL: Implement.
-	return 0.0;
+	vector<double> joint_positions;
+	getJointPositions(joint_positions);
+
+	vector<double> finger_positions;
+	for ( int i = joint_positions.size() - NR_FINGERS ; i < joint_positions.size() ; i++ )
+		finger_positions.push_back(joint_positions[i]);
+
+	double percentage_total = 0;
+	for ( const auto& finger_position : finger_positions )
+		// Get percentage open Since fully closed is 6400, we take the inverse of the percentage
+		percentage_total += 1.0 - finger_position/6400;
+		
+	percentage_total = percentage_total/NR_FINGERS;
+
+	return percentage_total * MAX_GRIPPER_WIDTH;
 }
 
 bool ArmControllerMico::setGripperWidth(const double required_width)
