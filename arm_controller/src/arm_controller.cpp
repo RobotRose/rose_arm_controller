@@ -137,7 +137,7 @@ void ArmController::initializeArmControllers()
 {
     ROS_INFO("Initializing arm controllers...");
     for (const auto& arm_controller : arm_controllers_ )
-        if ( not arm_controller.second->initialize() )
+        if ( not arm_controller.second->initialize(arm_controller.first) )
             ROS_ERROR("Could not initialize arm controller" );
 
     ROS_INFO("Done.");

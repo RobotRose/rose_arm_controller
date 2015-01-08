@@ -48,7 +48,7 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
     */
     ~ArmControllerRobai();
 
-    bool initialize();
+    bool initialize( const std::string name = std::string() );
     
     /**
      * @brief When closing the arm controller
@@ -182,7 +182,8 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
     bool setVelocityControl();
 
     ros::NodeHandle n_;
-
+    std::string     name_;
+    
     bool emergency_;
 
     // parameters

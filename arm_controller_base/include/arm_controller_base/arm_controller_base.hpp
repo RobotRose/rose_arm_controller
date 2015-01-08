@@ -41,7 +41,7 @@ class ArmControllerBase {
      * @details For instance: A Robai arm should connect to a certain ip address.
      * @return If initialization was successful.
      */
-    virtual bool initialize() = 0;
+    virtual bool initialize( const std::string name = std::string() ) = 0;
 
     /**
      * @brief When closing the arm controller

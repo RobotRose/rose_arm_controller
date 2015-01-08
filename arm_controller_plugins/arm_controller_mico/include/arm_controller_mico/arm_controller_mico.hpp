@@ -28,7 +28,7 @@
 
 #define ARM_NAME            "jaco_arm"
 #define MAX_GRIPPER_WIDTH   0.15 //[m]
-#define NR_FINGERS          2 
+#define NR_FINGERS          3 // Jaco has three, Mico uses this software and sets properties of the third finger to 0.0
 
 namespace arm_controller_plugins {    
 
@@ -53,7 +53,7 @@ class ArmControllerMico : public arm_controller_base::ArmControllerBase {
     */
     ~ArmControllerMico();
 
-    bool initialize();
+    bool initialize( const std::string name = std::string() );
     
     /**
      * @brief When closing the arm controller
@@ -143,6 +143,8 @@ class ArmControllerMico : public arm_controller_base::ArmControllerBase {
     void CB_joint_state_received(const sensor_msgs::JointState::ConstPtr& joint_state);
 
     ros::NodeHandle     n_;
+    std::string         name_;
+    
     ros::Publisher      arm_cartesian_command_publisher_;
     ros::ServiceClient  get_cartesian_position_client_;
 

@@ -30,8 +30,9 @@ ArmControllerRobai::~ArmControllerRobai()
 
 }
 
-bool ArmControllerRobai::initialize()
+bool ArmControllerRobai::initialize( const std::string name )
 {
+	name_ = name;
 	ROS_INFO("Initializing Robai arm...");
 	return connectToArms();
 }

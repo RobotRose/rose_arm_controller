@@ -20,14 +20,16 @@ ArmControllerMico::ArmControllerMico()
 	, joint_states_initialized_(false)
 	, emergency_(false)
 {
+	ros::NodeHandle n;
+
 	// Create all publishers
-	arm_cartesian_command_publisher_	= n_.advertise<wpi_jaco_msgs::CartesianCommand>(ARM_NAME + std::string("/cartesian_cmd"), 1);
+	arm_cartesian_command_publisher_	= n.advertise<wpi_jaco_msgs::CartesianCommand>(ARM_NAME + std::string("/cartesian_cmd"), 1);
 
 	// Create all subscribers
-	joint_state_sub_ 					= n_.subscribe(ARM_NAME + std::string("/joint_states"), 1, &ArmControllerMico::CB_joint_state_received, this);
+	joint_state_sub_ 					= n.subscribe(ARM_NAME + std::string("/joint_states"), 1, &ArmControllerMico::CB_joint_state_received, this);
 
 	// Create all service clients
-	get_cartesian_position_client_ 		= n_.serviceClient<wpi_jaco_msgs::GetCartesianPosition>(ARM_NAME + std::string("/get_cartesian_position"));
+	get_cartesian_position_client_ 		= n.serviceClient<wpi_jaco_msgs::GetCartesianPosition>(ARM_NAME + std::string("/get_cartesian_position"));
 }
 
 ArmControllerMico::~ArmControllerMico()
@@ -35,8 +37,9 @@ ArmControllerMico::~ArmControllerMico()
 
 }
 
-bool ArmControllerMico::initialize()
+bool ArmControllerMico::initialize( const std::string name )
 {
+	name_ = name;
 	ROS_INFO("Initializing Mico arm...");
 	//! @todo MdL: Implement.
 	return false;
@@ -141,7 +144,6 @@ bool ArmControllerMico::setEndEffectorVelocity(const Twist& velocity)
 
 	arm_cartesian_command_publisher_.publish(cartesian_cmd);
 
-	//! @todo MdL: Implement.
 	return true;
 }
 
