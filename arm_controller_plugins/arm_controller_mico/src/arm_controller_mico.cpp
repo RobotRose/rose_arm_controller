@@ -21,7 +21,7 @@ ArmControllerMico::ArmControllerMico()
 	, emergency_(false)
 {
 	// Create all publishers
-	arm_velocity_publisher_				= n_.advertise<wpi_jaco_msgs::CartesianCommand>(ARM_NAME + std::string("/cartesian_cmd"), 1);
+	arm_cartesian_command_publisher_				= n_.advertise<wpi_jaco_msgs::CartesianCommand>(ARM_NAME + std::string("/cartesian_cmd"), 1);
 
 	// Create all subscribers
 	joint_state_sub_ 					= n_.subscribe(ARM_NAME + std::string("/joint_states"), 1, &ArmControllerMico::CB_joint_state_received, this);
@@ -141,7 +141,7 @@ bool ArmControllerMico::setEndEffectorVelocity(const Twist& velocity)
 	cartesian_cmd.repeat 		= false; // What happens when you put this to true?
 	cartesian_cmd.arm 			= velocity;
 
-	arm_velocity_publisher_.publish(cartesian_cmd);
+	arm_cartesian_command_publisher_.publish(cartesian_cmd);
 
 	//! @todo MdL: Implement.
 	return true;
@@ -210,7 +210,7 @@ bool ArmControllerMico::setGripperWidth(const double required_width)
 	cartesian_cmd.repeat 		= false; 
 	cartesian_cmd.fingers		= finger_angles;
 
-	arm_velocity_publisher_.publish(cartesian_cmd);
+	arm_cartesian_command_publisher_.publish(cartesian_cmd);
 
 	return true;
 }

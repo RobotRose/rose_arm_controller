@@ -142,7 +142,7 @@ class ArmControllerMico : public arm_controller_base::ArmControllerBase {
     void CB_joint_state_received(const sensor_msgs::JointState::ConstPtr& joint_state);
 
     ros::NodeHandle     n_;
-    ros::Publisher      arm_velocity_publisher_;
+    ros::Publisher      arm_cartesian_command_publisher_;
     ros::ServiceClient  forward_kinematics_service_client_;
 
     bool                emergency_;
