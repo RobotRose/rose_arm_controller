@@ -254,6 +254,12 @@ bool ArmControllerMico::getJointPositions(vector<double>& joint_positions)
 	return true;
 }
 
+bool ArmControllerMico::setJointPositions(const vector<double>& joint_positions)
+{
+	//! @todo MdL: Implement.
+	return false;
+}
+
 bool ArmControllerMico::getJointVelocities(vector<double>& joint_velocities)
 {
 	joint_states_mutex_.lock();
@@ -263,6 +269,12 @@ bool ArmControllerMico::getJointVelocities(vector<double>& joint_velocities)
 	joint_states_mutex_.unlock();
 
 	return true;
+}
+
+bool ArmControllerMico::setJointVelocities(const vector<double>& joint_velocities)
+{
+	//! @todo MdL: Implement.
+	return false;
 }
 
 bool ArmControllerMico::getJointEfforts(vector<double>& joint_angular_forces)
@@ -275,6 +287,13 @@ bool ArmControllerMico::getJointEfforts(vector<double>& joint_angular_forces)
 
 	return true;
 }
+
+bool ArmControllerMico::setJointEfforts(const vector<double>& joint_angular_forces)
+{
+	//! @todo MdL: Implement.
+	return false;
+}
+
 
 void ArmControllerMico::CB_joint_state_received(const sensor_msgs::JointState::ConstPtr& joint_state)
 {

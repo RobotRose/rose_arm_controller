@@ -121,9 +121,15 @@ class ArmControllerBase {
 
     virtual bool getJointPositions(vector<double>&) = 0;
 
+    virtual bool setJointPositions(const vector<double>&) = 0;
+
     virtual bool getJointVelocities(vector<double>&) = 0;
 
+    virtual bool setJointVelocities(const vector<double>&) = 0;
+
     virtual bool getJointEfforts(vector<double>&) = 0;
+
+    virtual bool setJointEfforts(const vector<double>&) = 0;
 
     // virtual bool hasMoveItInterface() = 0;
 

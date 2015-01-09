@@ -258,8 +258,20 @@ bool ArmControllerRobai::getJointPositions(vector<double>& joint_positions)
 		return false;
     }
     
-	return false;
+	return true;
 }
+
+bool ArmControllerRobai::setJointPositions(const vector<double>& joint_positions)
+{
+    if (not setJointValues(joint_positions)) 
+    {
+    	ROS_ERROR("Could not set joint values");
+		return false;
+    }
+    
+	return true;
+}
+
 
 bool ArmControllerRobai::getJointVelocities(vector<double>& joint_velocities)
 {
@@ -267,9 +279,21 @@ bool ArmControllerRobai::getJointVelocities(vector<double>& joint_velocities)
 	return false;
 }
 
+bool ArmControllerRobai::setJointVelocities(const vector<double>&)
+{
+	ROS_ERROR("Cannot set joint velocities");
+	return false;
+}
+
 bool ArmControllerRobai::getJointEfforts(vector<double>& joint_angular_forces)
 {
 	ROS_ERROR("Cannot read joint efforts");
+	return false;
+}
+
+bool ArmControllerRobai::setJointEfforts(const vector<double>& joint_angular_forces)
+{
+	ROS_ERROR("Cannot set joint efforts");
 	return false;
 }
 

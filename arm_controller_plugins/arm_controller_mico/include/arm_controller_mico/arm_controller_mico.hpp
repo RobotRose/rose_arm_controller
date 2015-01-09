@@ -131,12 +131,17 @@ class ArmControllerMico : public arm_controller_base::ArmControllerBase {
 
     bool setEndEffectorWrench(const Wrench& Wrench);
 
-    bool getJointPositions(vector<double>& joint_positions);
+    bool getJointPositions(vector<double>&);
 
-    bool getJointVelocities(vector<double>& joint_velocities);
+    bool setJointPositions(const vector<double>&);
 
-    bool getJointEfforts(vector<double>& joint_angular_forces);
+    bool getJointVelocities(vector<double>&);
 
+    bool setJointVelocities(const vector<double>&);
+
+    bool getJointEfforts(vector<double>&);
+
+    bool setJointEfforts(const vector<double>&);
     // bool hasMoveItInterface();
 
   private:
