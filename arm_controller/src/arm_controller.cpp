@@ -169,7 +169,7 @@ void ArmController::registerSharedVariables()
 void ArmController::testArmMovement()
 {
     bool allow_first_movement;
-    n_.param("/allow_first_movement", allow_first_movement, true);
+    n_.param("/open_close_gripper_on_init", allow_first_movement, true);
 
     if (allow_first_movement)
         testMovementGrippers();

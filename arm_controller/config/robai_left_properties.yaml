@@ -1,6 +1,7 @@
-# Specific robai properties.
+# Specific properties for the robai left arm.
 
-robai_configuration:
+robai_left_configuration:
+
     # Correction from the point that is controlled by the position control to the gripper tip.
     # The Robai arm is controlled via its wrist joint
     gripper_tip_correction: 0.155

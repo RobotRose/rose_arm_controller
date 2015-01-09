@@ -1,0 +1,11 @@
+# This name should be the name defined in rm_basic_properties.yaml as <name>_configuration
+mico_configuration:
+
+	# This prefix is used to communicate with the arm. This is defined in the launch file for the Mico/Jaco arm
+	arm_prefix: "jaco_arm"
+
+	# Defined the width that the gripper can be opened
+	max_gripper_width: 0.15
+
+	# For the Kinova arm, define the number of fingers that are avaiable
+	nr_fingers: 2
