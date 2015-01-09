@@ -193,7 +193,9 @@ class ArmControllerRobai : public arm_controller_base::ArmControllerBase {
     bool emergency_;
 
     // parameters
-    double gripper_tip_correction_parameter_;
+    double  gripper_tip_correction_parameter_;
+    int     max_manipulation_tries_parameter_;
+    bool    enable_path_planning_function_parameter_;
 
     arm_controller_robai::RobaiManipulationAction manipulation_action_manager_;
 

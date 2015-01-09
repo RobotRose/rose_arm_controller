@@ -52,15 +52,17 @@ class RobaiManipulationAction
 	RobaiManipulationAction();
 	~RobaiManipulationAction();
 
-	bool executePoseManipulation(const int& arm_index, const int& end_effector_index, const Pose& pose);
-	bool executeGripperManipulation(const int& arm_index, const int& end_effector_index, const int& percentage_open);
-	bool executeJointPositionManipulation();
+    void setMaxManipulationTries(const int);
+    void enablePathPlanningFunction(const bool);
+
+    bool executePoseManipulation(const int& arm_index, const int& end_effector_index, const Pose& pose);
+    bool executeGripperManipulation(const int& arm_index, const int& end_effector_index, const int& percentage_open);
+    bool executeJointPositionManipulation();
 
 	bool cancelManipulation();
 	bool manipulationActive();
 
   private:
-  	bool loadParameters();
 
   	bool loadManipulationActionManager();
 	bool readManipulationManagerFile();
@@ -123,9 +125,8 @@ class RobaiManipulationAction
     ros::NodeHandle n_;
 
     // Parameters
-    double 	gripper_tip_correction_parameter_;
-    int 	max_manipulation_tries_parameter_;
-    bool 	enable_path_planning_function_parameter_;
+    int 	max_manipulation_tries_;
+    bool 	enable_path_planning_function_;
 
     EcManipulationActionManager manager_;
 

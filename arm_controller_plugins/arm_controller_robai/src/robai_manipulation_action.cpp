@@ -18,14 +18,23 @@ RobaiManipulationAction::RobaiManipulationAction()
     : n_("~robai_manipulation_action")
 {
     // Create private node handle
-
-    loadParameters();
 }
 
 RobaiManipulationAction::~RobaiManipulationAction()
 {
 
 }
+
+void RobaiManipulationAction::setMaxManipulationTries(const int max_manipulation_tries )
+{
+    max_manipulation_tries_ = max_manipulation_tries;
+}
+
+void RobaiManipulationAction::enablePathPlanningFunction(const bool enable_path_planning_function )
+{
+    enable_path_planning_function_ = enable_path_planning_function;
+}
+
 
 bool RobaiManipulationAction::executePoseManipulation(const int& arm_index, const int& end_effector_index, const Pose& pose)
 {
@@ -43,7 +52,7 @@ bool RobaiManipulationAction::executePoseManipulation(const int& arm_index, cons
     Pose corrected_pose = pose; //! @todo MdL: Find out what to do here.
 
     bool result = false;
-    if (enable_path_planning_function_parameter_ && not cancelled_)
+    if (enable_path_planning_function_ && not cancelled_)
     {
         if (not setPathPlanningDesiredPlacement(convertToRobaiPose(arm_index, corrected_pose)))
             ROS_ERROR("Could not set path planning pose.");
@@ -93,25 +102,6 @@ bool RobaiManipulationAction::cancelManipulation()
 bool RobaiManipulationAction::manipulationActive()
 {
 	return manipulation_active_;
-}
-
-bool RobaiManipulationAction::loadParameters()
-{
-    ROS_INFO("Loading robai arm parameters...");
-
-    //! @todo MdL: Check is values are loaded from configuration.
-    // if(not )
-    //     ROS_WARN("Maximal number of manipulation tries was not set in confugation file, defaulting to %d", max_manipulation_tries_parameter_);
-
-    // if(not )
-    //     ROS_WARN("Enable/Disable path planning function not set, not using function");
-
-    n_.param("/robai_configuration/max_manipulation_tries", max_manipulation_tries_parameter_, 1);
-    n_.param("/robai_configuration/enable_path_planning_function", enable_path_planning_function_parameter_, false);
-
-    ROS_INFO("Done.");
-
-    return true;
 }
 
 bool RobaiManipulationAction::loadManipulationActionManager()
@@ -270,7 +260,7 @@ bool RobaiManipulationAction::executeAction()
 
     bool result = false;
     int nr_fails = 0;
-    while (not result && nr_fails < max_manipulation_tries_parameter_ && not cancelled_)
+    while (not result && nr_fails < max_manipulation_tries_ && not cancelled_)
     {
         executeXmlAction();
 

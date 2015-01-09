@@ -23,6 +23,9 @@ ArmControllerRobai::ArmControllerRobai()
 {
 	// Load the parameters that are needed
 	loadParameters();
+
+	manipulation_action_manager_.setMaxManipulationTries(max_manipulation_tries_parameter_);
+    manipulation_action_manager_.enablePathPlanningFunction(enable_path_planning_function_parameter_);
 }
 
 ArmControllerRobai::~ArmControllerRobai()
@@ -336,7 +339,9 @@ bool ArmControllerRobai::loadParameters()
     // if(not )
     //    ROS_WARN("Gripper tip correction was not set in confugation file, defaulting to %f", gripper_tip_correction_parameter_);
 
-    n_.param("/robai_configuration/gripper_tip_correction", gripper_tip_correction_parameter_, 0.155);
+    n_.param(name_ + "_configuration/gripper_tip_correction", gripper_tip_correction_parameter_, 0.155);
+    n_.param(name_ + "_configuration/max_manipulation_tries", max_manipulation_tries_parameter_, 1);
+    n_.param(name_ + "_configuration/enable_path_planning_function", enable_path_planning_function_parameter_, false);
 
     ROS_INFO("Done.");
 
