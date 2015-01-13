@@ -16,11 +16,17 @@
 
 #include <ros/ros.h>
 
+#include <actionlib/client/simple_action_client.h>
 #include <mutex>  
 #include <pluginlib/class_list_macros.h>
 #include <tf/tf.h>
 
 #include "arm_controller_base/arm_controller_base.hpp"
+
+#include "rose_moveit_controller/arm_goalAction.h"
+#include "rose_moveit_controller/arm_goalGoal.h"
+#include "rose_moveit_controller/arm_goalFeedback.h"
+#include "rose_moveit_controller/arm_goalResult.h"
 
 #include "wpi_jaco_msgs/JacoFK.h"
 #include "wpi_jaco_msgs/CartesianCommand.h"
@@ -43,7 +49,7 @@ using std::vector;
   */
 class ArmControllerMico : public arm_controller_base::ArmControllerBase {
   public:
-    typedef actionlib::SimpleActionClient<rose_moveit_controller::arm_goal> MoveItClient;
+    typedef actionlib::SimpleActionClient<rose_moveit_controller::arm_goalAction> MoveItClient;
 
     /**
     * @brief  Constructor
