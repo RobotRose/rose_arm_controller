@@ -19,7 +19,7 @@ ArmControllerMico::ArmControllerMico()
 	: n_("~mico_arm")
 	, joint_states_initialized_(false)
 	, emergency_(false)
-	, move_it_client_("rose_moveit_server", true)
+	, move_it_client_("rose_moveit_controller", true)
 {
 	ros::NodeHandle n;
 
