@@ -43,6 +43,8 @@ using std::vector;
   */
 class ArmControllerMico : public arm_controller_base::ArmControllerBase {
   public:
+    typedef actionlib::SimpleActionClient<rose_moveit_controller::arm_goal> MoveItClient;
+
     /**
     * @brief  Constructor
     */
@@ -152,6 +154,8 @@ class ArmControllerMico : public arm_controller_base::ArmControllerBase {
     
     ros::Publisher      arm_cartesian_command_publisher_;
     ros::ServiceClient  get_cartesian_position_client_;
+
+    MoveItClient        move_it_client_;
 
     bool                emergency_;
 

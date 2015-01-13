@@ -30,6 +30,9 @@ ArmControllerMico::ArmControllerMico()
 
 	// Create all service clients
 	get_cartesian_position_client_ 		= n.serviceClient<wpi_jaco_msgs::GetCartesianPosition>(ARM_NAME + std::string("/get_cartesian_position"));
+
+	// Create actionlib client
+	move_it_client_ 					= MoveItClient("jaco_arm_moveit_server", true);
 }
 
 ArmControllerMico::~ArmControllerMico()
@@ -111,6 +114,12 @@ bool ArmControllerMico::setEndEffectorPose(const Pose& end_effector_pose)
 {	
 	if (emergency_)
 		return false;
+
+	rose_moveit_controller::arm_goal goal;
+	goal.pose = end_effector_pose;
+
+	move_it_client_.sendGoal(goal);
+	move_it_client_.waitForResult(ros::Duration(0.0)); // infinite?
 
 	//! @todo MdL: Implement. MoveIt!
 	return false;
