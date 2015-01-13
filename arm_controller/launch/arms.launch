@@ -1,0 +1,7 @@
+<launch>
+
+	<rosparam command="load" file="$(find arm_controller)/config/arm_basic_properties.yaml"/>
+	<rosparam command="load" file="$(find arm_controller)/config/mico_properties.yaml"/>
+
+	<node name="arm_controller" pkg="arm_controller" type="arm_controller" output="screen" />
+</launch>
