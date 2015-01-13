@@ -1,0 +1,64 @@
+/.tags
+# Exluded binary, build and devel
+bin/
+build/
+devel/
+
+#IDE files
+.tags
+.tags_sorted_by_file
+
+# Generated model files (for now, we only gitize the urdfs)
+*.sdf
+*.urdf
+
+#ROS generated folders
+msg_gen
+srv_gen
+
+# GEdit backup files
+*.*~
+
+# Generated files
+.catkin_workspace
+*.cfgc
+cfg/**
+_*.py
+*Config.py
+*Action.msg
+*ActionFeedback.msg
+*ActionResult.msg
+*Feedback.msg
+*Goal.msg
+*Result.msg
+*.asd-dep
+*.asd
+*.dox
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Compiled python files
+*.pyc
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Arm controller config file
+arm_controller_plugins/arm_controller_robai/config/manipulate_action.xml
