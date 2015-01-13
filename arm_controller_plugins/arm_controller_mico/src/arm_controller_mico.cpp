@@ -111,6 +111,7 @@ bool ArmControllerMico::getEndEffectorPose(Pose& pose)
 bool ArmControllerMico::setEndEffectorPose(const Pose& end_effector_pose)
 {	
 	ROS_INFO("Setting end effector pose...");
+	
 	if (emergency_)
 		return false;
 
