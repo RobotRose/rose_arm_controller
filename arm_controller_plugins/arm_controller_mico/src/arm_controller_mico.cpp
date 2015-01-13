@@ -19,7 +19,7 @@ ArmControllerMico::ArmControllerMico()
 	: n_("~mico_arm")
 	, joint_states_initialized_(false)
 	, emergency_(false)
-	, move_it_client_("jaco_arm_moveit_server", true)
+	, move_it_client_("rose_moveit_server", true)
 {
 	ros::NodeHandle n;
 
@@ -110,6 +110,7 @@ bool ArmControllerMico::getEndEffectorPose(Pose& pose)
 
 bool ArmControllerMico::setEndEffectorPose(const Pose& end_effector_pose)
 {	
+	ROS_INFO("Setting end effector pose...");
 	if (emergency_)
 		return false;
 
