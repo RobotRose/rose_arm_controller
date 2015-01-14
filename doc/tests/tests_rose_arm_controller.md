@@ -72,7 +72,7 @@ Here, *V* is a certain distance (time x velocity).
 Send a goal to set the gripper width of an arm.
 
 ID | Input values			| Expected results 		|				| Measured values 		| 			|			    ||		
----|:----------------------:|-----------------------|---------------|-----------------------|-----------|---------------
+---|:----------------------:|-----------------------|---------------|-----------------------|-----------|---------------|----
    | **required_width** [m] | **actionlib succes**	| **end_width** | **actionlib succes**	| **width** | **feedback** 	| **arm moved** 
  1 | 0.0        			| true 					| 0.0      		| true/false			|			| yes/no		| yes/no		
  2 | 0.05        			| true 					| 0.05     		| true/false			|			| yes/no		| yes/no		
