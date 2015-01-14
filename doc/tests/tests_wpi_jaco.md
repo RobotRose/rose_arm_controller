@@ -58,20 +58,20 @@ jaco_arm/get_cartesian_position | jaco_msgs/GetCartesianPosition| Read the Carte
 ### jaco_arm/fingers_controller
 Send a goal to the gripper to open, go half-way open and close.
 
-ID | Input values			| Expected results 	|			| Measured values 	| 			| 				|
----|:----------------------:|-------------------| ----------|-------------------|-----------|---------------
-   | command.position [m] 	| reached_goal		| position 	| reached_goal 		| position 	|  arm moved? 	|
- 1 | 0.0        			| true 				| 0.0      	| true/false		|			| yes/no		|
- 2 | 0.05        			| true 				| 0.05     	| true/false		|			| yes/no		|
- 3 | 0.10        			| true 				| 0.10 		| true/false		|			| yes/no		|
- 3 | 0.50 (wide)			| false 			| ?			| true/false		|			| yes/no		|
+ID | Input values			| Expected results 	|				| Measured values 	| 				| 				|
+---|:----------------------:|-------------------| --------------|-------------------|---------------|---------------
+   | **command.position**[m]| **reached_goal**	| **position** 	| **reached_goal**	| **position** 	|  **arm moved?** 	|
+ 1 | 0.0        			| true 				| 0.0      		| true/false		|				| yes/no		|
+ 2 | 0.05        			| true 				| 0.05     		| true/false		|				| yes/no		|
+ 3 | 0.10        			| true 				| 0.10 			| true/false		|				| yes/no		|
+ 3 | 0.50 (wide)			| false 			| ?				| true/false		|				| yes/no		|
 
 ### jaco_arm/home_arm
 Send a goal to move the arm to the homing position.
 
 ID | Input values			| Expected Results 	| Measured values 	|   			|
 ---|:----------------------:|-------------------| ------------------| --------------
-   | retract [bool]			| succes			| succes     		|  arm moved? 	|
+   | **retract** [bool]		| **succes**		| **succes**    	| **arm moved?**|
  1 | false        			| true 				| true/false		| yes/no 		|
 
 ### jaco_arm/angular_cmd
@@ -88,7 +88,7 @@ bool 				| position      | true for a position command, false for a velocity com
 bool 				| armCommand    | true if this command includes arm joint inputs						|
 bool 				| fingerCommand | true if this command includes finger inputs 							|
 bool 				| repeat        | true if the command should be repeatedly sent over a short interval 	|
-geometry_msgs/Twist	| arm    		| position (m, rad) or velocity (m/s, rad/s) arm command 						|
+geometry_msgs/Twist	| arm    		| position (m, rad) or velocity (m/s, rad/s) arm command 				|
 float32[] 			| fingers   	| position (rad) or velocity (rad/s) finger command 					|
 
 #### Position command (arm)
@@ -97,7 +97,7 @@ The variables armCommand and fingerCommand are both set to *false*, since this c
 
 ID | Input values			| Expected Results 	| Measured values 	|
 ---|:----------------------:|-------------------| ------------------
-   | arm [Twist]					| position			| position     		|  
+   | **arm** [Twist]		| **position**		| **position**  	|  
  1 | valid position 		|  					|  					|
 
 #### Position command (fingers)
@@ -106,7 +106,7 @@ The variables armCommand and fingerCommand are both set to *false*, since this c
 
 ID | Input values			| Expected Results 	| Measured values 	|
 ---|:----------------------:|-------------------| ------------------
-   | fingers [float32[]]	| position			| position     		|
+   | **fingers** [float32[]]| **position**		| **position**    	|
  1 | [0.01, 0.01, 0.01]		|  					|  					|  
  2 | [0.1,0.1, 0.1]		 	|  					|  					|
  3 | [0.2,0.2, 0.2]		 	|  					|  					|
@@ -118,7 +118,7 @@ The variables armCommand and fingerCommand are both set to *false*, since this c
 
 ID | Input values			| Expected Results 	| Measured values 	|
 ---|:----------------------:|-------------------| ------------------
-   | arm [Twist]			| position			| position     		|  
+   | **arm** [Twist]		| **position**		| **position**  	|  
  1 | valid position 		|  					|  					|
 
 #### Velocity command (fingers)
@@ -128,7 +128,7 @@ The variables armCommand and fingerCommand are both set to *false*, since this c
 
 ID | Input values			| Expected Results 	| Measured values 	|
 ---|:----------------------:|-------------------| ------------------
-   | fingers [float32[]]	| **position**		| **position** 		|  
+   | **fingers** [float32[]]| **position**		| **position** 		|  
  1 | [0.01, 0.01, 0.01]		|  					|  					|  
  2 | [0.1,0.1, 0.1]		 	|  					|  					|
  3 | [0.2,0.2, 0.2]		 	|  					|  					|
