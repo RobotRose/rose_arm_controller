@@ -99,7 +99,7 @@ ID | Input values			| Expected Results 	| Measured values 	|
    | arm 					| position			| position     		|  
  1 | valid position 		|  					|  					|
 
- #### Position command (fingers)
+#### Position command (fingers)
 For this the *position* input is always set to *true*.
 The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
 
