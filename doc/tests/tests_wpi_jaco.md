@@ -104,9 +104,9 @@ ID | Input values			| Expected Results 		| Measured values
  1 | linear.x = 0.1 		| home pos + 0.1 in x L	|  					
  2 | linear.y = 0.1 		| home pos + 0.1 in y L	|  
  3 | linear.z = 0.1 		| home pos + 0.1 in z L	|  
- 1 | angualar.x = 0.1 		| home pos + 0.1 in x A	|  					
- 2 | angualar.y = 0.1 		| home pos + 0.1 in y A	|  
- 3 | angualar.z = 0.1 		| home pos + 0.1 in z A	|  
+ 4 | angualar.x = 0.1 		| home pos + 0.1 in x A	|  					
+ 5 | angualar.y = 0.1 		| home pos + 0.1 in y A	|  
+ 6 | angualar.z = 0.1 		| home pos + 0.1 in z A	|  
 
 #### Position command (fingers)
 For this the *position* input is always set to *true*.
@@ -124,10 +124,18 @@ For this the *position* input is always set to *false*
 
 The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
 
-ID | Input values			| Expected Results 	| Measured values 
----|:----------------------:|-------------------| ------------------
-   | **arm** [Twist]		| **position**		| **position**  	
- 1 | valid position 		|  					|  					
+All tests starting from home position. Input of values of *arm* (below) are all zero, unless described differently.
+
+ID | Input values			| Expected Results 		| Measured values 	
+---|:----------------------:|-----------------------| ------------------
+   | **arm** [Twist]		| **position**			| **position**  	
+ 0 | Home position 			| -						| 
+ 1 | linear.x = 0.1 		| home pos + 0.1 in x L	|  					
+ 2 | linear.y = 0.1 		| home pos + 0.1 in y L	|  
+ 3 | linear.z = 0.1 		| home pos + 0.1 in z L	|  
+ 4 | angualar.x = 0.1 		| home pos + 0.1 in x A	|  					
+ 5 | angualar.y = 0.1 		| home pos + 0.1 in y A	|  
+ 6 | angualar.z = 0.1 		| home pos + 0.1 in z A	|  
 
 #### Velocity command (fingers)
 For this the *position* input is always set to *false*
