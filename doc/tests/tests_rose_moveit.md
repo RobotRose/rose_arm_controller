@@ -57,7 +57,7 @@ For this we start rviz with the interactive markers. We generate a random pose f
 
 There is a launch file *test_rose_moveit_controller.launch* in the launch directory for this test.
 
-The interface of the rose_moveit_controller is tested on planning to certain points. 
+The interface of the rose_moveit_controller is tested on planning to certain points. The points from previous test. This is because the rose_moveit_controller crashes on unreachable points at the moment.
 
 ## Tests interesting for later
 
