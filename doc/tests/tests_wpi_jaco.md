@@ -128,7 +128,7 @@ The variables armCommand and fingerCommand are both set to *false*, since this c
 
 ID | Input values			| Expected Results 	| Measured values 	|
 ---|:----------------------:|-------------------| ------------------
-   | fingers [float32[]]	| _position_		| _position_     		|  
+   | fingers [float32[]]	| **position**		| **position** 		|  
  1 | [0.01, 0.01, 0.01]		|  					|  					|  
  2 | [0.1,0.1, 0.1]		 	|  					|  					|
  3 | [0.2,0.2, 0.2]		 	|  					|  					|
