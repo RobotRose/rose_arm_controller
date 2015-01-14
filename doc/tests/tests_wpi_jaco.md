@@ -53,8 +53,7 @@ Topic 							| Message Type     				| Description
 --------------------------------|:-----------------------------:|-----------
 jaco_arm/get_cartesian_position | jaco_msgs/GetCartesianPosition| Read the Cartesian position from the arm
 
-Tests and Results
------------------
+Tests and Expected Results---------------
 
 ### jaco_arm/fingers_controller
 Send a goal to the gripper to open, go half-way open and close.
@@ -69,10 +68,10 @@ ID | Input values			| Expected results 	|			| Measured values 	| 			| 				|
 
 ### jaco_arm/home_arm
 
-ID | Input values			| Results	   	| Measured values 	|   			|
----|:----------------------:|---------------| ------------------| --------------
-   | retract 				| succes		| succes     		|  arm moved? 	|
- 1 | false        			| true 			| true/false		| yes/no 		|
+ID | Input values			| Expected Results 	| Measured values 	|   			|
+---|:----------------------:|-------------------| ------------------| --------------
+   | retract 				| succes			| succes     		|  arm moved? 	|
+ 1 | false        			| true 				| true/false		| yes/no 		|
 
 ### jaco_arm/angular_cmd
 Publish an angular command. Meaning: Sending joint angles. We do not test this at this time.
@@ -95,43 +94,43 @@ float32[] 			| fingers   	| position (rad) or velocity (rad/s) finger command 		
 For this the *position* input is always set to *true*.
 The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
 
-ID | Input values			| Results	   	| Measured values 	|
----|:----------------------:|---------------| ------------------
-   | arm 					| position		| position     		|  
- 1 | valid position 		|  				|  					|
+ID | Input values			| Expected Results 	| Measured values 	|
+---|:----------------------:|-------------------| ------------------
+   | arm 					| position			| position     		|  
+ 1 | valid position 		|  					|  					|
 
  #### Position command (fingers)
 For this the *position* input is always set to *true*.
 The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
 
-ID | Input values			| Results	   	| Measured values 	|
----|:----------------------:|---------------| ------------------
-   | fingers				| position		| position     		|
- 1 | [0.01, 0.01, 0.01]		|  				|  					|  
- 2 | [0.1,0.1, 0.1]		 	|  				|  					|
- 3 | [0.2,0.2, 0.2]		 	|  				|  					|
+ID | Input values			| Expected Results 	| Measured values 	|
+---|:----------------------:|-------------------| ------------------
+   | fingers				| position			| position     		|
+ 1 | [0.01, 0.01, 0.01]		|  					|  					|  
+ 2 | [0.1,0.1, 0.1]		 	|  					|  					|
+ 3 | [0.2,0.2, 0.2]		 	|  					|  					|
 
 #### Velocity command (arm)
 For this the *position* input is always set to *false*
 
 The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
 
-ID | Input values			| Results	   	| Measured values 	|
----|:----------------------:|---------------| ------------------
-   | arm 					| position		| position     		|  
- 1 | valid position 		|  				|  					|
+ID | Input values			| Expected Results 	| Measured values 	|
+---|:----------------------:|-------------------| ------------------
+   | arm 					| position			| position     		|  
+ 1 | valid position 		|  					|  					|
 
 #### Velocity command (fingers)
 For this the *position* input is always set to *false*
 
 The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
 
-ID | Input values			| Results	   	| Measured values 	|
----|:----------------------:|---------------| ------------------
-   | fingers				| position		| position     		|  
- 1 | [0.01, 0.01, 0.01]		|  				|  					|  
- 2 | [0.1,0.1, 0.1]		 	|  				|  					|
- 3 | [0.2,0.2, 0.2]		 	|  				|  					|
+ID | Input values			| Expected Results 	| Measured values 	|
+---|:----------------------:|-------------------| ------------------
+   | fingers				| position			| position     		|  
+ 1 | [0.01, 0.01, 0.01]		|  					|  					|  
+ 2 | [0.1,0.1, 0.1]		 	|  					|  					|
+ 3 | [0.2,0.2, 0.2]		 	|  					|  					|
 
 ### jaco_arm/joint_states
 ### jaco_arm/get_cartesian_position
