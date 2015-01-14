@@ -57,21 +57,23 @@ Normally velocity command have set contraints (keeping the gripper level for ins
 
 ID | Input values					| Expected Results 		| Measured values 	|
 ---|:------------------------------:|-----------------------|-------------------|-------
-   | **required_velocity** [Twist]	| **position**			| **feedback?**  	| **arm moved?**
+   | **required_velocity** [Twist]	| **position**			| **feedback**  	| **arm moved**
  0 | Home position 					| -						| yes/no			| yes/no 
- 1 | linear.x = 0.1 				| home pos + 0.1 in x L	| yes/no			| yes/no
- 2 | linear.y = 0.1 				| home pos + 0.1 in y L	| yes/no			| yes/no
- 3 | linear.z = 0.1 				| home pos + 0.1 in z L	| yes/no			| yes/no
- 4 | angualar.x = 0.1 				| home pos + 0.1 in x A	| yes/no			| yes/no
- 5 | angualar.y = 0.1 				| home pos + 0.1 in y A	| yes/no			| yes/no
- 6 | angualar.z = 0.1 				| home pos + 0.1 in z A	| yes/no			| yes/no
+ 1 | linear.x = 0.1 				| home pos + *V* in x L	| yes/no			| yes/no
+ 2 | linear.y = 0.1 				| home pos + *V* in y L	| yes/no			| yes/no
+ 3 | linear.z = 0.1 				| home pos + *V* in z L	| yes/no			| yes/no
+ 4 | angualar.x = 0.1 				| home pos + *V* in x A	| yes/no			| yes/no
+ 5 | angualar.y = 0.1 				| home pos + *V* in y A	| yes/no			| yes/no
+ 6 | angualar.z = 0.1 				| home pos + *V* in z A	| yes/no			| yes/no
+
+Here, *V* is a certain distance (time x velocity).
 
 ###arm_controller/gripper_width
 Send a goal to set the gripper width of an arm.
 
 ID | Input values			| Expected results 		|				| Measured values 	| 				| 				
 ---|:----------------------:|-----------------------|---------------|-------------------|---------------|---------------
-   | **required_width** [m] | **actionlib succes**	| **end_width** | **reached_goal**	| **position** 	|  **arm moved?** 
+   | **required_width** [m] | **actionlib succes**	| **end_width** | **reached_goal**	| **position** 	| **arm moved** 
  1 | 0.0        			| true 					| 0.0      		| true/false		|				| yes/no		
  2 | 0.05        			| true 					| 0.05     		| true/false		|				| yes/no		
  3 | 0.10        			| true 					| 0.10 			| true/false		|				| yes/no		

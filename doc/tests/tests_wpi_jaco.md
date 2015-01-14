@@ -13,8 +13,6 @@ These tests show the usability of the current state of the following [wpi_jaco](
 
 Dependencies
 ------------
-On which functions, nodes does this functionality directly rely?
-
 * The (closed source) Kinova API.
 
 Test setup
@@ -62,18 +60,18 @@ Send a goal to the gripper to open, go half-way open and close.
 
 ID | Input values			| Expected results 	|				| Measured values 	| 				| 				
 ---|:----------------------:|-------------------|---------------|-------------------|---------------|---------------
-   | **command.position** [m]| **reached_goal**	| **position** 	| **reached_goal**	| **position** 	| **arm moved?** 
+   | **command.position** [m]| **reached_goal**	| **position** 	| **reached_goal**	| **position** 	| **arm moved** 
  1 | 0.0        			| true 				| 0.0      		| true/false		|				| yes/no		
  2 | 0.05        			| true 				| 0.05     		| true/false		|				| yes/no		
  3 | 0.10        			| true 				| 0.10 			| true/false		|				| yes/no		
- 3 | 0.50 (wide)			| false 			| ?				| true/false		|				| yes/no		
+ 3 | 0.50 (wide)			| false 			| 				| true/false		|				| yes/no		
 
 ### jaco_arm/home_arm
 Send a goal to move the arm to the homing position.
 
 ID | Input values			| Expected Results 	| Measured values 	|   			
 ---|:----------------------:|-------------------|-------------------|---------------
-   | **retract** [bool]		| **succes**		| **succes**    	| **arm moved?**
+   | **retract** [bool]		| **succes**		| **succes**    	| **arm moved**
  1 | false        			| true 				| true/false		| yes/no 		
 
 ### jaco_arm/angular_cmd
@@ -107,7 +105,7 @@ The variables armCommand and fingerCommand are both set to *false*, since this c
 
 ID | Input values			| Expected Results 	| Measured values 	|
 ---|:----------------------:|-------------------|-------------------|-----------
-   | **fingers** [float32[]]| **position**		| **position**    	| **fingers moved?**
+   | **fingers** [float32[]]| **position**		| **position**    	| **fingers moved**
  1 | [0.1, 0.0, 0.0]		|  					|  					| yes/no 
  2 | [0.0, 0.1, 0.1]	 	|  					|  					| yes/no 
  3 | [0.0, 0.0, 0.1]	 	|  					|  					| yes/no 
@@ -124,7 +122,7 @@ All tests starting from home position. Input of values of *arm* (below) are all 
 
 ID | Input values			| Expected Results 		| Measured values 	|
 ---|:----------------------:|-----------------------|-------------------|-------
-   | **arm** [Twist]		| **position**			| **position**  	| **arm moved?**
+   | **arm** [Twist]		| **position**			| **position**  	| **arm moved**
  0 | Home position 			| -						| 					| yes/no 
  1 | linear.x = 0.1 		| home pos + 0.1 in x L	|  					| yes/no
  2 | linear.y = 0.1 		| home pos + 0.1 in y L	|  					| yes/no
@@ -142,7 +140,7 @@ The variables armCommand and fingerCommand are both set to *false*, since this c
 
 ID | Input values			| Expected Results 	| Measured values 	|
 ---|:----------------------:|-------------------|-------------------| --------------
-   | **fingers** [float32[]]| **position**		| **position** 		| **fingers moved?**
+   | **fingers** [float32[]]| **position**		| **position** 		| **fingers moved**
  1 | [0.1, 0.0, 0.0]		|  					|  					| yes/no 
  2 | [0.0, 0.1, 0.1]	 	|  					|  					| yes/no 
  3 | [0.0, 0.0, 0.1]	 	|  					|  					| yes/no 

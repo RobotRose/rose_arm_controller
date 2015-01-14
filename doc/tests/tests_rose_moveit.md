@@ -13,8 +13,6 @@ These tests show the usability of the current state of the following [rose_movei
 
 Dependencies
 ------------
-On which functions, nodes does this functionality directly rely?
-
 * MoveIt!
 * wpi_jaco
 
