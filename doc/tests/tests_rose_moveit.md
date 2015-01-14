@@ -58,3 +58,7 @@ For this we start rviz with the interactive markers. We generate a random pose f
 There is a launch file *test_rose_moveit_controller.launch* in the launch directory for this test.
 
 The interface of the rose_moveit_controller is tested on planning to certain points. 
+
+## Tests interesting for later
+
+* Test the velocity control of the rose_moveit_controller.
