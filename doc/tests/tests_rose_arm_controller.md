@@ -71,13 +71,13 @@ Here, *V* is a certain distance (time x velocity).
 ###arm_controller/gripper_width
 Send a goal to set the gripper width of an arm.
 
-ID | Input values			| Expected results 		|				| Measured values 	| 				||		
----|:----------------------:|-----------------------|---------------|-------------------|---------------|---------------
-   | **required_width** [m] | **actionlib succes**	| **end_width** | **reached_goal**	| **position** 	| **arm moved** 
- 1 | 0.0        			| true 					| 0.0      		| true/false		|				| yes/no		
- 2 | 0.05        			| true 					| 0.05     		| true/false		|				| yes/no		
- 3 | 0.10        			| true 					| 0.10 			| true/false		|				| yes/no		
- 3 | 0.50 (wide)			| true 					| ? ~fully open	| true/false		|				| yes/no	
+ID | Input values			| Expected results 		|				| Measured values 		| 			|			    ||		
+---|:----------------------:|-----------------------|---------------|-----------------------|-----------|---------------
+   | **required_width** [m] | **actionlib succes**	| **end_width** | **actionlib succes**	| **width** | **feedback** 	| **arm moved** 
+ 1 | 0.0        			| true 					| 0.0      		| true/false			|			| yes/no		| yes/no		
+ 2 | 0.05        			| true 					| 0.05     		| true/false			|			| yes/no		| yes/no		
+ 3 | 0.10        			| true 					| 0.10 			| true/false			|			| yes/no		| yes/no		
+ 3 | 0.50 (wide)			| true 					| ? ~fully open	| true/false			|			| yes/no		| yes/no		
 
 ###arm_controller/wrench
 Send a goal to force and torque of an arm.
