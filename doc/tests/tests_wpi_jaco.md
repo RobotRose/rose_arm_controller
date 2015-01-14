@@ -9,11 +9,12 @@ Tester: Mathijs de Langen (langen@robot-rose.nl)
 Introduction
 ------------
 
-These tests show the usability of the current state of the following [wpi_jaco](https://github.com/RIVeR-Lab/wpi_jaco/) software component.
+These tests show the usability of the current state of the [wpi_jaco](https://github.com/RIVeR-Lab/wpi_jaco/) software component.
 
 Dependencies
 ------------
 * The (closed source) Kinova API.
+* Installed Kinova drivers as stated in the Kinova manual.
 
 Test setup
 ----------
@@ -64,7 +65,7 @@ ID | Input values			| Expected results 	|				| Measured values 	| 				||
  1 | 0.0        			| true 				| 0.0      		| true/false		|				| yes/no		
  2 | 0.05        			| true 				| 0.05     		| true/false		|				| yes/no		
  3 | 0.10        			| true 				| 0.10 			| true/false		|				| yes/no		
- 3 | 0.50 (wide)			| false 			| 				| true/false		|				| yes/no		
+ 3 | 0.50 (too wide)			| false 			| 				| true/false		|				| yes/no		
 
 ### jaco_arm/home_arm
 Send a goal to move the arm to the homing position.
@@ -80,7 +81,11 @@ Publish an angular command. Meaning: Sending joint angles. We do not test this a
 ### jaco_arm/cartesian_cmd
 Publish a cartesian command. Meaning: Sending cartesian velocities or positions to the arm.
 
-The publish message is the following. We can split the test in position command, velocity command and finger command
+The message that is publishing in ROS is the following. We can split the test in the following commands:
+* Position command for the arm; 
+* Velocity command for the arm;
+* Position command for the fingers; 
+* Velocity command for the fingers;
 
 Type 				| Variable 		| description 															
 --------------------|:-------------:|-----------------------------------------------------------------------
@@ -95,23 +100,9 @@ float32[] 			| fingers   	| position (rad) or velocity (rad/s) finger command
 For this the *position* input is always set to *true*.
 The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
 
-All tests starting from home position. Input of values of *arm* (below) are all zero, unless described differently.
+All tests start from home position. Input of values of *arm* (below) are all zero, unless described differently.
 
 At this point, I do not know any valid cartesian positions for the arm. This is found out at the testing location.
-
-#### Position command (fingers)
-For this the *position* input is always set to *true*.
-The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
-
-ID | Input values			| Expected Results 	| Measured values 	||
----|:----------------------:|-------------------|-------------------|-----------
-   | **fingers** [float32[]]| **position**		| **position**    	| **fingers moved**
- 1 | [0.1, 0.0, 0.0]		|  					|  					| yes/no 
- 2 | [0.0, 0.1, 0.1]	 	|  					|  					| yes/no 
- 3 | [0.0, 0.0, 0.1]	 	|  					|  					| yes/no 
- 4 | [0.01, 0.01, 0.01]		|  					|  					| yes/no 
- 5 | [0.1,0.1, 0.1]		 	|  					|  					| yes/no 
- 6 | [0.2,0.2, 0.2]		 	|  					|  					| yes/no 
 
 #### Velocity command (arm)
 For this the *position* input is always set to *false*
@@ -130,6 +121,21 @@ ID | Input values			| Expected Results 		| Measured values 	||
  4 | angualar.x = 0.1 		| home pos + 0.1 in x A	|  					| yes/no
  5 | angualar.y = 0.1 		| home pos + 0.1 in y A	|  					| yes/no
  6 | angualar.z = 0.1 		| home pos + 0.1 in z A	|  					| yes/no
+
+
+#### Position command (fingers)
+For this the *position* input is always set to *true*.
+The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
+
+ID | Input values			| Expected Results 	| Measured values 	||
+---|:----------------------:|-------------------|-------------------|-----------
+   | **fingers** [float32[]]| **position**		| **position**    	| **fingers moved**
+ 1 | [0.1, 0.0, 0.0]		|  					|  					| yes/no 
+ 2 | [0.0, 0.1, 0.1]	 	|  					|  					| yes/no 
+ 3 | [0.0, 0.0, 0.1]	 	|  					|  					| yes/no 
+ 4 | [0.01, 0.01, 0.01]		|  					|  					| yes/no 
+ 5 | [0.1,0.1, 0.1]		 	|  					|  					| yes/no 
+ 6 | [0.2,0.2, 0.2]		 	|  					|  					| yes/no 
 
 #### Velocity command (fingers)
 The test starts with the fingers closed (position [0.0, 0.0, 0.0])

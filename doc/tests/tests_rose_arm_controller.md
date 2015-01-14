@@ -1,4 +1,4 @@
-Tests on the Jaco arm using the wpi_jaco package
+Tests on the Jaco arm using the wpi_jaco package in combination with our own MoveIt! interface
 ============
 Date: 15-01-2015
 
@@ -9,7 +9,7 @@ Tester: Mathijs de Langen (langen@robot-rose.nl)
 Introduction
 ------------
 
-These tests show the usability of the current state of the following [rose_arm_controller](https://github.com/RobotRose/rose_arm_controller) software component.
+These tests show the usability of the current state of the [rose_arm_controller](https://github.com/RobotRose/rose_arm_controller) software component.
 
 Dependencies
 ------------
