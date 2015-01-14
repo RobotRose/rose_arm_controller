@@ -24,6 +24,8 @@ On the [description](http://wiki.ros.org/wpi_jaco_wrapper) of the wpi_jaco packa
 
 This test inspects *only* the wpi_jaco package as a ROS node. The functions are tested with actionlib, rostopic publish or service calls.
 
+There is a specific launch file *test_wpi_jaco.launch* in the launch directory for this test.
+
 ## List of functions
 
 ### Action/Feedback/Result
