@@ -1,4 +1,4 @@
-Tests on the Jaco arm using the wpi_jaco package in combination with our own MoveIt! interface
+Tests on the Jaco arm using rose_arm_controller
 ============
 Date: 15-01-2015
 
