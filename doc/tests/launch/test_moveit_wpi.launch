@@ -1,0 +1,4 @@
+<launch>
+    <include file="$(find kinova_moveit_config)/launch/planning_and_execution.launch" />
+    <include file="$(find wpi_jaco_wrapper)/launch/arm.launch" />
+</launch>

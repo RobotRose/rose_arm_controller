@@ -1,0 +1,7 @@
+<launch>
+    <node name="rose_moveit_controller" pkg="rose_moveit_controller" type="rose_moveit_controller" output="screen" />
+
+    <include file="$(find kinova_moveit_config)/launch/planning_and_execution.launch" />
+    <include file="$(find arm_controller)/launch/arms.launch" />
+    <include file="$(find wpi_jaco_wrapper)/launch/arm.launch" />
+</launch>
