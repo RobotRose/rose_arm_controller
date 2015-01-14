@@ -97,16 +97,7 @@ The variables armCommand and fingerCommand are both set to *false*, since this c
 
 All tests starting from home position. Input of values of *arm* (below) are all zero, unless described differently.
 
-ID | Input values			| Expected Results 		| Measured values 	|
----|:----------------------:|-----------------------| ------------------|---------------
-   | **arm** [Twist]		| **position**			| **position**  	| **arm moved?**
- 0 | Home position 			| -						| 					| yes/no 
- 1 | linear.x = 0.1 		| home pos + 0.1 in x L	|  					| yes/no 
- 2 | linear.y = 0.1 		| home pos + 0.1 in y L	|  					| yes/no 
- 3 | linear.z = 0.1 		| home pos + 0.1 in z L	|  					| yes/no 
- 4 | angualar.x = 0.1 		| home pos + 0.1 in x A	|  					| yes/no 			
- 5 | angualar.y = 0.1 		| home pos + 0.1 in y A	|  					| yes/no 
- 6 | angualar.z = 0.1 		| home pos + 0.1 in z A	|  					| yes/no 
+At this point, I do not know any valid cartesian positions for the arm. This is found out at the testing location.
 
 #### Position command (fingers)
 For this the *position* input is always set to *true*.
