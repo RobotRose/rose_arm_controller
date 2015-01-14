@@ -58,7 +58,7 @@ jaco_arm/get_cartesian_position | wpi_jaco_msgs/GetCartesianPosition| Read the C
 ### jaco_arm/fingers_controller
 Send a goal to the gripper to open, go half-way open and close.
 
-ID | Input values			| Expected results 	|				| Measured values 	| 				| 				
+ID | Input values			| Expected results 	|				| Measured values 	| 				||
 ---|:----------------------:|-------------------|---------------|-------------------|---------------|---------------
    | **command.position** [m]| **reached_goal**	| **position** 	| **reached_goal**	| **position** 	| **arm moved** 
  1 | 0.0        			| true 				| 0.0      		| true/false		|				| yes/no		
@@ -69,7 +69,7 @@ ID | Input values			| Expected results 	|				| Measured values 	| 				|
 ### jaco_arm/home_arm
 Send a goal to move the arm to the homing position.
 
-ID | Input values			| Expected Results 	| Measured values 	|   			
+ID | Input values			| Expected Results 	| Measured values 	||
 ---|:----------------------:|-------------------|-------------------|---------------
    | **retract** [bool]		| **succes**		| **succes**    	| **arm moved**
  1 | false        			| true 				| true/false		| yes/no 		
@@ -103,7 +103,7 @@ At this point, I do not know any valid cartesian positions for the arm. This is 
 For this the *position* input is always set to *true*.
 The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
 
-ID | Input values			| Expected Results 	| Measured values 	|
+ID | Input values			| Expected Results 	| Measured values 	||
 ---|:----------------------:|-------------------|-------------------|-----------
    | **fingers** [float32[]]| **position**		| **position**    	| **fingers moved**
  1 | [0.1, 0.0, 0.0]		|  					|  					| yes/no 
@@ -120,7 +120,7 @@ The variables armCommand and fingerCommand are both set to *false*, since this c
 
 All tests starting from home position. Input of values of *arm* (below) are all zero, unless described differently.
 
-ID | Input values			| Expected Results 		| Measured values 	|
+ID | Input values			| Expected Results 		| Measured values 	||
 ---|:----------------------:|-----------------------|-------------------|-------
    | **arm** [Twist]		| **position**			| **position**  	| **arm moved**
  0 | Home position 			| -						| 					| yes/no 
@@ -138,8 +138,8 @@ For this the *position* input is always set to *false*
 
 The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
 
-ID | Input values			| Expected Results 	| Measured values 	|
----|:----------------------:|-------------------|-------------------| --------------
+ID | Input values			| Expected Results 	| Measured values 	||
+---|:----------------------:|-------------------|-------------------|--------------
    | **fingers** [float32[]]| **position**		| **position** 		| **fingers moved**
  1 | [0.1, 0.0, 0.0]		|  					|  					| yes/no 
  2 | [0.0, 0.1, 0.1]	 	|  					|  					| yes/no 
