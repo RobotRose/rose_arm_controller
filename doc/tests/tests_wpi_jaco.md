@@ -67,6 +67,7 @@ ID | Input values			| Expected results 	|			| Measured values 	| 			| 				|
  3 | 0.50 (wide)			| false 			| ?			| true/false		|			| yes/no		|
 
 ### jaco_arm/home_arm
+Send a goal to move the arm to the homing position.
 
 ID | Input values			| Expected Results 	| Measured values 	|   			|
 ---|:----------------------:|-------------------| ------------------| --------------
