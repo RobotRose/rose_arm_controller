@@ -11,7 +11,7 @@ Introduction
 
 These tests show the usability of the current state of the following software components:
 * [wpi_jaco](https://github.com/RIVeR-Lab/wpi_jaco/)
-* MoveIt! in combination with the API created by Debjyoti [link](https://github.com/RobotRose/rose_moveit_controller)
+* MoveIt! in combination with the API created by Debjyoti ([link](https://github.com/RobotRose/rose_moveit_controller))
 * This package, which combines all the packages above
 
 * (Optional, as a bonus) [ros-jaco](https://github.com/Kinovarobotics/jaco-ros)
