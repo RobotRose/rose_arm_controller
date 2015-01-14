@@ -97,27 +97,30 @@ The variables armCommand and fingerCommand are both set to *false*, since this c
 
 All tests starting from home position. Input of values of *arm* (below) are all zero, unless described differently.
 
-ID | Input values			| Expected Results 		| Measured values 	
----|:----------------------:|-----------------------| ------------------
-   | **arm** [Twist]		| **position**			| **position**  	
- 0 | Home position 			| -						| 
- 1 | linear.x = 0.1 		| home pos + 0.1 in x L	|  					
- 2 | linear.y = 0.1 		| home pos + 0.1 in y L	|  
- 3 | linear.z = 0.1 		| home pos + 0.1 in z L	|  
- 4 | angualar.x = 0.1 		| home pos + 0.1 in x A	|  					
- 5 | angualar.y = 0.1 		| home pos + 0.1 in y A	|  
- 6 | angualar.z = 0.1 		| home pos + 0.1 in z A	|  
+ID | Input values			| Expected Results 		| Measured values 	|
+---|:----------------------:|-----------------------| ------------------|---------------
+   | **arm** [Twist]		| **position**			| **position**  	| **arm moved?**
+ 0 | Home position 			| -						| 					| yes/no 
+ 1 | linear.x = 0.1 		| home pos + 0.1 in x L	|  					| yes/no 
+ 2 | linear.y = 0.1 		| home pos + 0.1 in y L	|  					| yes/no 
+ 3 | linear.z = 0.1 		| home pos + 0.1 in z L	|  					| yes/no 
+ 4 | angualar.x = 0.1 		| home pos + 0.1 in x A	|  					| yes/no 			
+ 5 | angualar.y = 0.1 		| home pos + 0.1 in y A	|  					| yes/no 
+ 6 | angualar.z = 0.1 		| home pos + 0.1 in z A	|  					| yes/no 
 
 #### Position command (fingers)
 For this the *position* input is always set to *true*.
 The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
 
-ID | Input values			| Expected Results 	| Measured values 	
----|:----------------------:|-------------------| ------------------
-   | **fingers** [float32[]]| **position**		| **position**    	
- 1 | [0.01, 0.01, 0.01]		|  					|  				
- 2 | [0.1,0.1, 0.1]		 	|  					|  					
- 3 | [0.2,0.2, 0.2]		 	|  					|  				
+ID | Input values			| Expected Results 	| Measured values 	|
+---|:----------------------:|-------------------| ------------------|-----------
+   | **fingers** [float32[]]| **position**		| **position**    	| **fingers moved?**
+ 1 | [0.1, 0.0, 0.0]		|  					|  					| yes/no 
+ 2 | [0.0, 0.1, 0.1]	 	|  					|  					| yes/no 
+ 3 | [0.0, 0.0, 0.1]	 	|  					|  					| yes/no 
+ 4 | [0.01, 0.01, 0.01]		|  					|  					| yes/no 
+ 5 | [0.1,0.1, 0.1]		 	|  					|  					| yes/no 
+ 6 | [0.2,0.2, 0.2]		 	|  					|  					| yes/no 
 
 #### Velocity command (arm)
 For this the *position* input is always set to *false*
@@ -126,28 +129,33 @@ The variables armCommand and fingerCommand are both set to *false*, since this c
 
 All tests starting from home position. Input of values of *arm* (below) are all zero, unless described differently.
 
-ID | Input values			| Expected Results 		| Measured values 	
----|:----------------------:|-----------------------| ------------------
-   | **arm** [Twist]		| **position**			| **position**  	
- 0 | Home position 			| -						| 
- 1 | linear.x = 0.1 		| home pos + 0.1 in x L	|  					
- 2 | linear.y = 0.1 		| home pos + 0.1 in y L	|  
- 3 | linear.z = 0.1 		| home pos + 0.1 in z L	|  
- 4 | angualar.x = 0.1 		| home pos + 0.1 in x A	|  					
- 5 | angualar.y = 0.1 		| home pos + 0.1 in y A	|  
- 6 | angualar.z = 0.1 		| home pos + 0.1 in z A	|  
+ID | Input values			| Expected Results 		| Measured values 	|
+---|:----------------------:|-----------------------| ------------------|-------
+   | **arm** [Twist]		| **position**			| **position**  	| **arm moved?**
+ 0 | Home position 			| -						| 					| yes/no 
+ 1 | linear.x = 0.1 		| home pos + 0.1 in x L	|  					| yes/no
+ 2 | linear.y = 0.1 		| home pos + 0.1 in y L	|  					| yes/no
+ 3 | linear.z = 0.1 		| home pos + 0.1 in z L	|  					| yes/no
+ 4 | angualar.x = 0.1 		| home pos + 0.1 in x A	|  					| yes/no
+ 5 | angualar.y = 0.1 		| home pos + 0.1 in y A	|  					| yes/no
+ 6 | angualar.z = 0.1 		| home pos + 0.1 in z A	|  					| yes/no
 
 #### Velocity command (fingers)
+The test starts with the fingers closed (position [0.0, 0.0, 0.0])
+
 For this the *position* input is always set to *false*
 
 The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
 
-ID | Input values			| Expected Results 	| Measured values 
----|:----------------------:|-------------------| ------------------
-   | **fingers** [float32[]]| **position**		| **position** 		
- 1 | [0.01, 0.01, 0.01]		|  					|  					
- 2 | [0.1,0.1, 0.1]		 	|  					|  					
- 3 | [0.2,0.2, 0.2]		 	|  					|  					
+ID | Input values			| Expected Results 	| Measured values 	|
+---|:----------------------:|-------------------| ------------------| --------------
+   | **fingers** [float32[]]| **position**		| **position** 		| **fingers moved?**
+ 1 | [0.1, 0.0, 0.0]		|  					|  					| yes/no 
+ 2 | [0.0, 0.1, 0.1]	 	|  					|  					| yes/no 
+ 3 | [0.0, 0.0, 0.1]	 	|  					|  					| yes/no 
+ 4 | [0.01, 0.01, 0.01]		|  					|  					| yes/no 
+ 5 | [0.1,0.1, 0.1]		 	|  					|  					| yes/no 
+ 6 | [0.2,0.2, 0.2]		 	|  					|  					| yes/no 
 
 ### jaco_arm/joint_states
 Listen to topic when the arm moves
@@ -155,14 +163,17 @@ Listen to topic when the arm moves
 ### jaco_arm/get_cartesian_position
 Move arm with velocity control. Request cartesian position.
 
-From home position, move the arm in certain positions using the previously tested velocity control. All values in the movement are
+From home position, move the arm in certain positions using the previously tested velocity control. Input of values of *movement* (below) are all zero, unless described differently.
 
 ID | Input values			| Expected Results 			| Measured values 
----|:----------------------:|-------------------| ------------------
-   | Movement [Twist] 		| Twist pos		| **position** 		
- 1 | [0.01, 0.01, 0.01]		|  					|  				
- 2 | [0.1,0.1, 0.1]		 	|  					|  				
- 3 | [0.2,0.2, 0.2]		 	|  					|  					
+---|:----------------------:|---------------------------| ------------------
+   | **Movement** [Twist] 	| Twist pos					| **position** 		
+ 1 | linear.x = 0.1 		| home pos + 0.1 in x L		|  					
+ 2 | linear.y = 0.1 		| home pos + 0.1 in y L		|  
+ 3 | linear.z = 0.1 		| home pos + 0.1 in z L		|  
+ 4 | angualar.x = 0.1 		| home pos + 0.1 in x A		|  					
+ 5 | angualar.y = 0.1 		| home pos + 0.1 in y A		|  
+ 6 | angualar.z = 0.1 		| home pos + 0.1 in z A		|  
 
 Tests interesting for later
 ---------------------------
