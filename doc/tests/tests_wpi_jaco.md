@@ -53,7 +53,7 @@ Topic 							| Message Type     				| Description
 --------------------------------|:-----------------------------:|-----------
 jaco_arm/get_cartesian_position | jaco_msgs/GetCartesianPosition| Read the Cartesian position from the arm
 
-Tests and Expected Results---------------
+##Tests and Results
 
 ### jaco_arm/fingers_controller
 Send a goal to the gripper to open, go half-way open and close.
