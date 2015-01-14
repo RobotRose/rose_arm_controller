@@ -51,11 +51,13 @@ At this point, I do not know any valid cartesian positions for the arm. This is 
 ###arm_controller/velocity
 Send a goal to set the linear and angular velocity of the end effector of an arm.
 
+The goal topic of jaco_arm/home_arm implemented in the wpi_jaco package.
+
 All tests starting from a certain home position.
 
 Normally velocity command have set contraints (keeping the gripper level for instance). This particular field is asked by the actionlib server, but not implemented. As an extra test, we can try to find ou whether or not it is needed or not.
 
-The goal topic of jaco_arm/home_arm implemented in the wpi_jaco package.
+
 
 ID | Input values					| Expected Results 		| Measured values 	|
 ---|:------------------------------:|-----------------------| ------------------|-------
