@@ -4,7 +4,7 @@ Date: 15-01-2015
 
 Location: RWTH Hörn, Aachen
 
-Tester: Mathijs de Langen
+Tester: Mathijs de Langen (langen@robot-rose.nl)
 
 Introduction
 ------------

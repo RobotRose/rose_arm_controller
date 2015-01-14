@@ -4,7 +4,7 @@ Date: 15-01-2015
 
 Location: RWTH Hörn, Aachen
 
-Tester: Mathijs de Langen
+Tester: Mathijs de Langen (langen@robot-rose.nl)
 
 Introduction
 ------------
@@ -25,3 +25,5 @@ This test inspects the basic functions of the rose generic arm controller with t
 There is a launch file *test_all.launch* in the launch directory for this test.
 
 ##Tests and Results
+
+###
