@@ -55,7 +55,7 @@ All tests starting from a certain home position. The goal topic of jaco_arm/home
 
 Normally velocity command have set contraints (keeping the gripper level for instance). This particular field is asked by the actionlib server, but not implemented. As an extra test, we can try to find ou whether or not it is needed or not.
 
-ID | Input values					| Expected Results 		| Measured values 	|
+ID | Input values					| Expected Results 		| Measured values 	|	x
 ---|:------------------------------:|-----------------------|-------------------|-------
    | **required_velocity** [Twist]	| **position**			| **feedback**  	| **arm moved**
  0 | Home position 					| -						| yes/no			| yes/no 
