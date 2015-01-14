@@ -49,30 +49,30 @@ jaco_arm/joint_states     		| sensor_msgs/JointState 		| Publishes the current s
 
 ### Services
 
-Topic 							| Message Type     				| Description 
---------------------------------|:-----------------------------:|-----------
-jaco_arm/get_cartesian_position | jaco_msgs/GetCartesianPosition| Read the Cartesian position from the arm
+Topic 							| Message Type     					| Description 
+--------------------------------|:---------------------------------:|-----------
+jaco_arm/get_cartesian_position | wpi_jaco_msgs/GetCartesianPosition| Read the Cartesian position from the arm
 
 ##Tests and Results
 
 ### jaco_arm/fingers_controller
 Send a goal to the gripper to open, go half-way open and close.
 
-ID | Input values			| Expected results 	|				| Measured values 	| 				| 				|
+ID | Input values			| Expected results 	|				| Measured values 	| 				| 				
 ---|:----------------------:|-------------------| --------------|-------------------|---------------|---------------
-   | **command.position**[m]| **reached_goal**	| **position** 	| **reached_goal**	| **position** 	|  **arm moved?** 	|
- 1 | 0.0        			| true 				| 0.0      		| true/false		|				| yes/no		|
- 2 | 0.05        			| true 				| 0.05     		| true/false		|				| yes/no		|
- 3 | 0.10        			| true 				| 0.10 			| true/false		|				| yes/no		|
- 3 | 0.50 (wide)			| false 			| ?				| true/false		|				| yes/no		|
+   | **command.position** [m]| **reached_goal**	| **position** 	| **reached_goal**	| **position** 	|  **arm moved?** 
+ 1 | 0.0        			| true 				| 0.0      		| true/false		|				| yes/no		
+ 2 | 0.05        			| true 				| 0.05     		| true/false		|				| yes/no		
+ 3 | 0.10        			| true 				| 0.10 			| true/false		|				| yes/no		
+ 3 | 0.50 (wide)			| false 			| ?				| true/false		|				| yes/no		
 
 ### jaco_arm/home_arm
 Send a goal to move the arm to the homing position.
 
-ID | Input values			| Expected Results 	| Measured values 	|   			|
+ID | Input values			| Expected Results 	| Measured values 	|   			
 ---|:----------------------:|-------------------| ------------------| --------------
-   | **retract** [bool]		| **succes**		| **succes**    	| **arm moved?**|
- 1 | false        			| true 				| true/false		| yes/no 		|
+   | **retract** [bool]		| **succes**		| **succes**    	| **arm moved?**
+ 1 | false        			| true 				| true/false		| yes/no 		
 
 ### jaco_arm/angular_cmd
 Publish an angular command. Meaning: Sending joint angles. We do not test this at this time.
@@ -82,64 +82,79 @@ Publish a cartesian command. Meaning: Sending cartesian velocities or positions 
 
 The publish message is the following. We can split the test in position command, velocity command and finger command
 
-Type 				| Variable 		| description 															|
+Type 				| Variable 		| description 															
 --------------------|:-------------:|-----------------------------------------------------------------------
-bool 				| position      | true for a position command, false for a velocity command 			|
-bool 				| armCommand    | true if this command includes arm joint inputs						|
-bool 				| fingerCommand | true if this command includes finger inputs 							|
-bool 				| repeat        | true if the command should be repeatedly sent over a short interval 	|
-geometry_msgs/Twist	| arm    		| position (m, rad) or velocity (m/s, rad/s) arm command 				|
-float32[] 			| fingers   	| position (rad) or velocity (rad/s) finger command 					|
+bool 				| position      | true for a position command, false for a velocity command 			
+bool 				| armCommand    | true if this command includes arm joint inputs						
+bool 				| fingerCommand | true if this command includes finger inputs 							
+bool 				| repeat        | true if the command should be repeatedly sent over a short interval 	
+geometry_msgs/Twist	| arm    		| position (m, rad) or velocity (m/s, rad/s) arm command 				
+float32[] 			| fingers   	| position (rad) or velocity (rad/s) finger command 					
 
 #### Position command (arm)
 For this the *position* input is always set to *true*.
 The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
 
-ID | Input values			| Expected Results 	| Measured values 	|
----|:----------------------:|-------------------| ------------------
-   | **arm** [Twist]		| **position**		| **position**  	|  
- 1 | valid position 		|  					|  					|
+All tests starting from home position. Input of values of *arm* (below) are all zero, unless described differently.
+
+ID | Input values			| Expected Results 		| Measured values 	
+---|:----------------------:|-----------------------| ------------------
+   | **arm** [Twist]		| **position**			| **position**  	
+ 0 | Home position 			| -						| 
+ 1 | linear.x = 0.1 		| home pos + 0.1 in x L	|  					
+ 2 | linear.y = 0.1 		| home pos + 0.1 in y L	|  
+ 3 | linear.z = 0.1 		| home pos + 0.1 in z L	|  
+ 1 | angualar.x = 0.1 		| home pos + 0.1 in x A	|  					
+ 2 | angualar.y = 0.1 		| home pos + 0.1 in y A	|  
+ 3 | angualar.z = 0.1 		| home pos + 0.1 in z A	|  
 
 #### Position command (fingers)
 For this the *position* input is always set to *true*.
 The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
 
-ID | Input values			| Expected Results 	| Measured values 	|
+ID | Input values			| Expected Results 	| Measured values 	
 ---|:----------------------:|-------------------| ------------------
-   | **fingers** [float32[]]| **position**		| **position**    	|
- 1 | [0.01, 0.01, 0.01]		|  					|  					|  
- 2 | [0.1,0.1, 0.1]		 	|  					|  					|
- 3 | [0.2,0.2, 0.2]		 	|  					|  					|
+   | **fingers** [float32[]]| **position**		| **position**    	
+ 1 | [0.01, 0.01, 0.01]		|  					|  				
+ 2 | [0.1,0.1, 0.1]		 	|  					|  					
+ 3 | [0.2,0.2, 0.2]		 	|  					|  				
 
 #### Velocity command (arm)
 For this the *position* input is always set to *false*
 
 The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
 
-ID | Input values			| Expected Results 	| Measured values 	|
+ID | Input values			| Expected Results 	| Measured values 
 ---|:----------------------:|-------------------| ------------------
-   | **arm** [Twist]		| **position**		| **position**  	|  
- 1 | valid position 		|  					|  					|
+   | **arm** [Twist]		| **position**		| **position**  	
+ 1 | valid position 		|  					|  					
 
 #### Velocity command (fingers)
 For this the *position* input is always set to *false*
 
 The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
 
-ID | Input values			| Expected Results 	| Measured values 	|
+ID | Input values			| Expected Results 	| Measured values 
 ---|:----------------------:|-------------------| ------------------
-   | **fingers** [float32[]]| **position**		| **position** 		|  
- 1 | [0.01, 0.01, 0.01]		|  					|  					|  
- 2 | [0.1,0.1, 0.1]		 	|  					|  					|
- 3 | [0.2,0.2, 0.2]		 	|  					|  					|
+   | **fingers** [float32[]]| **position**		| **position** 		
+ 1 | [0.01, 0.01, 0.01]		|  					|  					
+ 2 | [0.1,0.1, 0.1]		 	|  					|  					
+ 3 | [0.2,0.2, 0.2]		 	|  					|  					
 
 ### jaco_arm/joint_states
-### jaco_arm/get_cartesian_position
+Listen to topic when the arm moves
 
-ID | Test values       | Measured values   | Required values 
----|:-----------------:|-------------------| ---------------
- 1 | parameters        | Measurements      | 
- 2 | parameters        | Measurements      | 
+### jaco_arm/get_cartesian_position
+Move arm with velocity control. Request cartesian position.
+
+From home position, move the arm in certain positions using the previously tested velocity control. All values in the movement are
+
+ID | Input values			| Expected Results 			| Measured values 
+---|:----------------------:|-------------------| ------------------
+   | Movement [Twist] 		| Twist pos		| **position** 		
+ 1 | [0.01, 0.01, 0.01]		|  					|  				
+ 2 | [0.1,0.1, 0.1]		 	|  					|  				
+ 3 | [0.2,0.2, 0.2]		 	|  					|  					
 
 Tests interesting for later
 ---------------------------
