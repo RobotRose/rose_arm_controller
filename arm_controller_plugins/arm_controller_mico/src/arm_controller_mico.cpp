@@ -121,8 +121,7 @@ bool ArmControllerMico::setEndEffectorPose(const Pose& end_effector_pose)
 	move_it_client_.sendGoal(goal);
 	move_it_client_.waitForResult(ros::Duration(0.0)); // infinite?
 
-	//! @todo MdL: Implement. MoveIt!
-	return false;
+	return true;
 }
 
 bool ArmControllerMico::getEndEffectorVelocity(Twist& twist)
