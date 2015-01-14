@@ -28,6 +28,12 @@
 #include "rose_moveit_controller/arm_goalFeedback.h"
 #include "rose_moveit_controller/arm_goalResult.h"
 
+#include "control_msgs/GripperCommand.h"
+#include "control_msgs/GripperCommandAction.h"
+#include "control_msgs/GripperCommandGoal.h"
+#include "control_msgs/GripperCommandFeedback.h"
+#include "control_msgs/GripperCommandResult.h"
+
 #include "wpi_jaco_msgs/JacoFK.h"
 #include "wpi_jaco_msgs/CartesianCommand.h"
 #include "wpi_jaco_msgs/GetCartesianPosition.h"
@@ -49,7 +55,8 @@ using std::vector;
   */
 class ArmControllerMico : public arm_controller_base::ArmControllerBase {
   public:
-    typedef actionlib::SimpleActionClient<rose_moveit_controller::arm_goalAction> MoveItClient;
+    typedef actionlib::SimpleActionClient<rose_moveit_controller::arm_goalAction>   MoveItClient;
+    typedef actionlib::SimpleActionClient<control_msgs::GripperCommandAction>       GripperClient;
 
     /**
     * @brief  Constructor
@@ -162,8 +169,11 @@ class ArmControllerMico : public arm_controller_base::ArmControllerBase {
     ros::ServiceClient  get_cartesian_position_client_;
 
     MoveItClient        move_it_client_;
+    GripperClient       gripper_client_;
 
     bool                emergency_;
+
+    double              gripper_width_;
 
     std::mutex          joint_states_mutex_;
     JointState          joint_states_;

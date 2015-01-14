@@ -20,6 +20,8 @@ ArmControllerMico::ArmControllerMico()
 	, joint_states_initialized_(false)
 	, emergency_(false)
 	, move_it_client_("rose_moveit_controller", true)
+	, gripper_client_(ARM_NAME + std::string("/fingers_controller"), true)
+	, gripper_width_(0.0)
 {
 	ros::NodeHandle n;
 
@@ -178,6 +180,9 @@ bool ArmControllerMico::resetConstraints()
 
 double ArmControllerMico::getGripperWidth()
 {
+	return gripper_width_;
+
+	//! @todo MdL: Test above, if correct: Remove below.
 	vector<double> joint_positions;
 	getJointPositions(joint_positions);
 
@@ -199,6 +204,19 @@ bool ArmControllerMico::setGripperWidth(const double required_width)
 {	
 	if(emergency_)
 		return false;
+
+	control_msgs::GripperCommandGoal gripper_command;
+	gripper_command.command.position = required_width;
+	// gripper_command.command.max_effort = 10.0; If init 0, problem?
+
+	gripper_client_.sendGoal(gripper_command);
+	gripper_client_.waitForResult(ros::Duration(0.0));
+
+	control_msgs::GripperCommandResultConstPtr result = gripper_client_.getResult();
+
+	gripper_width_ = result->position;
+
+	return result->reached_goal;
 
 	// The two fingers on the MICO have a range of 
 	// approximately 0 (fully open) to 6400 (fully closed). 
