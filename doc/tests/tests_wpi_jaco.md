@@ -22,7 +22,7 @@ Test setup
 
 On the [description](http://wiki.ros.org/wpi_jaco_wrapper) of the wpi_jaco package on the ROS website, is stated that the following functions are usable. These functions need to be tested accordingly.
 
-This test starts *only* the wpi_jaco package as a ROS node. The functions are tested with actionlib, rostopic publish or service calls.
+This test inspects *only* the wpi_jaco package as a ROS node. The functions are tested with actionlib, rostopic publish or service calls.
 
 ## List of functions
 
@@ -71,7 +71,7 @@ Send a goal to move the arm to the homing position.
 
 ID | Input values			| Expected Results 	| Measured values 	|   			|
 ---|:----------------------:|-------------------| ------------------| --------------
-   | retract 				| succes			| succes     		|  arm moved? 	|
+   | retract [bool]			| succes			| succes     		|  arm moved? 	|
  1 | false        			| true 				| true/false		| yes/no 		|
 
 ### jaco_arm/angular_cmd
@@ -97,7 +97,7 @@ The variables armCommand and fingerCommand are both set to *false*, since this c
 
 ID | Input values			| Expected Results 	| Measured values 	|
 ---|:----------------------:|-------------------| ------------------
-   | arm 					| position			| position     		|  
+   | arm [Twist]					| position			| position     		|  
  1 | valid position 		|  					|  					|
 
 #### Position command (fingers)
@@ -106,7 +106,7 @@ The variables armCommand and fingerCommand are both set to *false*, since this c
 
 ID | Input values			| Expected Results 	| Measured values 	|
 ---|:----------------------:|-------------------| ------------------
-   | fingers				| position			| position     		|
+   | fingers [float32[]]	| position			| position     		|
  1 | [0.01, 0.01, 0.01]		|  					|  					|  
  2 | [0.1,0.1, 0.1]		 	|  					|  					|
  3 | [0.2,0.2, 0.2]		 	|  					|  					|
@@ -118,7 +118,7 @@ The variables armCommand and fingerCommand are both set to *false*, since this c
 
 ID | Input values			| Expected Results 	| Measured values 	|
 ---|:----------------------:|-------------------| ------------------
-   | arm 					| position			| position     		|  
+   | arm [Twist]			| position			| position     		|  
  1 | valid position 		|  					|  					|
 
 #### Velocity command (fingers)
@@ -128,7 +128,7 @@ The variables armCommand and fingerCommand are both set to *false*, since this c
 
 ID | Input values			| Expected Results 	| Measured values 	|
 ---|:----------------------:|-------------------| ------------------
-   | fingers				| position			| position     		|  
+   | fingers [float32[]]	| position			| position     		|  
  1 | [0.01, 0.01, 0.01]		|  					|  					|  
  2 | [0.1,0.1, 0.1]		 	|  					|  					|
  3 | [0.2,0.2, 0.2]		 	|  					|  					|
