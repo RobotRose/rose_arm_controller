@@ -62,7 +62,7 @@ Send a goal to the gripper to open, go half-way open and close.
 
 ID | Input values			| Expected results 	|				| Measured values 	| 				| 				
 ---|:----------------------:|-------------------|---------------|-------------------|---------------|---------------
-   | **command.position** [m]| **reached_goal**	| **position** 	| **reached_goal**	| **position** 	|  **arm moved?** 
+   | **command.position** [m]| **reached_goal**	| **position** 	| **reached_goal**	| **position** 	| **arm moved?** 
  1 | 0.0        			| true 				| 0.0      		| true/false		|				| yes/no		
  2 | 0.05        			| true 				| 0.05     		| true/false		|				| yes/no		
  3 | 0.10        			| true 				| 0.10 			| true/false		|				| yes/no		
