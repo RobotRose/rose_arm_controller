@@ -27,6 +27,7 @@ ArmControllerMico::ArmControllerMico()
 
 	// Create all publishers
 	arm_cartesian_command_publisher_	= n.advertise<wpi_jaco_msgs::CartesianCommand>(ARM_NAME + std::string("/cartesian_cmd"), 1);
+	arm_angular_command_publisher_ 		= n.advertise<wpi_jaco_msgs::AngularCommand>(ARM_NAME + std::string("/angular_cmd"), 1);
 
 	// Create all subscribers
 	joint_state_sub_ 					= n.subscribe(ARM_NAME + std::string("/joint_states"), 1, &ArmControllerMico::CB_joint_state_received, this);
@@ -282,8 +283,31 @@ bool ArmControllerMico::getJointPositions(vector<double>& joint_positions)
 
 bool ArmControllerMico::setJointPositions(const vector<double>& joint_positions)
 {
-	//! @todo MdL: Implement.
-	return false;
+	wpi_jaco_msgs::AngularCommand angular_cmd;
+	angular_cmd.position 		= true;
+	angular_cmd.armCommand 		= true;
+	angular_cmd.repeat 			= true; 
+
+	// Only arm joints
+	if ( joint_positions.size() == NR_JOINTS )
+		angular_cmd.fingerCommand 	= false;
+	
+	// Arm and finger joints
+	else if ( NR_JOINTS < joint_positions.size() and joint_positions.size() <= 9 )
+	{
+		angular_cmd.fingerCommand 	= true;	
+		std::copy ( joint_positions.begin() + NR_JOINTS, joint_positions.end(), angular_cmd.fingers.begin() );
+	}
+
+	else
+	{
+		ROS_ERROR("Wrong number of joints given");
+		return false;
+	}
+
+	arm_angular_command_publisher_.publish(angular_cmd);
+
+	return true;
 }
 
 bool ArmControllerMico::getJointVelocities(vector<double>& joint_velocities)
