@@ -162,6 +162,7 @@ class ArmControllerMico : public arm_controller_base::ArmControllerBase {
     // bool hasMoveItInterface();
 
   private:
+    bool setAngularJointValues(const vector<double>& values, const bool& position);
     void CB_joint_state_received(const sensor_msgs::JointState::ConstPtr& joint_state);
 
     ros::NodeHandle     n_;

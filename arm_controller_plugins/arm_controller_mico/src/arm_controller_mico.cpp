@@ -283,31 +283,7 @@ bool ArmControllerMico::getJointPositions(vector<double>& joint_positions)
 
 bool ArmControllerMico::setJointPositions(const vector<double>& joint_positions)
 {
-	wpi_jaco_msgs::AngularCommand angular_cmd;
-	angular_cmd.position 		= true;
-	angular_cmd.armCommand 		= true;
-	angular_cmd.repeat 			= true; 
-
-	// Only arm joints
-	if ( joint_positions.size() == NR_JOINTS )
-		angular_cmd.fingerCommand 	= false;
-	
-	// Arm and finger joints
-	else if ( NR_JOINTS < joint_positions.size() and joint_positions.size() <= 9 )
-	{
-		angular_cmd.fingerCommand 	= true;	
-		std::copy ( joint_positions.begin() + NR_JOINTS, joint_positions.end(), angular_cmd.fingers.begin() );
-	}
-
-	else
-	{
-		ROS_ERROR("Wrong number of joints given");
-		return false;
-	}
-
-	arm_angular_command_publisher_.publish(angular_cmd);
-
-	return true;
+	return setAngularJointValues(joint_positions, true);
 }
 
 bool ArmControllerMico::getJointVelocities(vector<double>& joint_velocities)
@@ -323,8 +299,7 @@ bool ArmControllerMico::getJointVelocities(vector<double>& joint_velocities)
 
 bool ArmControllerMico::setJointVelocities(const vector<double>& joint_velocities)
 {
-	//! @todo MdL: Implement.
-	return false;
+	return setAngularJointValues(joint_velocities, false);
 }
 
 bool ArmControllerMico::getJointEfforts(vector<double>& joint_angular_forces)
@@ -354,6 +329,37 @@ void ArmControllerMico::CB_joint_state_received(const sensor_msgs::JointState::C
 
 	joint_states_mutex_.unlock();
 }
+
+bool ArmControllerMico::setAngularJointValues(const vector<double>& values, const bool& position)
+{
+	wpi_jaco_msgs::AngularCommand angular_cmd;
+	angular_cmd.position 		= position;
+	angular_cmd.armCommand 		= true;
+	angular_cmd.repeat 			= true; 
+
+	// Only arm joints
+	if ( values.size() == NR_JOINTS )
+	{
+		angular_cmd.fingerCommand 	= false;
+		std::copy ( values.begin(), values.begin() + NR_JOINTS, angular_cmd.joints.begin() );
+	}
+	// Arm and finger joints
+	else if ( NR_JOINTS < values.size() and values.size() <= 9 )
+	{
+		angular_cmd.fingerCommand 	= true;	
+		std::copy ( values.begin() + NR_JOINTS, values.end(), angular_cmd.fingers.begin() );
+	}
+	else
+	{
+		ROS_ERROR("Wrong number of joints given");
+		return false;
+	}
+
+	arm_angular_command_publisher_.publish(angular_cmd);
+
+	return true;
+}
+
 
 }; // namespace
 
