@@ -50,7 +50,7 @@ bool ArmControllerKinova::initialize( const std::string name )
 	// Create all service clients
 	get_cartesian_position_client_ 		= n.serviceClient<wpi_jaco_msgs::GetCartesianPosition>(arm_prefix_ + std::string("/get_cartesian_position"));
 
-	return false;
+	return true;
 }
 
 bool ArmControllerKinova::close()
