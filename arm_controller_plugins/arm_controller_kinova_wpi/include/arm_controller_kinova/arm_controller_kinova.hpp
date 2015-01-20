@@ -7,12 +7,12 @@
 *       - File created.
 *
 * Description:
-*   This package describes the mico interface for robot arms. This plugin uses
+*   This package describes the kinova interface for robot arms. This plugin uses
 *   the WPI jaco package (http://wiki.ros.org/wpi_jaco)
 * 
 ***********************************************************************************/
-#ifndef ARM_CONTROLLER_MICO_HPP
-#define ARM_CONTROLLER_MICO_HPP
+#ifndef ARM_CONTROLLER_KINOVA_WPI_HPP
+#define ARM_CONTROLLER_KINOVA_WPI_HPP
 
 #include <ros/ros.h>
 
@@ -39,7 +39,7 @@
 #include "wpi_jaco_msgs/AngularCommand.h"
 #include "wpi_jaco_msgs/GetCartesianPosition.h"
 
-#define ARM_NAME            "jaco_arm"
+#define ARM_NAME            "jaco_arm" //! @todo MdL [CONF]: Make configurable, or dependend on roslaunch parameters.
 #define MAX_GRIPPER_WIDTH   0.15 //[m]
 #define NR_FINGERS          3 // Jaco has three, Mico uses this software and sets properties of the third finger to 0.0
 #define NR_JOINTS           6 // Jaco has three, Mico uses this software and sets properties of the third finger to 0.0
@@ -55,7 +55,7 @@ using std::vector;
  /**
   * @brief Provides an interface to interact with each kind of arm.
   */
-class ArmControllerMico : public arm_controller_base::ArmControllerBase {
+class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
   public:
     typedef actionlib::SimpleActionClient<rose_moveit_controller::arm_goalAction>   MoveItClient;
     typedef actionlib::SimpleActionClient<control_msgs::GripperCommandAction>       GripperClient;
@@ -63,12 +63,12 @@ class ArmControllerMico : public arm_controller_base::ArmControllerBase {
     /**
     * @brief  Constructor
     */
-    ArmControllerMico();
+    ArmControllerKinova();
 
     /**
     * @brief  Destructor
     */
-    ~ArmControllerMico();
+    ~ArmControllerKinova();
 
     bool initialize( const std::string name = std::string() );
     
@@ -161,7 +161,7 @@ class ArmControllerMico : public arm_controller_base::ArmControllerBase {
     bool setJointEfforts(const vector<double>&);
     // bool hasMoveItInterface();
 
-  private:
+  protected:
     bool setAngularJointValues(const vector<double>& values, const bool& position);
     void CB_joint_state_received(const sensor_msgs::JointState::ConstPtr& joint_state);
 
@@ -184,6 +184,7 @@ class ArmControllerMico : public arm_controller_base::ArmControllerBase {
     ros::Subscriber     joint_state_sub_;
     bool                joint_states_initialized_;
 };
-};
+
+} //namespace
 
 #endif

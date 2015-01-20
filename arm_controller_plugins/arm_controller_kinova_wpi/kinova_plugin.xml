@@ -1,0 +1,7 @@
+<library path="lib/libarm_controller_kinova">
+  <class type="arm_controller_plugins::ArmControllerKinova" base_class_type="arm_controller_base::ArmControllerBase">
+    <description>
+      Implementation of the arm_controller for the Kinova Jaco arm.
+    </description>
+  </class>
+</library>

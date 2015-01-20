@@ -1,0 +1,43 @@
+x: 0.067675
+y: 0.12317
+z: 0.66697
+
+x: 0.60781
+y: -0.33113
+z: -0.5427
+w: 0.47581
+
+arm: 'mico'
+required_pose: 
+  header: 
+    seq: 0
+    stamp: 
+      secs: 0
+      nsecs: 0
+    frame_id: ''
+  pose: 
+    position: 
+      x: 0.067675
+      y: 0.12317
+      z: 0.66697
+    orientation: 
+      x: 0.60781
+      y: -0.33113
+      z: -0.5427
+      w: 0.47581
+constraint: 
+  header: 
+    seq: 0
+    stamp: 
+      secs: 0
+      nsecs: 0
+    frame_id: ''
+  twist: 
+    linear: 
+      x: 0.0
+      y: 0.0
+      z: 0.0
+    angular: 
+      x: 0.0
+      y: 0.0
+      z: 0.0

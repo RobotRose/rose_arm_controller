@@ -7,19 +7,19 @@
 *       - File created.
 *
 * Description:
-*   This package describes the mico interface for robot arms. This plugin uses
+*   This package describes the kinova interface for robot arms. This plugin uses
 *   the WPI jaco package (http://wiki.ros.org/wpi_jaco)
 * 
 ***********************************************************************************/
-#include "arm_controller_mico/arm_controller_mico.hpp"
+#include "arm_controller_kinova/arm_controller_kinova.hpp"
 
 namespace arm_controller_plugins {
 
-ArmControllerMico::ArmControllerMico()
-	: n_("~mico_arm")
+ArmControllerKinova::ArmControllerKinova()
+	: n_("~kinova")
 	, joint_states_initialized_(false)
 	, emergency_(false)
-	, move_it_client_("rose_moveit_controller", true)
+	, move_it_client_("rose_moveit_controller", true) //! @todo MdL [CONF]: configure the moveit client name.
 	, gripper_client_(ARM_NAME + std::string("/fingers_controller"), true)
 	, gripper_width_(0.0)
 {
@@ -30,53 +30,53 @@ ArmControllerMico::ArmControllerMico()
 	arm_angular_command_publisher_ 		= n.advertise<wpi_jaco_msgs::AngularCommand>(ARM_NAME + std::string("/angular_cmd"), 1);
 
 	// Create all subscribers
-	joint_state_sub_ 					= n.subscribe(ARM_NAME + std::string("/joint_states"), 1, &ArmControllerMico::CB_joint_state_received, this);
+	joint_state_sub_ 					= n.subscribe(ARM_NAME + std::string("/joint_states"), 1, &ArmControllerKinova::CB_joint_state_received, this);
 
 	// Create all service clients
 	get_cartesian_position_client_ 		= n.serviceClient<wpi_jaco_msgs::GetCartesianPosition>(ARM_NAME + std::string("/get_cartesian_position"));
 }
 
-ArmControllerMico::~ArmControllerMico()
+ArmControllerKinova::~ArmControllerKinova()
 {
 
 }
 
-bool ArmControllerMico::initialize( const std::string name )
+bool ArmControllerKinova::initialize( const std::string name )
 {
 	name_ = name;
-	ROS_INFO("Initializing Mico arm...");
-	//! @todo MdL: Implement.
+	ROS_INFO("Initializing arm...");
+	//! @todo MdL [IMPL]: Implement this function.
 	return false;
 }
 
-bool ArmControllerMico::close()
+bool ArmControllerKinova::close()
 {
-	//! @todo MdL: Implement.
+	//! @todo MdL [IMPL]: Implement this function.
 	return false;
 }
 
-bool ArmControllerMico::cancel()
+bool ArmControllerKinova::cancel()
 {
 	ROS_INFO("Cancel received");
-	//! @todo MdL: Implement.
+	//! @todo MdL [IMPL]: Implement this function.
 	return false;
 }
 
-bool ArmControllerMico::emergencyStop()
+bool ArmControllerKinova::emergencyStop()
 {
 	emergency_ = true;
 
 	return cancel();
 }
 
-bool ArmControllerMico::resetEmergencyStop()
+bool ArmControllerKinova::resetEmergencyStop()
 {
 	emergency_ = false;
 
 	return true;
 }
 
-int ArmControllerMico::getNumberOfJoints() 
+int ArmControllerKinova::getNumberOfJoints() 
 {
 	vector<double> joint_positions;
 	if ( not getJointPositions(joint_positions))
@@ -85,7 +85,7 @@ int ArmControllerMico::getNumberOfJoints()
 	return joint_positions.size();
 }
 
-bool ArmControllerMico::getEndEffectorPose(Pose& pose)
+bool ArmControllerKinova::getEndEffectorPose(Pose& pose)
 {
 	wpi_jaco_msgs::GetCartesianPosition get_cartesian_position_message;
 
@@ -111,7 +111,7 @@ bool ArmControllerMico::getEndEffectorPose(Pose& pose)
 	return false;
 }
 
-bool ArmControllerMico::setEndEffectorPose(const Pose& end_effector_pose)
+bool ArmControllerKinova::setEndEffectorPose(const Pose& end_effector_pose)
 {	
 	ROS_INFO("Setting end effector pose...");
 	
@@ -127,13 +127,13 @@ bool ArmControllerMico::setEndEffectorPose(const Pose& end_effector_pose)
 	return true;
 }
 
-bool ArmControllerMico::getEndEffectorVelocity(Twist& twist)
+bool ArmControllerKinova::getEndEffectorVelocity(Twist& twist)
 {
-	//! @todo MdL: Implement.
+	//! @todo MdL [IMPL]: Implement this function.
 	return false;
 }
 
-bool ArmControllerMico::setEndEffectorVelocity(const Twist& velocity)
+bool ArmControllerKinova::setEndEffectorVelocity(const Twist& velocity)
 {
 	if (emergency_)
 		return false;
@@ -158,28 +158,28 @@ bool ArmControllerMico::setEndEffectorVelocity(const Twist& velocity)
 	return true;
 }
 
-bool ArmControllerMico::getConstraints(Twist& twist)
+bool ArmControllerKinova::getConstraints(Twist& twist)
 {
-	//! @todo MdL: Implement.	
+	//! @todo MdL [IMPL]: Implement this function.	
 	return false;
 }
 
-bool ArmControllerMico::setConstraints(const Twist& constraint)
+bool ArmControllerKinova::setConstraints(const Twist& constraint)
 {
 	if(emergency_)
 		return false;
 
-	//! @todo MdL: Implement.
+	//! @todo MdL [IMPL]: Implement this function.
 	return false;
 }
 
-bool ArmControllerMico::resetConstraints()
+bool ArmControllerKinova::resetConstraints()
 {
-	//! @todo MdL: Implement.
+	//! @todo MdL [IMPL]: Implement this function.
 	return false;
 }
 
-double ArmControllerMico::getGripperWidth()
+double ArmControllerKinova::getGripperWidth()
 {
 	return gripper_width_;
 
@@ -201,7 +201,7 @@ double ArmControllerMico::getGripperWidth()
 	return percentage_total * MAX_GRIPPER_WIDTH;
 }
 
-bool ArmControllerMico::setGripperWidth(const double required_width)
+bool ArmControllerKinova::setGripperWidth(const double required_width)
 {	
 	if(emergency_)
 		return false;
@@ -255,22 +255,22 @@ bool ArmControllerMico::setGripperWidth(const double required_width)
 	return true;
 }
 
-bool ArmControllerMico::getEndEffectorWrench(Wrench& wrench)
+bool ArmControllerKinova::getEndEffectorWrench(Wrench& wrench)
 {
-	ROS_ERROR("Mico does not support reading force/torque values");
+	ROS_ERROR("This arm does not support reading force/torque values");
 	return false;
 }
 
-bool ArmControllerMico::setEndEffectorWrench(const Wrench& Wrench)
+bool ArmControllerKinova::setEndEffectorWrench(const Wrench& Wrench)
 {
 	if(emergency_)
 		return false;
 
-	ROS_ERROR("Mico does not support force/torque control");
+	ROS_ERROR("This arm does not support force/torque control");
 	return false;
 }
 
-bool ArmControllerMico::getJointPositions(vector<double>& joint_positions)
+bool ArmControllerKinova::getJointPositions(vector<double>& joint_positions)
 {
 	joint_states_mutex_.lock();
 	
@@ -281,12 +281,12 @@ bool ArmControllerMico::getJointPositions(vector<double>& joint_positions)
 	return true;
 }
 
-bool ArmControllerMico::setJointPositions(const vector<double>& joint_positions)
+bool ArmControllerKinova::setJointPositions(const vector<double>& joint_positions)
 {
 	return setAngularJointValues(joint_positions, true);
 }
 
-bool ArmControllerMico::getJointVelocities(vector<double>& joint_velocities)
+bool ArmControllerKinova::getJointVelocities(vector<double>& joint_velocities)
 {
 	joint_states_mutex_.lock();
 	
@@ -297,12 +297,12 @@ bool ArmControllerMico::getJointVelocities(vector<double>& joint_velocities)
 	return true;
 }
 
-bool ArmControllerMico::setJointVelocities(const vector<double>& joint_velocities)
+bool ArmControllerKinova::setJointVelocities(const vector<double>& joint_velocities)
 {
 	return setAngularJointValues(joint_velocities, false);
 }
 
-bool ArmControllerMico::getJointEfforts(vector<double>& joint_angular_forces)
+bool ArmControllerKinova::getJointEfforts(vector<double>& joint_angular_forces)
 {
 	joint_states_mutex_.lock();
 	
@@ -313,14 +313,14 @@ bool ArmControllerMico::getJointEfforts(vector<double>& joint_angular_forces)
 	return true;
 }
 
-bool ArmControllerMico::setJointEfforts(const vector<double>& joint_angular_forces)
+bool ArmControllerKinova::setJointEfforts(const vector<double>& joint_angular_forces)
 {
-	//! @todo MdL: Implement.
+	//! @todo MdL [IMPL]: Implement this function.
 	return false;
 }
 
 
-void ArmControllerMico::CB_joint_state_received(const sensor_msgs::JointState::ConstPtr& joint_state)
+void ArmControllerKinova::CB_joint_state_received(const sensor_msgs::JointState::ConstPtr& joint_state)
 {
 	joint_states_mutex_.lock();
 
@@ -330,7 +330,7 @@ void ArmControllerMico::CB_joint_state_received(const sensor_msgs::JointState::C
 	joint_states_mutex_.unlock();
 }
 
-bool ArmControllerMico::setAngularJointValues(const vector<double>& values, const bool& position)
+bool ArmControllerKinova::setAngularJointValues(const vector<double>& values, const bool& position)
 {
 	wpi_jaco_msgs::AngularCommand angular_cmd;
 	angular_cmd.position 		= position;
@@ -360,7 +360,6 @@ bool ArmControllerMico::setAngularJointValues(const vector<double>& values, cons
 	return true;
 }
 
+} // namespace
 
-}; // namespace
-
-PLUGINLIB_EXPORT_CLASS(arm_controller_plugins::ArmControllerMico, arm_controller_base::ArmControllerBase);
+PLUGINLIB_EXPORT_CLASS(arm_controller_plugins::ArmControllerKinova, arm_controller_base::ArmControllerBase);

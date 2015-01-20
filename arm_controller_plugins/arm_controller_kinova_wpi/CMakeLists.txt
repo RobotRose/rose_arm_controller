@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(arm_controller_mico)
+project(arm_controller_kinova_wpi)
 
 find_package(catkin 
 	REQUIRED
@@ -42,11 +42,34 @@ include_directories(
 	${catkin_INCLUDE_DIRS}
 )
 
-add_library( ${PROJECT_NAME}
+# Kinova base
+add_library( arm_controller_kinova
+	src/arm_controller_kinova.cpp
+)
+
+add_dependencies(arm_controller_kinova ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_generate_messages_cpp)
+
+# Mico arm
+add_library( arm_controller_mico
 	src/arm_controller_mico.cpp
 )
 
-install(TARGETS ${PROJECT_NAME} 
+add_dependencies(arm_controller_mico ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_generate_messages_cpp)
+target_link_libraries(arm_controller_mico arm_controller_kinova)
+
+# Jaco arm
+add_library( arm_controller_jaco
+	src/arm_controller_jaco.cpp
+)
+
+add_dependencies(arm_controller_jaco ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_generate_messages_cpp)
+target_link_libraries(arm_controller_jaco arm_controller_kinova)
+
+
+install( 
+	TARGETS 
+		arm_controller_jaco 
+		arm_controller_mico 
 	ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 	LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 	RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -57,6 +80,10 @@ install(DIRECTORY include/${PROJECT_NAME}/
 	PATTERN ".svn" EXCLUDE
 )
 
-install(FILES mico_plugin.xml
+install(
+	FILES 
+		mico_plugin.xml 
+		jaco_plugin.xml
+		kinova_plugin.xml
 	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )

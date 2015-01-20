@@ -3,9 +3,12 @@ plugins:
     - 
         name: mico
         type: "arm_controller_plugins::ArmControllerMico"
-    # - 
-    #   name: robai_left
-    #   type: "arm_controller_plugins::ArmControllerRobai"
+    - 
+        name: jaco
+        type: "arm_controller_plugins::ArmControllerJaco"        
+    - 
+        name: robai_left
+        type: "arm_controller_plugins::ArmControllerRobai"
     # - 
     # name: robai_right
     # type: "arm_controller_plugins::ArmControllerRobai"

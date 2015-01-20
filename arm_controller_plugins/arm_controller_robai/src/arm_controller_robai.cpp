@@ -21,11 +21,7 @@ ArmControllerRobai::ArmControllerRobai()
 	, manipulation_action_manager_()
 	, emergency_(false)
 {
-	// Load the parameters that are needed
-	loadParameters();
 
-	manipulation_action_manager_.setMaxManipulationTries(max_manipulation_tries_parameter_);
-    manipulation_action_manager_.enablePathPlanningFunction(enable_path_planning_function_parameter_);
 }
 
 ArmControllerRobai::~ArmControllerRobai()
@@ -37,6 +33,13 @@ bool ArmControllerRobai::initialize( const std::string name )
 {
 	name_ = name;
 	ROS_INFO("Initializing Robai arm...");
+
+	// Load the parameters that are needed
+	loadParameters();
+
+	manipulation_action_manager_.setMaxManipulationTries(max_manipulation_tries_parameter_);
+    manipulation_action_manager_.enablePathPlanningFunction(enable_path_planning_function_parameter_);
+
 	return connectToArms();
 }
 
@@ -333,7 +336,7 @@ bool ArmControllerRobai::connectToArms(const std::string ip)
 
 bool ArmControllerRobai::loadParameters()
 {
-    ROS_INFO("Loading robai arm parameters...");
+    ROS_INFO("Loading robai arm parameters for <%s>", name_.c_str());
 
     //! @todo MdL: Check is parameters are loaded via a file.
     // if(not )
