@@ -37,18 +37,21 @@ bool ArmControllerKinova::initialize( const std::string name )
 
 	ros::NodeHandle n;
 
-	// Register SMC client for gripper
-	gripper_client_ = new GripperClient(arm_prefix_ + std::string("/fingers_controller"), true);
+	// Register actionlib client for moveit
+	//! @todo MdL [IMPR]: Change to SMC?
 	move_it_client_ = new MoveItClient(moveit_server_name_, true);
 
-	// Create all publishers
+	// Register actionlib client to the wpi_jaco driver for the gripper
+	gripper_client_ = new GripperClient(arm_prefix_ + std::string("/fingers_controller"), true);
+
+	// Create all publishers to the wpi_jaco driver
 	arm_cartesian_command_publisher_	= n.advertise<wpi_jaco_msgs::CartesianCommand>(arm_prefix_ + std::string("/cartesian_cmd"), 1);
 	arm_angular_command_publisher_ 		= n.advertise<wpi_jaco_msgs::AngularCommand>(arm_prefix_ + std::string("/angular_cmd"), 1);
 
-	// Create all subscribers
+	// Create all subscribers to the wpi_jaco driver
 	joint_state_sub_ 					= n.subscribe(arm_prefix_ + std::string("/joint_states"), 1, &ArmControllerKinova::CB_joint_state_received, this);
 
-	// Create all service clients
+	// Create all service clients to the wpi_jaco driver
 	get_cartesian_position_client_ 		= n.serviceClient<wpi_jaco_msgs::GetCartesianPosition>(arm_prefix_ + std::string("/get_cartesian_position"));
 
 	return true;
