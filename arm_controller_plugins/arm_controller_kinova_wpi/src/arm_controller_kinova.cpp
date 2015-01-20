@@ -33,6 +33,7 @@ bool ArmControllerKinova::initialize( const std::string name )
 {
 	name_ = name;
 	ROS_INFO("Initializing arm <%s>", name.c_str());
+	loadParameters();
 
 	ros::NodeHandle n;
 
