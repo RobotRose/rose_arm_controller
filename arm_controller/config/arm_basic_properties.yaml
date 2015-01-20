@@ -1,14 +1,14 @@
 open_close_gripper_on_init: true
 plugins: 
+    # - 
+    #     name: robai_left
+    #     type: "arm_controller_plugins::ArmControllerRobai"
     - 
         name: mico
         type: "arm_controller_plugins::ArmControllerMico"
     - 
         name: jaco
         type: "arm_controller_plugins::ArmControllerJaco"        
-    - 
-        name: robai_left
-        type: "arm_controller_plugins::ArmControllerRobai"
     # - 
     # name: robai_right
     # type: "arm_controller_plugins::ArmControllerRobai"
