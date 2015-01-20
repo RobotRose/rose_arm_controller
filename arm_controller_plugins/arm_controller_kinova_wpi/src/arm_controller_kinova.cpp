@@ -19,21 +19,9 @@ ArmControllerKinova::ArmControllerKinova()
 	: n_("~kinova")
 	, joint_states_initialized_(false)
 	, emergency_(false)
-	, move_it_client_("rose_moveit_controller", true) //! @todo MdL [CONF]: configure the moveit client name.
-	, gripper_client_(ARM_NAME + std::string("/fingers_controller"), true)
 	, gripper_width_(0.0)
 {
-	ros::NodeHandle n;
 
-	// Create all publishers
-	arm_cartesian_command_publisher_	= n.advertise<wpi_jaco_msgs::CartesianCommand>(ARM_NAME + std::string("/cartesian_cmd"), 1);
-	arm_angular_command_publisher_ 		= n.advertise<wpi_jaco_msgs::AngularCommand>(ARM_NAME + std::string("/angular_cmd"), 1);
-
-	// Create all subscribers
-	joint_state_sub_ 					= n.subscribe(ARM_NAME + std::string("/joint_states"), 1, &ArmControllerKinova::CB_joint_state_received, this);
-
-	// Create all service clients
-	get_cartesian_position_client_ 		= n.serviceClient<wpi_jaco_msgs::GetCartesianPosition>(ARM_NAME + std::string("/get_cartesian_position"));
 }
 
 ArmControllerKinova::~ArmControllerKinova()
@@ -45,7 +33,23 @@ bool ArmControllerKinova::initialize( const std::string name )
 {
 	name_ = name;
 	ROS_INFO("Initializing arm...");
-	//! @todo MdL [IMPL]: Implement this function.
+
+	ros::NodeHandle n;
+
+	// Register SMC client for gripper
+	gripper_client_ = new GripperClient(arm_prefix_ + std::string("/fingers_controller"), true);
+	move_it_client_ = new MoveItClient(moveit_server_name_, true);
+
+	// Create all publishers
+	arm_cartesian_command_publisher_	= n.advertise<wpi_jaco_msgs::CartesianCommand>(arm_prefix_ + std::string("/cartesian_cmd"), 1);
+	arm_angular_command_publisher_ 		= n.advertise<wpi_jaco_msgs::AngularCommand>(arm_prefix_ + std::string("/angular_cmd"), 1);
+
+	// Create all subscribers
+	joint_state_sub_ 					= n.subscribe(arm_prefix_ + std::string("/joint_states"), 1, &ArmControllerKinova::CB_joint_state_received, this);
+
+	// Create all service clients
+	get_cartesian_position_client_ 		= n.serviceClient<wpi_jaco_msgs::GetCartesianPosition>(arm_prefix_ + std::string("/get_cartesian_position"));
+
 	return false;
 }
 
@@ -121,8 +125,8 @@ bool ArmControllerKinova::setEndEffectorPose(const Pose& end_effector_pose)
 	rose_moveit_controller::arm_goalGoal goal;
 	goal.goal_pose.pose = end_effector_pose;
 
-	move_it_client_.sendGoal(goal);
-	move_it_client_.waitForResult(ros::Duration(0.0)); // infinite?
+	move_it_client_->sendGoal(goal);
+	move_it_client_->waitForResult(ros::Duration(0.0)); // infinite?
 
 	return true;
 }
@@ -188,7 +192,7 @@ double ArmControllerKinova::getGripperWidth()
 	getJointPositions(joint_positions);
 
 	vector<double> finger_positions;
-	for ( int i = joint_positions.size() - NR_FINGERS ; i < joint_positions.size() ; i++ )
+	for ( int i = joint_positions.size() - nr_fingers_ ; i < joint_positions.size() ; i++ )
 		finger_positions.push_back(joint_positions[i]);
 
 	double percentage_total = 0;
@@ -196,9 +200,9 @@ double ArmControllerKinova::getGripperWidth()
 		// Get percentage open Since fully closed is 6400, we take the inverse of the percentage
 		percentage_total += 1.0 - finger_position/6400;
 		
-	percentage_total = percentage_total/NR_FINGERS;
+	percentage_total = percentage_total/nr_fingers_;
 
-	return percentage_total * MAX_GRIPPER_WIDTH;
+	return percentage_total * max_gripper_width_;
 }
 
 bool ArmControllerKinova::setGripperWidth(const double required_width)
@@ -210,10 +214,10 @@ bool ArmControllerKinova::setGripperWidth(const double required_width)
 	gripper_command.command.position = required_width;
 	// gripper_command.command.max_effort = 10.0; If init 0, problem?
 
-	gripper_client_.sendGoal(gripper_command);
-	gripper_client_.waitForResult(ros::Duration(0.0));
+	gripper_client_->sendGoal(gripper_command);
+	gripper_client_->waitForResult(ros::Duration(0.0));
 
-	control_msgs::GripperCommandResultConstPtr result = gripper_client_.getResult();
+	control_msgs::GripperCommandResultConstPtr result = gripper_client_->getResult();
 
 	gripper_width_ = result->position;
 
@@ -223,15 +227,15 @@ bool ArmControllerKinova::setGripperWidth(const double required_width)
 	// approximately 0 (fully open) to 6400 (fully closed). 
 	// (http://wiki.ros.org/jaco_ros)
 
-	// Limit to the min and max values (0, MAX_GRIPPER_WIDTH)
-	std::min(std::max(required_width, 0.0), MAX_GRIPPER_WIDTH);
+	// Limit to the min and max values (0, max_gripper_width_)
+	std::min(std::max(required_width, 0.0), max_gripper_width_);
 
 	// Calculate the percentage open
-	double percentage_open = required_width/MAX_GRIPPER_WIDTH;
+	double percentage_open = required_width/max_gripper_width_;
 
 	vector<float> finger_angles;
-	finger_angles.resize(NR_FINGERS);
-	for ( int i = 0 ; i < NR_FINGERS ; i++ )
+	finger_angles.resize(nr_fingers_);
+	for ( int i = 0 ; i < nr_fingers_ ; i++ )
 		// Since fully closed is 6400, we take the inverse of the percentage open
 		finger_angles[i] = (1.0 - percentage_open)*6400;
 
@@ -319,6 +323,23 @@ bool ArmControllerKinova::setJointEfforts(const vector<double>& joint_angular_fo
 	return false;
 }
 
+bool ArmControllerKinova::loadParameters()
+{
+    ROS_INFO("Loading kinova arm parameters for <%s>", name_.c_str());
+
+    //! @todo MdL: Check is parameters are loaded via a file.
+    // if(not )
+    //    ROS_WARN("Gripper tip correction was not set in confugation file, defaulting to %f", gripper_tip_correction_parameter_);
+
+    n_.param(name_ + "_configuration/arm_prefix", arm_prefix_, std::string("kinova_arm"));
+    n_.param(name_ + "_configuration/max_gripper_width", max_gripper_width_, 0.15);
+    n_.param(name_ + "_configuration/nr_fingers", nr_fingers_, 3);
+    n_.param(name_ + "_configuration/moveit_server_name", moveit_server_name_, std::string("rose_moveit_controller"));
+
+    ROS_INFO("Done.");
+
+    return true;
+}
 
 void ArmControllerKinova::CB_joint_state_received(const sensor_msgs::JointState::ConstPtr& joint_state)
 {

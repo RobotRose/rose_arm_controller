@@ -40,8 +40,6 @@
 #include "wpi_jaco_msgs/GetCartesianPosition.h"
 
 #define ARM_NAME            "jaco_arm" //! @todo MdL [CONF]: Make configurable, or dependend on roslaunch parameters.
-#define MAX_GRIPPER_WIDTH   0.15 //[m]
-#define NR_FINGERS          3 // Jaco has three, Mico uses this software and sets properties of the third finger to 0.0
 #define NR_JOINTS           6 // Jaco has three, Mico uses this software and sets properties of the third finger to 0.0
 
 namespace arm_controller_plugins {    
@@ -162,6 +160,8 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
     // bool hasMoveItInterface();
 
   protected:
+    bool loadParameters();
+
     bool setAngularJointValues(const vector<double>& values, const bool& position);
     void CB_joint_state_received(const sensor_msgs::JointState::ConstPtr& joint_state);
 
@@ -172,8 +172,8 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
     ros::Publisher      arm_angular_command_publisher_;
     ros::ServiceClient  get_cartesian_position_client_;
 
-    MoveItClient        move_it_client_;
-    GripperClient       gripper_client_;
+    MoveItClient*       move_it_client_;
+    GripperClient*      gripper_client_;
 
     bool                emergency_;
 
@@ -183,6 +183,12 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
     JointState          joint_states_;
     ros::Subscriber     joint_state_sub_;
     bool                joint_states_initialized_;
+
+    // Parameters
+    std::string         arm_prefix_;
+    std::string         moveit_server_name_;
+    double              max_gripper_width_;
+    int                 nr_fingers_;
 };
 
 } //namespace
