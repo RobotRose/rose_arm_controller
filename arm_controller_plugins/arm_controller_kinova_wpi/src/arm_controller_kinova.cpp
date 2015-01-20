@@ -328,17 +328,14 @@ bool ArmControllerKinova::loadParameters()
 {
     ROS_INFO("Loading kinova arm parameters for <%s>", name_.c_str());
 
-    //! @todo MdL: Check is parameters are loaded via a file.
-    // if(not )
-    //    ROS_WARN("Gripper tip correction was not set in confugation file, defaulting to %f", gripper_tip_correction_parameter_);
+    n_.param("/" + name_ + "_configuration/arm_prefix", arm_prefix_, std::string("kinova_arm"));
+    n_.param("/" + name_ + "_configuration/max_gripper_width", max_gripper_width_, 0.15);
+    n_.param("/" + name_ + "_configuration/nr_fingers", nr_fingers_, 3);
+    n_.param("/" + name_ + "_configuration/moveit_server_name", moveit_server_name_, std::string("rose_moveit_controller"));
 
-    n_.param(name_ + "_configuration/arm_prefix", arm_prefix_, std::string("kinova_arm"));
-    n_.param(name_ + "_configuration/max_gripper_width", max_gripper_width_, 0.15);
-    n_.param(name_ + "_configuration/nr_fingers", nr_fingers_, 3);
-    n_.param(name_ + "_configuration/moveit_server_name", moveit_server_name_, std::string("rose_moveit_controller"));
+    ROS_INFO("Parameters loaded.");
 
-    ROS_INFO("Done.");
-
+    //! @todo MdL [IMPR]: Return is values are all correctly loaded.
     return true;
 }
 
