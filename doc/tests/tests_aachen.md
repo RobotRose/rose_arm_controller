@@ -1,6 +1,6 @@
 Tests on the Jaco arm (overall)
 ============
-Date: 15-01-2015
+Date: 15/01/2015
 
 Location: RWTH Hörn, Aachen
 

@@ -76,7 +76,80 @@ ID | Input values			| Expected Results 	| Measured values 	||
  1 | false        			| true 				| true/false		| yes/no 		
 
 ### jaco_arm/angular_cmd
-Publish an angular command. Meaning: Sending joint angles. We do not test this at this time.
+Publish an angular command. Meaning: Sending joint angles.
+
+The message that is publishing in ROS is the following. We can split the test in the following commands:
+* Position command for the arm; 
+* Velocity command for the arm;
+* Position command for the fingers; 
+* Velocity command for the fingers;
+
+Type 				| Variable 		| description 															
+--------------------|:-------------:|-----------------------------------------------------------------------
+bool 				| position      | true for a position command, false for a velocity command 			
+bool 				| armCommand    | true if this command includes arm joint inputs						
+bool 				| fingerCommand | true if this command includes finger inputs 							
+bool 				| repeat        | true if the command should be repeatedly sent over a short interval 	
+float32[]           | arm    		| position (rad) or velocity (rad/s) arm command				
+float32[]   		| fingers   	| position (rad) or velocity (rad/s) finger command			
+
+#### Position command (arm)
+For this the *position* input is always set to *true*.
+The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
+
+All tests start from home position. Input of values of *arm* (below) are all zero, unless described differently.
+
+At this point, I do not know any valid cartesian positions for the arm. This is found out at the testing location.
+
+#### Velocity command (arm)
+For this the *position* input is always set to *false*
+
+The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
+
+All tests starting from home position. Input of values of *arm* (below) are all zero, unless described differently.
+
+ID | Input values			| Expected Results 		| Measured values 	||
+---|:----------------------:|-----------------------|-------------------|-------
+   | **arm** [Twist]		| **position**			| **position**  	| **arm moved**
+ 0 | Home position 			| -						| 					| yes/no 
+ 1 | linear.x = 0.1 		| home pos + 0.1 in x L	|  					| yes/no
+ 2 | linear.y = 0.1 		| home pos + 0.1 in y L	|  					| yes/no
+ 3 | linear.z = 0.1 		| home pos + 0.1 in z L	|  					| yes/no
+ 4 | angualar.x = 0.1 		| home pos + 0.1 in x A	|  					| yes/no
+ 5 | angualar.y = 0.1 		| home pos + 0.1 in y A	|  					| yes/no
+ 6 | angualar.z = 0.1 		| home pos + 0.1 in z A	|  					| yes/no
+
+
+#### Position command (fingers)
+For this the *position* input is always set to *true*.
+The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
+
+ID | Input values			| Expected Results 	| Measured values 	||
+---|:----------------------:|-------------------|-------------------|-----------
+   | **fingers** [float32[]]| **position**		| **position**    	| **fingers moved**
+ 1 | [0.1, 0.0, 0.0]		|  					|  					| yes/no 
+ 2 | [0.0, 0.1, 0.1]	 	|  					|  					| yes/no 
+ 3 | [0.0, 0.0, 0.1]	 	|  					|  					| yes/no 
+ 4 | [0.01, 0.01, 0.01]		|  					|  					| yes/no 
+ 5 | [0.1,0.1, 0.1]		 	|  					|  					| yes/no 
+ 6 | [0.2,0.2, 0.2]		 	|  					|  					| yes/no 
+
+#### Velocity command (fingers)
+The test starts with the fingers closed (position [0.0, 0.0, 0.0])
+
+For this the *position* input is always set to *false*
+
+The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
+
+ID | Input values			| Expected Results 	| Measured values 	||
+---|:----------------------:|-------------------|-------------------|--------------
+   | **fingers** [float32[]]| **position**		| **position** 		| **fingers moved**
+ 1 | [0.1, 0.0, 0.0]		|  					|  					| yes/no 
+ 2 | [0.0, 0.1, 0.1]	 	|  					|  					| yes/no 
+ 3 | [0.0, 0.0, 0.1]	 	|  					|  					| yes/no 
+ 4 | [0.01, 0.01, 0.01]		|  					|  					| yes/no 
+ 5 | [0.1,0.1, 0.1]		 	|  					|  					| yes/no 
+ 6 | [0.2,0.2, 0.2]		 	|  					|  					| yes/no 	
 
 ### jaco_arm/cartesian_cmd
 Publish a cartesian command. Meaning: Sending cartesian velocities or positions to the arm.
