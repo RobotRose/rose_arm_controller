@@ -21,7 +21,7 @@ namespace arm_controller_plugins {
  /**
   * @brief Provides an interface to interact with each kind of arm.
   */
-class ArmControllerJaco : public ArmControllerKinova 
+class ArmControllerJaco : public ArmControllerKinova
 {
   public:
     /**
