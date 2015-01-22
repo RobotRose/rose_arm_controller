@@ -147,7 +147,7 @@ bool ArmControllerKinova::getEndEffectorVelocity(Twist& twist)
 
 bool ArmControllerKinova::setEndEffectorVelocity(const Twist& velocity)
 {
-	ROS_INFO("Setting end effector velocity...");
+	ROS_DEBUG("Setting end effector velocity...");
 	if (emergency_)
 		return false;
 
@@ -155,7 +155,7 @@ bool ArmControllerKinova::setEndEffectorVelocity(const Twist& velocity)
 	// bool position             # true for a position command, false for a velocity command
 	// bool armCommand           # true if this command includes arm joint inputs
 	// bool fingerCommand        # true if this command includes finger inputs
-	// bool repeat               # true if the command should be repeatedly sent over a short interval
+	// bool repeat               # true if the command should be repeatedly sent over a short interval, needed for vel control
 	// geometry_msgs/Twist arm   # position (m, rad) or velocity (m/s, rad/s) arm command
 	// float32[] fingers         # position (rad) or velocity (rad/s) finger command
 
@@ -163,7 +163,7 @@ bool ArmControllerKinova::setEndEffectorVelocity(const Twist& velocity)
 	cartesian_cmd.position 		= false;
 	cartesian_cmd.armCommand 	= true;
 	cartesian_cmd.fingerCommand = false;
-	cartesian_cmd.repeat 		= false; // What happens when you put this to true?
+	cartesian_cmd.repeat 		= true; 
 	cartesian_cmd.arm 			= velocity;
 
 	arm_cartesian_command_publisher_.publish(cartesian_cmd);
