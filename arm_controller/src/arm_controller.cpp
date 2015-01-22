@@ -210,8 +210,10 @@ void ArmController::testMovementGrippers()
     // Open and close the grippers
     for ( const auto& arm_controller : arm_controllers_ )
     {
-        arm_controller.second->setGripperWidth(0.001); //0.02 m
-        arm_controller.second->setGripperWidth(0.08); //0.08 m
+        if ( not arm_controller.second->setGripperWidth(0.001))
+            ROS_ERROR("Gripper could not close"); //0.02 m
+        if ( not arm_controller.second->setGripperWidth(0.08)); //0.08 m
+            ROS_ERROR("Gripper could not open");
     }
 }
 
