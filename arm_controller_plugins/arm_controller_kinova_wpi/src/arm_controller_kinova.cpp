@@ -225,6 +225,7 @@ bool ArmControllerKinova::setGripperWidth(const double required_width)
 	gripper_command.command.position = gripper_value;
 	// gripper_command.command.max_effort = 10.0; If init 0, problem?
 
+	ROS_DEBUG("Sending gripper %f width to driver", gripper_value);
 	gripper_client_->sendGoal(gripper_command);
 	if ( not gripper_client_->waitForResult(ros::Duration(5.0)) )
 		return false; //! @todo MdL [IMPR]: Better idea for time out?
