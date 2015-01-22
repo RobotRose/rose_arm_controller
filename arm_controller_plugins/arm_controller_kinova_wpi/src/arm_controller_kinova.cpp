@@ -220,7 +220,7 @@ bool ArmControllerKinova::setGripperWidth(const double required_width)
 	// gripper_command.command.max_effort = 10.0; If init 0, problem?
 
 	gripper_client_->sendGoal(gripper_command);
-	if ( not gripper_client_->waitForResult(ros::Duration(2.0)) )
+	if ( not gripper_client_->waitForResult(ros::Duration(5.0)) )
 		return false; //! @todo MdL [IMPR]: Better idea for time out?
 
 	control_msgs::GripperCommandResultConstPtr result = gripper_client_->getResult();
