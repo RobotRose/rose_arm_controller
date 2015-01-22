@@ -215,8 +215,14 @@ bool ArmControllerKinova::setGripperWidth(const double required_width)
 	if(emergency_)
 		return false;
 
+	std::min(std::max(required_width, 0.0), max_gripper_width_);
+	double percentage_open = required_width/max_gripper_width_;
+
+	double distance 	 = gripper_value_open_ - gripper_value_closed_;
+	double gripper_value = gripper_value_open_ += percentage_open * distance;
+
 	control_msgs::GripperCommandGoal gripper_command;
-	gripper_command.command.position = required_width;
+	gripper_command.command.position = gripper_value;
 	// gripper_command.command.max_effort = 10.0; If init 0, problem?
 
 	gripper_client_->sendGoal(gripper_command);
@@ -234,34 +240,7 @@ bool ArmControllerKinova::setGripperWidth(const double required_width)
 	// (http://wiki.ros.org/jaco_ros)
 
 	// Limit to the min and max values (0, max_gripper_width_)
-	std::min(std::max(required_width, 0.0), max_gripper_width_);
-
-	// Calculate the percentage open
-	double percentage_open = required_width/max_gripper_width_;
-
-	vector<float> finger_angles;
-	finger_angles.resize(nr_fingers_);
-	for ( int i = 0 ; i < nr_fingers_ ; i++ )
-		// Since fully closed is 6400, we take the inverse of the percentage open
-		finger_angles[i] = (1.0 - percentage_open)*6400;
-
-	// wpi_jaco_msgs::CartesianCommand message definition
-	// bool position             # true for a position command, false for a velocity command
-	// bool armCommand           # true if this command includes arm joint inputs
-	// bool fingerCommand        # true if this command includes finger inputs
-	// bool repeat               # true if the command should be repeatedly sent over a short interval
-	// geometry_msgs/Twist arm   # position (m, rad) or velocity (m/s, rad/s) arm command
-	// float32[] fingers         # position (rad) or velocity (rad/s) finger command
-
-	wpi_jaco_msgs::CartesianCommand cartesian_cmd;
-	cartesian_cmd.position 		= true;
-	cartesian_cmd.armCommand 	= false;
-	cartesian_cmd.fingerCommand = true;
-	cartesian_cmd.repeat 		= false; 
-	cartesian_cmd.fingers		= finger_angles;
-
-	arm_cartesian_command_publisher_.publish(cartesian_cmd);
-
+	
 	return true;
 }
 
@@ -335,6 +314,8 @@ bool ArmControllerKinova::loadParameters()
 
     n_.param("/" + name_ + "_configuration/arm_prefix", arm_prefix_, std::string("kinova_arm"));
     n_.param("/" + name_ + "_configuration/max_gripper_width", max_gripper_width_, 0.15);
+    n_.param("/" + name_ + "_configuration/gripper_value_open", gripper_value_open_, 0.0);
+    n_.param("/" + name_ + "_configuration/gripper_value_closed", gripper_value_closed_, 40.0);
     n_.param("/" + name_ + "_configuration/nr_fingers", nr_fingers_, 3);
     n_.param("/" + name_ + "_configuration/moveit_server_name", moveit_server_name_, std::string("rose_moveit_controller"));
 

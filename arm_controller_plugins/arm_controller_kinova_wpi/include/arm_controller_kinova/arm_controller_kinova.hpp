@@ -188,6 +188,8 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
     std::string         arm_prefix_;
     std::string         moveit_server_name_;
     double              max_gripper_width_;
+    double              gripper_value_open_;
+    double              gripper_value_closed_;
     int                 nr_fingers_;
 };
 
