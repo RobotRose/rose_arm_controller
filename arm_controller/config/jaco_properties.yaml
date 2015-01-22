@@ -7,8 +7,10 @@ jaco_configuration:
     # Defined the width that the gripper can be opened
     max_gripper_width: 0.15
 
+    # Value of gripper finger when fully opened
     gripper_value_open: 0.0
 
+    # Value of gripper finger when fully closed
     gripper_value_closed: 50.0
 
     # For the Kinova arm, define the number of fingers that are avaiable
