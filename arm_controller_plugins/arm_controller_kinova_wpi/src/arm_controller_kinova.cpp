@@ -220,8 +220,12 @@ bool ArmControllerKinova::setGripperWidth(const double required_width)
 
 	ROS_DEBUG("Gripper needs to be %f percentage open", percentage_open);
 
-	double distance 	 = gripper_value_open_ - gripper_value_closed_;
-	double gripper_value = gripper_value_open_ - percentage_open * distance;
+	double gripper_value;
+	//! @todo MdL [IMPR]: Quick fix, when open value < closed vlue.
+	if ( gripper_value_open_ > gripper_value_closed_)
+		gripper_value = percentage_open * gripper_value_open_;
+	else
+	 	gripper_value = (1-percentage_open) * gripper_value_closed_;
 
 	control_msgs::GripperCommandGoal gripper_command;
 	gripper_command.command.position = gripper_value;
