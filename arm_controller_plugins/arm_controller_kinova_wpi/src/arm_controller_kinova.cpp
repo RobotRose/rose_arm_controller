@@ -219,7 +219,7 @@ bool ArmControllerKinova::setGripperWidth(const double required_width)
 	double percentage_open = required_width/max_gripper_width_;
 
 	double distance 	 = gripper_value_open_ - gripper_value_closed_;
-	double gripper_value = gripper_value_open_ + percentage_open * distance;
+	double gripper_value = gripper_value_open_ - percentage_open * distance;
 
 	control_msgs::GripperCommandGoal gripper_command;
 	gripper_command.command.position = gripper_value;
