@@ -301,6 +301,7 @@ void ArmController::CB_receivePositionGoal(const rose_arm_controller_msgs::set_p
 
     arm_controller->setConstraints(goal_constraint);
 
+    //! @todo MdL [IMPL]: Result message.
     rose_arm_controller_msgs::set_positionResult result;
     smc->sendServerResult<rose_arm_controller_msgs::set_positionAction>(arm_controller->setEndEffectorPose(goal_pose), result );    
 }
@@ -348,6 +349,8 @@ void ArmController::CB_receiveVelocityGoal(const rose_arm_controller_msgs::set_v
 
     //! @todo MdL [IMPL]: description.: Constraint always Frame End Effector?.
     // arm_controller->setConstraints(goal_constraint);
+
+    //! @todo MdL [IMPL]: Result message.
     rose_arm_controller_msgs::set_velocityResult result;
     smc->sendServerResult<rose_arm_controller_msgs::set_velocityAction>(arm_controller->setEndEffectorVelocity(goal_twist), result );
 }
@@ -420,6 +423,7 @@ void ArmController::CB_receiveWrenchGoal(const rose_arm_controller_msgs::set_wre
     if ( not getArmController(goal->arm, arm_controller))
         return;
 
+    //! @todo MdL [IMPL]: Result message.
     rose_arm_controller_msgs::set_wrenchResult result;
     smc->sendServerResult<rose_arm_controller_msgs::set_wrenchAction>(arm_controller->setEndEffectorWrench(goal->required_wrench), result );
 }
