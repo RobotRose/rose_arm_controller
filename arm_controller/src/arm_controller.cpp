@@ -145,6 +145,7 @@ void ArmController::initializeArmControllers()
 
 void ArmController::initializePublishersAndServices()
 {
+    ROS_INFO("Initializing pub/sub");
     // attach_item_service_    = n_.advertiseService("/" + name_ + "/set_item_attachment",      &ArmController::CB_attach_item,  this);
     // query_attached_items_service_    = n_.advertiseService("/" + name_ + "/get_item_attachment",      &ArmController::CB_query_attached_items,  this);
 
@@ -156,6 +157,7 @@ void ArmController::initializePublishersAndServices()
     }
 
     joint_state_timer_ = n_.createTimer(ros::Duration(0.0333), boost::bind(&ArmController::CB_updateJointStates, this));
+    ROS_INFO("Done");
 }
 
 void ArmController::registerSharedVariables()
@@ -168,11 +170,14 @@ void ArmController::registerSharedVariables()
 
 void ArmController::testArmMovement()
 {
+    ROS_INFO("Testing arm movement...");
     bool allow_first_movement;
     n_.param("/open_close_gripper_on_init", allow_first_movement, true);
 
     if (allow_first_movement)
         testMovementGrippers();
+
+    ROS_INFO("Done");
 }
 
 void ArmController::closeAllArmControllers()
