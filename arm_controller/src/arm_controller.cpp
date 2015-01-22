@@ -342,11 +342,11 @@ void ArmController::CB_receiveVelocityGoal(const rose_arm_controller_msgs::set_v
 
     velocity_watchdog_.reset();
 
-    //! @todo MdL: Transform both to arm base link.
+    //! @todo MdL [IMPL]: description.: Transform both to arm base link.
     Twist goal_twist        = goal->required_velocity.twist;
     Twist goal_constraint   = goal->constraint.twist;
 
-    //! @todo MdL: Constraint always Frame End Effector?.
+    //! @todo MdL [IMPL]: description.: Constraint always Frame End Effector?.
     // arm_controller->setConstraints(goal_constraint);
     rose_arm_controller_msgs::set_velocityResult result;
     smc->sendServerResult<rose_arm_controller_msgs::set_velocityAction>(arm_controller->setEndEffectorVelocity(goal_twist), result );
