@@ -125,7 +125,7 @@ bool ArmControllerKinova::getEndEffectorPose(Pose& pose)
 
 bool ArmControllerKinova::setEndEffectorPose(const Pose& end_effector_pose)
 {	
-	ROS_INFO("Setting end effector pose...");
+	ROS_DEBUG("Setting end effector pose...");
 	
 	if (emergency_)
 		return false;
@@ -147,6 +147,7 @@ bool ArmControllerKinova::getEndEffectorVelocity(Twist& twist)
 
 bool ArmControllerKinova::setEndEffectorVelocity(const Twist& velocity)
 {
+	ROS_INFO("Setting end effector velocity...");
 	if (emergency_)
 		return false;
 
