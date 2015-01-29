@@ -1,6 +1,6 @@
 Tests on the Jaco arm using the rose_moveit_controller interface
 ============
-Date: 15-01-2015
+Date: 22-01-2015
 
 Location: RWTH Hörn, Aachen
 

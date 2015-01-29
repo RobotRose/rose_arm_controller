@@ -1,6 +1,6 @@
 Tests on the Jaco arm using the wpi_jaco package
 ============
-Date: 15-01-2015
+Date: 22-01-2015
 
 Location: RWTH Hörn, Aachen
 
