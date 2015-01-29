@@ -56,16 +56,21 @@ jaco_arm/get_cartesian_position | wpi_jaco_msgs/GetCartesianPosition| Read the C
 
 ##Tests and Results
 
-### jaco_arm/fingers_controller
+### jaco_arm/fingers_controller/gripper
 Send a goal to the gripper to open, go half-way open and close.
 
 ID | Input values			| Expected results 	|				| Measured values 	| 				||
 ---|:----------------------:|-------------------|---------------|-------------------|---------------|---------------
    | **command.position** [m]| **reached_goal**	| **position** 	| **reached_goal**	| **position** 	| **arm moved** 
- 1 | 0.0        			| true 				| 0.0      		| true/false		|				| yes/no		
- 2 | 0.05        			| true 				| 0.05     		| true/false		|				| yes/no		
- 3 | 0.10        			| true 				| 0.10 			| true/false		|				| yes/no		
- 3 | 0.50 (too wide)			| false 			| 				| true/false		|				| yes/no		
+ 1 | 0.0 (fully open)		| true 				| 0.0      		| true		        | _0.70_		| yes		
+ 2 | 50.0 (almost closed)   | true 				| 50.0     		| true      		| _0.004_		| yes		
+ 3 | 200 (too wide)			| false 			| ? 			| _true_          	| _0.92_		| yes	
+
+The arm moves to the required input values. As we can see in this experiment the resulted values for the positions are not correct. Also, the result is retrieved almost immediately when sending a goal to the gripper. This can conclude why the resulting position is not correct. 
+
+Secondly, in the last test we send a goal which is not possible (too wide). The reached goal result message is _true_ and the gripper moves towards this goal. This is also not expected.
+
+For both issues, an issue is reported on [github](https://github.com/RIVeR-Lab/wpi_jaco/issues/19).
 
 ### jaco_arm/home_arm
 Send a goal to move the arm to the homing position.
@@ -255,3 +260,8 @@ Topic 							| Message Type     				| Description
 --------------------------------|:-----------------------------:|-----------
 jaco_arm/manipulation/grasp 	| wpi_jaco_msgs/ExecuteGrasp 	| Execute a grasp or release with the JACO gripper at a designated speed until the fingers can no longer move.
 jaco_arm/manipulation/pickup	| wpi_jaco_msgs/ExecutePickup   | Execute a pickup action that lifts the end effector while applying a constant force to close the fingers, preventing objects from slipping.
+
+Additional issues
+-------------------
+* The arm would not connect via an USB 3 port. No action has been taken on this point.
+* The WPI driver crashes when the arm is not connected, or disconnected while operating. This has been reported on [github](https://github.com/RIVeR-Lab/wpi_jaco/issues/14).
