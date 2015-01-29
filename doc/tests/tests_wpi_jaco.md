@@ -29,11 +29,10 @@ There is a specific launch file *test_wpi_jaco.launch* in the launch directory f
 
 ### Action/Feedback/Result
 
-Topic 							       | Message Type     				| Description 
----------------------------------------|:------------------------------:|-----------
-jaco_arm/fingers_controller/gripper    | control_msgs/GripperCommand    | Gripper control using control_msgs
-(remapped)                             |                                |
-jaco_arm/home_arm 				       | wpi_jaco_msgs/HomeArm 		    | Move arm to the home position, or to a defined position via the home position
+Topic 							               | Message Type     				| Description 
+-----------------------------------------------|:------------------------------:|-----------
+jaco_arm/fingers_controller/gripper (remapped) | control_msgs/GripperCommand    | Gripper control using control_msgs
+jaco_arm/home_arm 				               | wpi_jaco_msgs/HomeArm 		    | Move arm to the home position, or to a defined position via the home position
 
 ### Subscribed Topics
 
