@@ -78,7 +78,9 @@ Send a goal to move the arm to the homing position.
 ID | Input values			| Expected Results 	| Measured values 	||
 ---|:----------------------:|-------------------|-------------------|---------------
    | **retract** [bool]		| **succes**		| **succes**    	| **arm moved**
- 1 | false        			| true 				| true/false		| yes/no 		
+ 1 | false        			| true 				| true	         	| yes
+
+ Works as expected.
 
 ### jaco_arm/angular_cmd
 Publish an angular command. Meaning: Sending joint angles.
@@ -100,11 +102,11 @@ float32[]   		| fingers   	| position (rad) or velocity (rad/s) finger command
 
 #### Position command (arm)
 For this the *position* input is always set to *true*.
-The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
+The variables armCommand is set to *true* and the fingerCommand is set to *false*.
 
-All tests start from home position. Input of values of *arm* (below) are all zero, unless described differently.
+For this test we also monitor the topic jaco_arm/joint_states for information about the arm.
 
-At this point, I do not know any valid cartesian positions for the arm. This is found out at the testing location.
+I did not write down the actual joint values I have sent and the resulting values. However, I could conclude from the test that the joint angles reached their position within an angle of 0.03 radians. This is also verified by the code corresponding to this function (it sets the goal as reached when the angle is within 0.03 radians).
 
 #### Velocity command (arm)
 For this the *position* input is always set to *false*
