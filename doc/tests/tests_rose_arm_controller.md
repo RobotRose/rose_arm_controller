@@ -1,6 +1,6 @@
 Tests on the Jaco arm using rose_arm_controller
 ============
-Date: 15-01-2015
+Date: 22-01-2015
 
 Location: RWTH Hörn, Aachen
 
