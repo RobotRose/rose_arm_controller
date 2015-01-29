@@ -163,16 +163,20 @@ float32[] 			| fingers   	| position (rad) or velocity (rad/s) finger command
 
 #### Position command (arm)
 For this the *position* input is always set to *true*.
-The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
+The variables armCommand is set to *true*, the fingerCommand is set to *false* and repeat is set to *false*.
 
-All tests start from home position. Input of values of *arm* (below) are all zero, unless described differently.
+For this test we also monitor the topic jaco_arm/joint_states for information about the arm.
 
-At this point, I do not know any valid cartesian positions for the arm. This is found out at the testing location.
+I did not write down the actual positions I have sent and the resulting values given by the joint state publisher. However, I could conclude from the test that the joint angles reached their position within an acuracy of 0.03. This is also verified by the code corresponding to this function (it sets the goal as reached when the position is within a distance of 0.03).
+
+When the position sent is unreachable, the arm will move towards the goal and eventually stop. I do not know if this is wanted behaviour.
 
 #### Velocity command (arm)
 For this the *position* input is always set to *false*
 
-The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
+he variables armCommand is set to *true* and  the fingerCommand is set to *false*.
+
+For this test we also monitor the topic jaco_arm/joint_states for information about the arm.
 
 All tests starting from home position. Input of values of *arm* (below) are all zero, unless described differently.
 
