@@ -123,6 +123,7 @@ ID | Input values			 | Expected Results 		| Measured values 	||
  1 | joints = [0,0,0,0,0,-40] | -                    |                      | yes, shortly
 
 We have seen that the *repeat* has to be set to *true*. Otherwise, the arm will not move. Secondly, the velocity command has to be sent continiously. This has been verified by Dadid Kent (mainterner of the package):
+
     Velocity control will only send a command for about 1/60th of a second, so you need to send commands continuously at about 60 Hz.  I assume this is a safety feature of the API, so that if you lose connection to the arm it will stop.
 
 #### Position command (fingers)
