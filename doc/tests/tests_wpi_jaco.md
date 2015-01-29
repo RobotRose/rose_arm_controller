@@ -106,7 +106,7 @@ The variables armCommand is set to *true* and the fingerCommand is set to *false
 
 For this test we also monitor the topic jaco_arm/joint_states for information about the arm.
 
-I did not write down the actual joint values I have sent and the resulting values. However, I could conclude from the test that the joint angles reached their position within an angle of 0.03 radians. This is also verified by the code corresponding to this function (it sets the goal as reached when the angle is within 0.03 radians).
+I did not write down the actual joint values I have sent and the resulting values given by the joint state publisher. However, I could conclude from the test that the joint angles reached their position within an angle of 0.03 radians. This is also verified by the code corresponding to this function (it sets the goal as reached when the angle is within 0.03 radians).
 
 #### Velocity command (arm)
 For this the *position* input is always set to *false*
