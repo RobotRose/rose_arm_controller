@@ -109,23 +109,22 @@ For this test we also monitor the topic jaco_arm/joint_states for information ab
 I did not write down the actual joint values I have sent and the resulting values given by the joint state publisher. However, I could conclude from the test that the joint angles reached their position within an angle of 0.03 radians. This is also verified by the code corresponding to this function (it sets the goal as reached when the angle is within 0.03 radians).
 
 #### Velocity command (arm)
-For this the *position* input is always set to *false*
+For this the *position* input is always set to *true*.
+The variables armCommand is set to *true* and the fingerCommand is set to *false*.
 
-The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
+For this test we also monitor the topic jaco_arm/joint_states for information about the arm.
 
-All tests starting from home position. Input of values of *arm* (below) are all zero, unless described differently.
+Input of values of *arm* (below) are all zero, unless described differently.
 
-ID | Input values			| Expected Results 		| Measured values 	||
----|:----------------------:|-----------------------|-------------------|-------
-   | **arm** [Twist]		| **position**			| **position**  	| **arm moved**
- 0 | Home position 			| -						| 					| yes/no 
- 1 | linear.x = 0.1 		| home pos + 0.1 in x L	|  					| yes/no
- 2 | linear.y = 0.1 		| home pos + 0.1 in y L	|  					| yes/no
- 3 | linear.z = 0.1 		| home pos + 0.1 in z L	|  					| yes/no
- 4 | angualar.x = 0.1 		| home pos + 0.1 in x A	|  					| yes/no
- 5 | angualar.y = 0.1 		| home pos + 0.1 in y A	|  					| yes/no
- 6 | angualar.z = 0.1 		| home pos + 0.1 in z A	|  					| yes/no
+ID | Input values			 | Expected Results 		| Measured values 	||
+---|:-----------------------:|-----------------------|----------------------|-------
+   | **arm** [Twist]		 | **position**			 | **position**  	    | **arm moved**
+ 1 | joints = [0,0,0,0,0,40] |                       |  				    | yes, shortly
+ 1 | joints = [0,0,0,0,0,-40] |                      |                      | yes, shortly
 
+
+We have seen that the *repeat* has to be set to *true*. Otherwise, the arm will not move. Secondly, the velocity command has to be sent continiously. This has been verified by Dadid Kent (mainterner of the package):
+    Velocity control will only send a command for about 1/60th of a second, so you need to send commands continuously at about 60 Hz.  I assume this is a safety feature of the API, so that if you lose connection to the arm it will stop.
 
 #### Position command (fingers)
 For this the *position* input is always set to *true*.
