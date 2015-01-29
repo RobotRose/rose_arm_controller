@@ -130,7 +130,7 @@ Secondly, the velocity command has to be sent continiously. This has been verifi
 #### Position command (fingers)
 For this the *position* input is always set to *true*.
 
-The variables armCommand is set to *true* and the fingerCommand is set to *false*.
+The variables armCommand is set to *false* and the fingerCommand is set to *true*.
 
 I did not write down the actual finger values I have sent and the resulting values given by the joint state publisher. However, I could conclude from the test that the joint angles reached their position within an angle of 0.03 radians. This is also verified by the code corresponding to this function (it sets the goal as reached when the angle is within 0.03 radians).
 
@@ -139,7 +139,7 @@ The test starts with the fingers closed (position [0.0, 0.0, 0.0])
 
 For this the *position* input is always set to *false*
 
-The variables armCommand is set to *true* and the fingerCommand is set to *false*.
+The variables armCommand is set to *false* and the fingerCommand is set to *true*.
 
 The conclusions from this test are the same as for the arm: We have seen that the *repeat* has to be set to *true*. Otherwise, the arm will not move. Secondly, the velocity command has to be sent continiously.
 
