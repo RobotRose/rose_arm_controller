@@ -119,8 +119,8 @@ Input of values of *arm* (below) are all zero, unless described differently.
 ID | Input values			 | Expected Results 		| Measured values 	||
 ---|:-----------------------:|-----------------------|----------------------|-------
    | **arm** [Twist]		 | **position**			 | **position**  	    | **arm moved**
- 1 | joints = [0,0,0,0,0,40] |                       |  				    | yes, shortly
- 1 | joints = [0,0,0,0,0,-40] |                      |                      | yes, shortly
+ 1 | joints = [0,0,0,0,0,40] | -                     | -  				    | yes, shortly
+ 1 | joints = [0,0,0,0,0,-40] | -                    |                      | yes, shortly
 
 
 We have seen that the *repeat* has to be set to *true*. Otherwise, the arm will not move. Secondly, the velocity command has to be sent continiously. This has been verified by Dadid Kent (mainterner of the package):
