@@ -62,9 +62,9 @@ Send a goal to the gripper to open, go half-way open and close.
 ID | Input values			| Expected results 	|				| Measured values 	| 				||
 ---|:----------------------:|-------------------|---------------|-------------------|---------------|---------------
    | **command.position** [m]| **reached_goal**	| **position** 	| **reached_goal**	| **position** 	| **arm moved** 
- 1 | 0.0 (fully open)		| true 				| 0.0      		| true		        | _0.70_		| yes		
- 2 | 50.0 (almost closed)   | true 				| 50.0     		| true      		| _0.004_		| yes		
- 3 | 200 (too wide)			| false 			| ? 			| _true_          	| _0.92_		| yes	
+ 1 | 0.0 (fully open)		| true 				| 0.0      		| true		        | __0.70__		| yes		
+ 2 | 50.0 (almost closed)   | true 				| 50.0     		| true      		| __0.004__		| yes		
+ 3 | 200 (too wide)			| false 			| ? 			| __true__         	| __0.92__		| __yes__
 
 The arm moves to the required input values. As we can see in this experiment the resulted values for the positions are not correct. Also, the result is retrieved almost immediately when sending a goal to the gripper. This can conclude why the resulting position is not correct. 
 
