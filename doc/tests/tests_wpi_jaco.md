@@ -102,7 +102,7 @@ float32[]   		| fingers   	| position (rad) or velocity (rad/s) finger command
 
 #### Position command (arm)
 For this the *position* input is always set to *true*.
-The variables armCommand is set to *true* and the fingerCommand is set to *false*.
+The variables armCommand is set to *true*, the fingerCommand is set to *false* and repeat is set to *false*.
 
 For this test we also monitor the topic jaco_arm/joint_states for information about the arm.
 
@@ -122,40 +122,26 @@ ID | Input values			 | Expected Results 		| Measured values 	||
  1 | joints = [0,0,0,0,0,40] | -                     | -  				    | yes, shortly
  1 | joints = [0,0,0,0,0,-40] | -                    |                      | yes, shortly
 
-We have seen that the *repeat* has to be set to *true*. Otherwise, the arm will not move. Secondly, the velocity command has to be sent continiously. This has been verified by Dadid Kent (mainterner of the package):
+We have seen that the *repeat* has to be set to *true*. Otherwise, the arm will not move. 
 
+Secondly, the velocity command has to be sent continiously. This has been verified by Dadid Kent (mainterner of the package):
 > Velocity control will only send a command for about 1/60th of a second, so you need to send commands continuously at about 60 Hz.  I assume this is a safety feature of the API, so that if you lose connection to the arm it will stop.
 
 #### Position command (fingers)
 For this the *position* input is always set to *true*.
-The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
 
-ID | Input values			| Expected Results 	| Measured values 	||
----|:----------------------:|-------------------|-------------------|-----------
-   | **fingers** [float32[]]| **position**		| **position**    	| **fingers moved**
- 1 | [0.1, 0.0, 0.0]		|  					|  					| yes/no 
- 2 | [0.0, 0.1, 0.1]	 	|  					|  					| yes/no 
- 3 | [0.0, 0.0, 0.1]	 	|  					|  					| yes/no 
- 4 | [0.01, 0.01, 0.01]		|  					|  					| yes/no 
- 5 | [0.1,0.1, 0.1]		 	|  					|  					| yes/no 
- 6 | [0.2,0.2, 0.2]		 	|  					|  					| yes/no 
+The variables armCommand is set to *true* and the fingerCommand is set to *false*.
+
+I did not write down the actual finger values I have sent and the resulting values given by the joint state publisher. However, I could conclude from the test that the joint angles reached their position within an angle of 0.03 radians. This is also verified by the code corresponding to this function (it sets the goal as reached when the angle is within 0.03 radians).
 
 #### Velocity command (fingers)
 The test starts with the fingers closed (position [0.0, 0.0, 0.0])
 
 For this the *position* input is always set to *false*
 
-The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
+The variables armCommand is set to *true* and the fingerCommand is set to *false*.
 
-ID | Input values			| Expected Results 	| Measured values 	||
----|:----------------------:|-------------------|-------------------|--------------
-   | **fingers** [float32[]]| **position**		| **position** 		| **fingers moved**
- 1 | [0.1, 0.0, 0.0]		|  					|  					| yes/no 
- 2 | [0.0, 0.1, 0.1]	 	|  					|  					| yes/no 
- 3 | [0.0, 0.0, 0.1]	 	|  					|  					| yes/no 
- 4 | [0.01, 0.01, 0.01]		|  					|  					| yes/no 
- 5 | [0.1,0.1, 0.1]		 	|  					|  					| yes/no 
- 6 | [0.2,0.2, 0.2]		 	|  					|  					| yes/no 	
+The conclusions from this test are the same as for the arm: We have seen that the *repeat* has to be set to *true*. Otherwise, the arm will not move. Secondly, the velocity command has to be sent continiously.
 
 ### jaco_arm/cartesian_cmd
 Publish a cartesian command. Meaning: Sending cartesian velocities or positions to the arm.
