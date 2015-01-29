@@ -174,7 +174,7 @@ When the position sent is unreachable, the arm will move towards the goal and ev
 #### Velocity command (arm)
 For this the *position* input is always set to *false*
 
-he variables armCommand is set to *true* and  the fingerCommand is set to *false*.
+The variables armCommand is set to *true*, the fingerCommand is set to *false* and repeat is set to *true*.
 
 For this test we also monitor the topic jaco_arm/joint_states for information about the arm.
 
@@ -183,48 +183,38 @@ All tests starting from home position. Input of values of *arm* (below) are all 
 ID | Input values			| Expected Results 		| Measured values 	||
 ---|:----------------------:|-----------------------|-------------------|-------
    | **arm** [Twist]		| **position**			| **position**  	| **arm moved**
- 0 | Home position 			| -						| 					| yes/no 
- 1 | linear.x = 0.1 		| home pos + 0.1 in x L	|  					| yes/no
- 2 | linear.y = 0.1 		| home pos + 0.1 in y L	|  					| yes/no
- 3 | linear.z = 0.1 		| home pos + 0.1 in z L	|  					| yes/no
- 4 | angualar.x = 0.1 		| home pos + 0.1 in x A	|  					| yes/no
- 5 | angualar.y = 0.1 		| home pos + 0.1 in y A	|  					| yes/no
- 6 | angualar.z = 0.1 		| home pos + 0.1 in z A	|  					| yes/no
-
+ 0 | linear.z = 1 			| -						| - 				| yes, shortly
 
 #### Position command (fingers)
 For this the *position* input is always set to *true*.
+
 The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
 
 ID | Input values			| Expected Results 	| Measured values 	||
 ---|:----------------------:|-------------------|-------------------|-----------
    | **fingers** [float32[]]| **position**		| **position**    	| **fingers moved**
- 1 | [0.1, 0.0, 0.0]		|  					|  					| yes/no 
- 2 | [0.0, 0.1, 0.1]	 	|  					|  					| yes/no 
- 3 | [0.0, 0.0, 0.1]	 	|  					|  					| yes/no 
- 4 | [0.01, 0.01, 0.01]		|  					|  					| yes/no 
- 5 | [0.1,0.1, 0.1]		 	|  					|  					| yes/no 
- 6 | [0.2,0.2, 0.2]		 	|  					|  					| yes/no 
+ 1 | [0.0, 0.0, 0.0]		| -   				| - 				| yes, fully opened
+ 2 | [50, 50, 50]			| -  				| -                 | yes, fully closed
+
+Behaves as expected.
 
 #### Velocity command (fingers)
-The test starts with the fingers closed (position [0.0, 0.0, 0.0])
+For this the *position* input is always set to *false*.
 
-For this the *position* input is always set to *false*
-
-The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
+The variables armCommand is set to *false*, the fingerCommand is set to *true* and repeat is set to *true*.
 
 ID | Input values			| Expected Results 	| Measured values 	||
 ---|:----------------------:|-------------------|-------------------|--------------
    | **fingers** [float32[]]| **position**		| **position** 		| **fingers moved**
- 1 | [0.1, 0.0, 0.0]		|  					|  					| yes/no 
- 2 | [0.0, 0.1, 0.1]	 	|  					|  					| yes/no 
- 3 | [0.0, 0.0, 0.1]	 	|  					|  					| yes/no 
- 4 | [0.01, 0.01, 0.01]		|  					|  					| yes/no 
- 5 | [0.1,0.1, 0.1]		 	|  					|  					| yes/no 
- 6 | [0.2,0.2, 0.2]		 	|  					|  					| yes/no 
+ 0 | [50.0, 50.0, 50.0]     | -                 | -                 | yes, closing gripper 
+ 1 | [-50.0, -50.0, -50.0]  | -					| -					| yes, opening gripper
+
+Command has to be continuously sent.
 
 ### jaco_arm/joint_states
 Listen to topic when the arm moves
+
+*Not specifically tested*
 
 ### jaco_arm/get_cartesian_position
 Move arm with velocity control. Request cartesian position.
