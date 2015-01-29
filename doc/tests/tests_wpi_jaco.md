@@ -219,17 +219,7 @@ Listen to topic when the arm moves
 ### jaco_arm/get_cartesian_position
 Move arm with velocity control. Request cartesian position.
 
-From home position, move the arm in certain positions using the previously tested velocity control. Input of values of *movement* (below) are all zero, unless described differently.
-
-ID | Input values			| Expected Results 			| Measured values 
----|:----------------------:|---------------------------|-------------------
-   | **Movement** [Twist] 	| Twist pos					| **position** 		
- 1 | linear.x = 0.1 		| home pos + 0.1 in x L		|  					
- 2 | linear.y = 0.1 		| home pos + 0.1 in y L		|  
- 3 | linear.z = 0.1 		| home pos + 0.1 in z L		|  
- 4 | angualar.x = 0.1 		| home pos + 0.1 in x A		|  					
- 5 | angualar.y = 0.1 		| home pos + 0.1 in y A		|  
- 6 | angualar.z = 0.1 		| home pos + 0.1 in z A		|  
+*Has been empirically verified during testing.* 
 
 Tests interesting for later
 ---------------------------
@@ -241,6 +231,10 @@ Topic 							| Message Type     				| Description
 --------------------------------|:-----------------------------:|-----------
 jaco_arm/manipulation/grasp 	| wpi_jaco_msgs/ExecuteGrasp 	| Execute a grasp or release with the JACO gripper at a designated speed until the fingers can no longer move.
 jaco_arm/manipulation/pickup	| wpi_jaco_msgs/ExecutePickup   | Execute a pickup action that lifts the end effector while applying a constant force to close the fingers, preventing objects from slipping.
+
+Both tested shortly:
+* grasp did not give the expected result. The gripper did not close fully and it did not open at all. When trying to open I got the message "Gripper already open. Grasp execution complete.". This problem has been reported to WPI, but no further action is taken here.
+* pickup moves a certain distance in the z-direction. This is not feasable for Rose, since we mount the arm differently.
 
 Additional issues
 -------------------
