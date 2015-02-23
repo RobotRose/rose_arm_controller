@@ -9,7 +9,7 @@ find_package(catkin REQUIRED
 		rose_common
 		rose_arm_controller_msgs
 		rose_watchdogs
-		shared_variables
+		rose_shared_variables
         tf
 )
 
@@ -24,7 +24,7 @@ catkin_package(
 		rose_common
 		rose_arm_controller_msgs
 		rose_watchdogs
-		shared_variables
+		rose_shared_variables
         tf
 #  DEPENDS system_lib
 )
