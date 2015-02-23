@@ -1,4 +1,4 @@
-Tests on the Jaco arm (overall)
+Tests on the Mico arm (overall)
 ============
 Date: 23/02/2015
 
@@ -19,7 +19,7 @@ Still needs to be tested:
 
 Test setup
 ----------
-The test setup at Aachen consists of a Jaco arm mounted on top of a table. The control will be directly done via the command line.
+The test setup at Aachen consists of a Mico arm mounted sideways. The control will be directly done via the command line.
 * actionlibs axclient (rosrun actionlib axclient.pysrun), or;
 * publishers (via rostopic pub), or; 
 * servicecalls (rosservice).
