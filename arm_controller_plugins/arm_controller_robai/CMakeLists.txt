@@ -24,7 +24,7 @@ catkin_package(
 		pluginlib
 		roscpp
 		rose_arm_controller_msgs
-		rose_rose_third_party
+		rose_third_party
 		tf
 #  DEPENDS system_lib
 )
