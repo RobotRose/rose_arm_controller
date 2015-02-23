@@ -24,7 +24,7 @@
 #include "arm_controller_base/arm_controller_base.hpp"
 
 #include "rose_common/common.hpp"
-#include "rose_server_multiple_client/server_multiple_client.hpp"
+#include "server_multiple_client/server_multiple_client.hpp"
 
 #include "rose_arm_controller_msgs/set_positionAction.h"
 #include "rose_arm_controller_msgs/set_positionGoal.h"
@@ -45,7 +45,7 @@
 // #include "action_result_message.hpp"
 
 #include "rose_watchdogs/watchdog.hpp"
-#include "shared_variables/shared_variable.hpp"
+#include "rose_shared_variables/shared_variable.hpp"
 
 namespace arm_controller_core {
 
@@ -56,9 +56,10 @@ namespace arm_controller_core {
 using geometry_msgs::Pose;
 using geometry_msgs::Vector3;
 using geometry_msgs::Twist;
-using shared_variables::SharedVariable;
+using rose_shared_variables::SharedVariable;
 using std::find;
 using std::map;
+using std::string;
 using std::vector;
 
 /**

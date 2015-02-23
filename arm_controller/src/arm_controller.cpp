@@ -303,7 +303,7 @@ void ArmController::CB_receivePositionGoal(const rose_arm_controller_msgs::set_p
 
     //! @todo MdL [IMPL]: Result message.
     rose_arm_controller_msgs::set_positionResult result;
-    smc->sendServerResult<rose_arm_controller_msgs::set_positionAction>(arm_controller->setEndEffectorPose(goal_pose), result );    
+    smc->sendServerResult(arm_controller->setEndEffectorPose(goal_pose), result );    
 }
 
 void ArmController::CB_receivePositionCancel(SMC_position* smc)
@@ -352,7 +352,7 @@ void ArmController::CB_receiveVelocityGoal(const rose_arm_controller_msgs::set_v
 
     //! @todo MdL [IMPL]: Result message.
     rose_arm_controller_msgs::set_velocityResult result;
-    smc->sendServerResult<rose_arm_controller_msgs::set_velocityAction>(arm_controller->setEndEffectorVelocity(goal_twist), result );
+    smc->sendServerResult(arm_controller->setEndEffectorVelocity(goal_twist), result );
 }
 
 void ArmController::CB_receiveVelocityCancel(SMC_velocity* smc)
@@ -389,7 +389,7 @@ void ArmController::CB_receiveGripperGoal(const rose_arm_controller_msgs::set_gr
         return;
 
     rose_arm_controller_msgs::set_gripper_widthResult result;
-    smc->sendServerResult<rose_arm_controller_msgs::set_gripper_widthAction>(arm_controller->setGripperWidth(goal->required_width), result );
+    smc->sendServerResult(arm_controller->setGripperWidth(goal->required_width), result );
 }
 
 void ArmController::CB_receiveGripperCancel(SMC_gripper* smc)
@@ -425,7 +425,7 @@ void ArmController::CB_receiveWrenchGoal(const rose_arm_controller_msgs::set_wre
 
     //! @todo MdL [IMPL]: Result message.
     rose_arm_controller_msgs::set_wrenchResult result;
-    smc->sendServerResult<rose_arm_controller_msgs::set_wrenchAction>(arm_controller->setEndEffectorWrench(goal->required_wrench), result );
+    smc->sendServerResult(arm_controller->setEndEffectorWrench(goal->required_wrench), result );
 }
 
 void ArmController::CB_receiveWrenchCancel(SMC_wrench* smc)
