@@ -23,8 +23,8 @@
 
 #include "arm_controller_base/arm_controller_base.hpp"
 
-#include "rose20_common/common.hpp"
-#include "rose20_common/server_multiple_client/server_multiple_client.hpp"
+#include "rose_common/common.hpp"
+#include "rose_server_multiple_client/server_multiple_client.hpp"
 
 #include "rose_arm_controller_msgs/set_positionAction.h"
 #include "rose_arm_controller_msgs/set_positionGoal.h"

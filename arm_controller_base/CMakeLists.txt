@@ -3,7 +3,7 @@ project(arm_controller_base)
 
 find_package(catkin 
 	REQUIRED
-		COMPONENTS
+	COMPONENTS
 		geometry_msgs
 		std_msgs
 		tf
