@@ -61,16 +61,16 @@ Send a goal to the gripper to open, go half-way open and close.
 
 ID | Input values			| Expected results 	|				| Measured values 	| 				||
 ---|:----------------------:|-------------------|---------------|-------------------|---------------|---------------
-   | **command.position** [m]| **reached_goal**	| **position** 	| **reached_goal**	| **position** 	| **arm moved** 
- 1 | 0.0 (fully open)		| true 				| 0.0      		| true		        | __0.70__		| yes		
- 2 | 50.0 (almost closed)   | true 				| 50.0     		| true      		| __0.004__		| yes		
- 3 | 200 (too wide)			| false 			| ? 			| __true__         	| __0.92__		| __yes__
+   | **command.position** [m]| **reached_goal**	| **position** 	| **reached_goal**	| **position** 	 | **arm moved** 
+ 1 | 0.0 (fully open)		| true 				| 0.0      		| true		        | __102.989__	 | yes		
+ 2 | 6400.0 (closed)        | true 				| 50.0     		| true      		| __0.209439510239	| yes		
+ 3 | -10.0 (not allowed)    | false 			| ? 			| __true__         	| __111.8__		 | __yes__
 
 The arm moves to the required input values. As we can see in this experiment the resulted values for the positions are not correct. Also, the result is retrieved almost immediately when sending a goal to the gripper. This can conclude why the resulting position is not correct. 
 
-Secondly, in the last test we send a goal which is not possible (too wide). The reached goal result message is _true_ and the gripper moves towards this goal. This is also not expected.
+Secondly, in the last test we send a goal which is not possible (negative value). The reached goal result message is _true_ and the gripper moves towards this goal. This is also not expected.
 
-For both issues, an issue is reported on [github](https://github.com/RIVeR-Lab/wpi_jaco/issues/19).
+Both issues have been seen when testing the Jaco arm. Issues are reported on [github](https://github.com/RIVeR-Lab/wpi_jaco/issues/19) and can probably be merged into our fork when the bug is fixed.
 
 ### jaco_arm/home_arm
 Send a goal to move the arm to the homing position.
