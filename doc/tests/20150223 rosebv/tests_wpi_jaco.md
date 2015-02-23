@@ -2,7 +2,7 @@ Tests on the Jaco arm using the wpi_jaco package
 ============
 Date: 22-02-2015
 
-Location: Rose BS, Horsten 1, Eindhoven
+Location: Rose BV, Horsten 1, Eindhoven
 
 Tester: Mathijs de Langen (langen@robot-rose.nl)
 
