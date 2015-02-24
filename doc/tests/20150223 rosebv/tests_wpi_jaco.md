@@ -108,6 +108,24 @@ For this test we also monitor the topic jaco_arm/joint_states for information ab
 
 I did not write down the actual joint values I have sent and the resulting values given by the joint state publisher. However, I could conclude from the test that the joint angles reached their position within an angle of 0.03 radians. This is also verified by the code corresponding to this function (it sets the goal as reached when the angle is within 0.03 radians).
 
+##### Observations
+
+Streching the arm:
+```
+rostopic pub /jaco_arm/angular_cmd wpi_jaco_msgs/AngularCommand "position: true
+armCommand: true
+fingerCommand: false
+repeat: false
+joints: [0.0,3.14,3.14,0.0,0.0,0.0]
+fingers: [0,0,0]" 
+```
+
+Limits for joint 2 and 3:
+Joint 2 [0.8, 5.3]
+Joint 3 [0.6, 5.6]
+
+Continious joints do not rotate more than once. So (in my observation) when sending a high value (say 1000) it will map it to a value within -PI and PI. This is also verified by the joint states topic.
+
 #### Velocity command (arm)
 For this the *position* input is always set to *true*.
 The variables armCommand is set to *true* and the fingerCommand is set to *false*.
@@ -165,7 +183,6 @@ repeat: false
 joints: [0,0,0,0,0,0]
 fingers: [6400,6400,0]" 
 ```
-
 
 #### Velocity command (fingers)
 The test starts with the fingers closed (position [0.0, 0.0, 0.0])
