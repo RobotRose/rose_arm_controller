@@ -287,7 +287,6 @@ fingers: [0,0,0]"
 ```
 Sends the arm 'down' (in its own frame).
 
-
 #### Position command (fingers)
 For this the *position* input is always set to *true*.
 
@@ -299,7 +298,32 @@ ID | Input values			| Expected Results 	| Measured values 	||
  1 | [0.0, 0.0, 0.0]		| -   				| - 				| yes, fully opened
  2 | [50, 50, 50]			| -  				| -                 | yes, fully closed
 
-Behaves as expected.
+#####Observations
+```
+rostopic pub /jaco_arm/cartesian_cmd wpi_jaco_msgs/CartesianCommand "position: true
+armCommand: false
+fingerCommand: true
+repeat: false
+arm:
+  linear: {x: -0.2, y: 0.0, z: 0.0}
+  angular: {x: 0.0, y: 0.0, z: 0.0}
+fingers: [6400,6400,0]" 
+```
+Closes the fingers completely.
+
+```
+rostopic pub /jaco_arm/cartesian_cmd wpi_jaco_msgs/CartesianCommand "position: true
+armCommand: false
+fingerCommand: true
+repeat: false
+arm:
+  linear: {x: -0.2, y: 0.0, z: 0.0}
+  angular: {x: 0.0, y: 0.0, z: 0.0}
+fingers: [0,0,0]" 
+```
+Opens the fingers completely.
+
+Sending an array with two values for the fingers only moves the fingers for a couple of seconds. This should probably be fixed in the wpi driver.
 
 #### Velocity command (fingers)
 For this the *position* input is always set to *false*.
