@@ -238,7 +238,7 @@ ID | Input values			| Expected Results 		| Measured values 	||
 #### Position command (fingers)
 For this the *position* input is always set to *true*.
 
-The variables armCommand and fingerCommand are both set to *false*, since this command does not include arm/finger inputs (whatever that might be).
+The variables armCommand is set to *false*, the fingerCommand is set to *true* and repeat is set to *true*.
 
 ID | Input values			| Expected Results 	| Measured values 	||
 ---|:----------------------:|-------------------|-------------------|-----------
@@ -260,6 +260,32 @@ ID | Input values			| Expected Results 	| Measured values 	||
  1 | [-50.0, -50.0, -50.0]  | -					| -					| yes, opening gripper
 
 Command has to be continuously sent.
+
+#### Velocity command (combined)
+
+#### Position command (combined)
+For this the *position* input is always set to *true*.
+The variables armCommand is set to *true*, the fingerCommand is set to *true* and repeat is set to *false*.
+
+``` 
+rostopic pub /jaco_arm/angular_cmd wpi_jaco_msgs/AngularCommand "position: true
+armCommand: true
+fingerCommand: true
+repeat: false
+joints: [0.0,3.14,3.14,0.0,0.0,3.14]
+fingers: [0,0,0]"
+```
+Rotates the last joint and opens the gripper.
+
+``` 
+rostopic pub /jaco_arm/angular_cmd wpi_jaco_msgs/AngularCommand "position: true
+armCommand: true
+fingerCommand: true
+repeat: false
+joints: [0.0,3.14,3.14,0.0,0.0,0.0]
+fingers: [6400,6400,0]"
+```
+Rotates the last joint and opens the gripper.
 
 ### jaco_arm/joint_states
 Listen to topic when the arm moves
