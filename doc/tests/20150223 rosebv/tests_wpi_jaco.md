@@ -314,5 +314,5 @@ Both tested shortly:
 
 Additional issues
 -------------------
-* The arm would not connect via an USB 3 port. No action has been taken on this point.
+* ~~The arm would not connect via an USB 3 port. No action has been taken on this point.~~ Not an issue with the Mico arm.
 * The WPI driver crashes when the arm is not connected, or disconnected while operating. This has been reported on [github](https://github.com/RIVeR-Lab/wpi_jaco/issues/14).
