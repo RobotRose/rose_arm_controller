@@ -261,6 +261,8 @@ ID | Input values			| Expected Results 		| Measured values 	||
    | **arm** [Twist]		| **position**			| **position**  	| **arm moved**
  0 | linear.z = 1 			| -						| - 				| yes, shortly
 
+#####Observations
+
 ```
 rostopic pub -r 10 /jaco_arm/cartesian_cmd wpi_jaco_msgs/CartesianCommand "position: false
 armCommand: true
