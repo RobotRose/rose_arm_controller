@@ -193,6 +193,32 @@ The variables armCommand is set to *false* and the fingerCommand is set to *true
 
 The conclusions from this test are the same as for the arm: We have seen that the *repeat* has to be set to *true*. Otherwise, the arm will not move. Secondly, the velocity command has to be sent continiously.
 
+#### Velocity command (combined)
+
+#### Position command (combined)
+For this the *position* input is always set to *true*.
+The variables armCommand is set to *true*, the fingerCommand is set to *true* and repeat is set to *false*.
+
+``` 
+rostopic pub /jaco_arm/angular_cmd wpi_jaco_msgs/AngularCommand "position: true
+armCommand: true
+fingerCommand: true
+repeat: false
+joints: [0.0,3.14,3.14,0.0,0.0,3.14]
+fingers: [0,0,0]"
+```
+Rotates the last joint and opens the gripper.
+
+``` 
+rostopic pub /jaco_arm/angular_cmd wpi_jaco_msgs/AngularCommand "position: true
+armCommand: true
+fingerCommand: true
+repeat: false
+joints: [0.0,3.14,3.14,0.0,0.0,0.0]
+fingers: [6400,6400,0]"
+```
+Rotates the last joint and opens the gripper.
+
 ### jaco_arm/cartesian_cmd
 Publish a cartesian command. Meaning: Sending cartesian velocities or positions to the arm.
 
@@ -248,6 +274,21 @@ ID | Input values			| Expected Results 	| Measured values 	||
 
 Behaves as expected.
 
+Closes the fingers slowly.
+
+#### Velocity command (fingers)
+For this the *position* input is always set to *false*.
+
+The variables armCommand is set to *false*, the fingerCommand is set to *true* and repeat is set to *true*.
+
+ID | Input values			| Expected Results 	| Measured values 	||
+---|:----------------------:|-------------------|-------------------|--------------
+   | **fingers** [float32[]]| **position**		| **position** 		| **fingers moved**
+ 0 | [50.0, 50.0, 50.0]     | -                 | -                 | yes, closing gripper 
+ 1 | [-50.0, -50.0, -50.0]  | -					| -					| yes, opening gripper
+
+Command has to be continuously sent.
+
 #####Observations
 
 ```
@@ -273,47 +314,6 @@ arm:
   angular: {x: 0.0, y: 0.0, z: 0.0}
 fingers: [100,100,0]" 
 ```
-
-Closes the fingers slowly.
-
-#### Velocity command (fingers)
-For this the *position* input is always set to *false*.
-
-The variables armCommand is set to *false*, the fingerCommand is set to *true* and repeat is set to *true*.
-
-ID | Input values			| Expected Results 	| Measured values 	||
----|:----------------------:|-------------------|-------------------|--------------
-   | **fingers** [float32[]]| **position**		| **position** 		| **fingers moved**
- 0 | [50.0, 50.0, 50.0]     | -                 | -                 | yes, closing gripper 
- 1 | [-50.0, -50.0, -50.0]  | -					| -					| yes, opening gripper
-
-Command has to be continuously sent.
-
-#### Velocity command (combined)
-
-#### Position command (combined)
-For this the *position* input is always set to *true*.
-The variables armCommand is set to *true*, the fingerCommand is set to *true* and repeat is set to *false*.
-
-``` 
-rostopic pub /jaco_arm/angular_cmd wpi_jaco_msgs/AngularCommand "position: true
-armCommand: true
-fingerCommand: true
-repeat: false
-joints: [0.0,3.14,3.14,0.0,0.0,3.14]
-fingers: [0,0,0]"
-```
-Rotates the last joint and opens the gripper.
-
-``` 
-rostopic pub /jaco_arm/angular_cmd wpi_jaco_msgs/AngularCommand "position: true
-armCommand: true
-fingerCommand: true
-repeat: false
-joints: [0.0,3.14,3.14,0.0,0.0,0.0]
-fingers: [6400,6400,0]"
-```
-Rotates the last joint and opens the gripper.
 
 ### jaco_arm/joint_states
 Listen to topic when the arm moves
