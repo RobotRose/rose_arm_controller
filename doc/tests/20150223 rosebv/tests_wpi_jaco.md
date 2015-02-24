@@ -127,6 +127,12 @@ We have seen that the *repeat* has to be set to *true*. Otherwise, the arm will 
 Secondly, the velocity command has to be sent continiously. This has been verified by Dadid Kent (mainterner of the package):
 > Velocity control will only send a command for about 1/60th of a second, so you need to send commands continuously at about 60 Hz.  I assume this is a safety feature of the API, so that if you lose connection to the arm it will stop.
 
+With 
+```
+  rostopic pub -r 10 /jaco_arm/angular_cmd
+```
+you send a command with a rate of 10Hz. Using this, the arm kept rotating.
+
 The input of the joints for the arm should be values between 0 and 1 (where 0 is 0% speed and 1 is 100% speed). Higher values than 1 do not cause a different the angle speed.
 
 #### Position command (fingers)
