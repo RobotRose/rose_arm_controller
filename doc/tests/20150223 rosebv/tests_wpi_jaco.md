@@ -248,6 +248,34 @@ ID | Input values			| Expected Results 	| Measured values 	||
 
 Behaves as expected.
 
+#####Observations
+
+```
+rostopic pub -r 10 /jaco_arm/cartesian_cmd wpi_jaco_msgs/CartesianCommand "position: false
+armCommand: false
+fingerCommand: true
+repeat: true
+arm:
+  linear: {x: 0.0, y: 0.0, z: 0.05}
+  angular: {x: 0.0, y: 0.0, z: 0.0}
+fingers: [-100,-100,0]" 
+```
+
+Opens the fingers slowly.
+
+```
+rostopic pub -r 10 /jaco_arm/cartesian_cmd wpi_jaco_msgs/CartesianCommand "position: false
+armCommand: false
+fingerCommand: true
+repeat: true
+arm:
+  linear: {x: 0.0, y: 0.0, z: 0.05}
+  angular: {x: 0.0, y: 0.0, z: 0.0}
+fingers: [100,100,0]" 
+```
+
+Closes the fingers slowly.
+
 #### Velocity command (fingers)
 For this the *position* input is always set to *false*.
 
