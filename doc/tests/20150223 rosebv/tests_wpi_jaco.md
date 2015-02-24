@@ -63,7 +63,7 @@ ID | Input values			| Expected results 	|				| Measured values 	| 				||
 ---|:----------------------:|-------------------|---------------|-------------------|---------------|---------------
    | **command.position** [m]| **reached_goal**	| **position** 	| **reached_goal**	| **position** 	 | **arm moved** 
  1 | 0.0 (fully open)		| true 				| 0.0      		| true		        | __102.989__	 | yes		
- 2 | 6400.0 (closed)        | true 				| 50.0     		| true      		| __0.209439510239	| yes		
+ 2 | 6400.0 (closed)        | true 				| 50.0     		| true      		| __0.209439510239__	| yes		
  3 | -10.0 (not allowed)    | false 			| ? 			| __true__         	| __111.8__		 | __yes__
 
 The arm moves to the required input values. As we can see in this experiment the resulted values for the positions are not correct. Also, the result is retrieved almost immediately when sending a goal to the gripper. This can conclude why the resulting position is not correct. 
