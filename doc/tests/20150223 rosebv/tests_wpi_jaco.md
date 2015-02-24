@@ -261,6 +261,31 @@ ID | Input values			| Expected Results 		| Measured values 	||
    | **arm** [Twist]		| **position**			| **position**  	| **arm moved**
  0 | linear.z = 1 			| -						| - 				| yes, shortly
 
+```
+rostopic pub -r 10 /jaco_arm/cartesian_cmd wpi_jaco_msgs/CartesianCommand "position: false
+armCommand: true
+fingerCommand: false
+repeat: true
+arm:
+  linear: {x: 0.0, y: 0.0, z: 0.2}
+  angular: {x: 0.0, y: 0.0, z: 0.0}
+fingers: [0,0,0]" 
+```
+Sends the arm 'up' (in its own frame).
+
+```
+rostopic pub -r 10 /jaco_arm/cartesian_cmd wpi_jaco_msgs/CartesianCommand "position: false
+armCommand: true
+fingerCommand: false
+repeat: true
+arm:
+  linear: {x: 0.0, y: 0.0, z: 0.2}
+  angular: {x: 0.0, y: 0.0, z: 0.0}
+fingers: [0,0,0]" 
+```
+Sends the arm 'down' (in its own frame).
+
+
 #### Position command (fingers)
 For this the *position* input is always set to *true*.
 
@@ -273,8 +298,6 @@ ID | Input values			| Expected Results 	| Measured values 	||
  2 | [50, 50, 50]			| -  				| -                 | yes, fully closed
 
 Behaves as expected.
-
-Closes the fingers slowly.
 
 #### Velocity command (fingers)
 For this the *position* input is always set to *false*.
@@ -297,7 +320,7 @@ armCommand: false
 fingerCommand: true
 repeat: true
 arm:
-  linear: {x: 0.0, y: 0.0, z: 0.05}
+  linear: {x: 0.0, y: 0.0, z: 0.0}
   angular: {x: 0.0, y: 0.0, z: 0.0}
 fingers: [-100,-100,0]" 
 ```
@@ -310,10 +333,12 @@ armCommand: false
 fingerCommand: true
 repeat: true
 arm:
-  linear: {x: 0.0, y: 0.0, z: 0.05}
+  linear: {x: 0.0, y: 0.0, z: 0.0}
   angular: {x: 0.0, y: 0.0, z: 0.0}
 fingers: [100,100,0]" 
 ```
+
+Closes the fingers slowly.
 
 ### jaco_arm/joint_states
 Listen to topic when the arm moves
