@@ -132,7 +132,7 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 			{
 				ROS_ERROR("Could not transform to frame %s", arm_name.c_str());
 				found_error = false;
-				stopMovement(arm);
+				stopMovement(arm_name);
 			}
 		}
 
@@ -146,7 +146,7 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 			double y = arm_pose_stamped.pose.position.y;
 			double z = arm_pose_stamped.pose.position.z;
 
-			Pose zero;
+			geometry_msgs::Pose zero;
 			double error_distance = rose_geometry::distanceXYZ(zero, arm_pose_stamped.pose);
 			ROS_DEBUG_NAMED(ROS_NAME, "Found distance to %s: %f", frame_id.c_str(), error_distance);
 			if ( error_distance < max_distance)
@@ -185,12 +185,12 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 				nr_fails = 30;
 			}
 
-			sendArmSpeeds(arm, speed_x, speed_y, speed_z);
+			sendArmSpeeds(arm_name, speed_x, speed_y, speed_z);
 		}
 	}
 
 	// Stop movement
-	stopMovement(arm);
+	stopMovement(arm_name);
 
 	if ( not reached_goal )
 	{
@@ -210,14 +210,15 @@ void ArmVisualServoing::stopMovement( const std::string arm )
 	sendArmSpeeds(arm,0,0,0);
 }
 
-void ArmVisualServoing::sendArmSpeeds( const std::string arm, const double x, const double y, const double z )
+void ArmVisualServoing::sendArmSpeeds( const std::string arm_name, const double x, const double y, const double z )
 {
 	ROS_DEBUG_NAMED(ROS_NAME, "Sending arm movement (%f, %f, %f)", x, y, z);
-	geometry_msgs::Twist arm_movement;
+	geometry_msgs::TwistStamped arm_movement;
 
-	arm_movement.linear.x = x;
-	arm_movement.linear.y = y;
-	arm_movement.linear.z = z;
+	//! @todo MdL [IMPR]: This needs a header.
+	arm_movement.twist.linear.x = x;
+	arm_movement.twist.linear.y = y;
+	arm_movement.twist.linear.z = z;
 
 	rose_arm_controller_msgs::set_velocityGoal velocity_goal;
 	velocity_goal.arm 				= arm_name;
@@ -231,7 +232,7 @@ void ArmVisualServoing::CB_serverCancel( SMC* smc )
 
 }
 
-void ArmVisualServoing::sendResult( const bool succes, const arm_controller::set_velocityResultConstPtr& result )
+void ArmVisualServoing::sendResult( const bool succes, const rose_arm_controller_msgs::set_velocityResultConstPtr& result )
 {
 	rose_arm_controller_msgs::move_to_tfResult move_result;
 	// move_result.return_code = result->return_code;

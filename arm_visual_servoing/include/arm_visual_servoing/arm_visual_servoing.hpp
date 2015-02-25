@@ -32,6 +32,7 @@
 #include "rose_arm_controller_msgs/set_velocityFeedback.h"
 #include "rose_arm_controller_msgs/set_velocityResult.h"
 
+#include "rose_geometry/geometry.hpp"
 #include "rose_transformations/transformations.hpp"
 
 #include "server_multiple_client/server_multiple_client.hpp"
@@ -105,11 +106,11 @@ class ArmVisualServoing
 	 * @param succes If the action was successful
 	 * @param result The result message (return code)
 	 */
-	void sendResult( const bool succes, const rose_arm_controller_msgs::set_velocityResultPtr& result );
+	void sendResult( const bool succes, const rose_arm_controller_msgs::set_velocityResultConstPtr& result );
 
-	void stopMovement( const std::string arm );
+	void stopMovement( const std::string arm_name );
 
-	void sendArmSpeeds( const std::string arm, const double x, const double y, const double z );
+	void sendArmSpeeds( const std::string arm_name, const double x, const double y, const double z );
 	
 	double distance(const double& x, const double& y);
 	
@@ -118,6 +119,8 @@ class ArmVisualServoing
   	
 	SMC*				  smc_;					 //!< Server multiple client
 	tf::TransformListener tf_;					 //!< Transform listener
+
+	rose_arm_controller_msgs::set_velocityResultPtr result_;
 
 };
 
