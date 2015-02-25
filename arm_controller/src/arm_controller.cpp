@@ -157,6 +157,11 @@ void ArmController::initializePublishersAndServices()
     }
 
     joint_state_timer_ = n_.createTimer(ros::Duration(0.0333), boost::bind(&ArmController::CB_updateJointStates, this));
+
+    ROS_INFO("Initializing services");
+
+    get_arms_service_ = n_.advertiseService("/" + name_ + "/get_arms", &ArmController::CB_get_arms, this);
+
     ROS_INFO("Done");
 }
 
@@ -469,5 +474,11 @@ void ArmController::CB_updateJointStates()
     updateJointStates();
 }
 
+bool ArmController::CB_get_arms(rose_arm_controller_msgs::get_arms::Request &req,
+                                rose_arm_controller_msgs::get_arms::Response &res )
+{
+    for ( const auto& arm_controller : arm_controllers_)
+        res.arms.push_back(arm_controller.first);
+}
 
 }; // namespace

@@ -42,6 +42,8 @@
 #include "rose_arm_controller_msgs/set_wrenchGoal.h"
 #include "rose_arm_controller_msgs/set_wrenchResult.h"
 
+#include "rose_arm_controller_msgs/get_arms.h"
+
 // #include "action_result_message.hpp"
 
 #include "rose_watchdogs/watchdog.hpp"
@@ -124,6 +126,8 @@ class ArmController
     void CB_cancelVelocityForArms();
     void CB_emergency(const bool& emergency);
     void CB_updateJointStates();
+    bool CB_get_arms(rose_arm_controller_msgs::get_arms::Request &req,
+                     rose_arm_controller_msgs::get_arms::Response &res );
 
     std::string         name_;
     ros::NodeHandle     n_;
@@ -132,10 +136,12 @@ class ArmController
     int                                     nr_of_arms_;
     std::map<std::string, std::string>      arm_plugins_;
 
-    SMC_position*  set_position_smc_;
-    SMC_velocity*  set_velocity_smc_;
-    SMC_gripper*   set_gripper_width_smc_;
-    SMC_wrench*    set_wrench_smc_;
+    SMC_position*           set_position_smc_;
+    SMC_velocity*           set_velocity_smc_;
+    SMC_gripper*            set_gripper_width_smc_;
+    SMC_wrench*             set_wrench_smc_;
+
+    ros::ServiceServer      get_arms_service_;
 
     pluginlib::ClassLoader<arm_controller_base::ArmControllerBase>                    arm_controller_plugin_loader_;
 

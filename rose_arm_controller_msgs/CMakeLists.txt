@@ -25,6 +25,7 @@ find_package(catkin
 add_service_files(
 	FILES
 		emergency_stop.srv
+		get_arms.srv
 		reset_emergency_stop.srv
 )
 
