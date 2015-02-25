@@ -34,6 +34,7 @@
 
 #include "rose_geometry/geometry.hpp"
 #include "rose_transformations/transformations.hpp"
+#include "rose_conversions/conversions.hpp"
 
 #include "server_multiple_client/server_multiple_client.hpp"
 
@@ -110,12 +111,15 @@ class ArmVisualServoing
 
 	void stopMovement( const std::string arm_name );
 
-	void sendArmSpeeds( const std::string arm_name, const double x, const double y, const double z );
+	void sendArmSpeeds( const std::string arm_name, const double x, const double y, const double z,
+													const double roll = 0.0, const double pitch = 0.0, const double yaw = 0.0 );
 	
 	double distance(const double& x, const double& y);
 	
   	ros::NodeHandle 	 n_;		//!< NodeHandle
   	std::string 		 name_;     //!< Name of the node
+
+  	std::string 		 visual_servoing_server_name_;
   	
 	SMC*				  smc_;					 //!< Server multiple client
 	tf::TransformListener tf_;					 //!< Transform listener

@@ -12,6 +12,7 @@
 
   <build_depend>rose_arm_controller_msgs</build_depend>
   <build_depend>rose_common</build_depend>
+  <build_depend>rose_conversions</build_depend>
   <build_depend>rose_geometry</build_depend>
   <build_depend>rose_transformations</build_depend>
   <build_depend>server_multiple_client</build_depend>
@@ -19,6 +20,7 @@
 
   <run_depend>rose_arm_controller_msgs</run_depend>
   <run_depend>rose_common</run_depend>
+  <run_depend>rose_conversions</run_depend>
   <run_depend>rose_geometry</run_depend>
   <run_depend>rose_transformations</run_depend>
   <run_depend>server_multiple_client</run_depend>

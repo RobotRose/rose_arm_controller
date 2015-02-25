@@ -5,6 +5,7 @@ find_package(catkin REQUIRED
 	COMPONENTS
 	rose_arm_controller_msgs
 	rose_common
+	rose_conversions
 	rose_geometry
 	rose_transformations
 	server_multiple_client
@@ -17,6 +18,7 @@ catkin_package(
  	CATKIN_DEPENDS 
 	 	rose_arm_controller_msgs
 	 	rose_common
+	 	rose_conversions
 	 	rose_geometry
 	 	rose_transformations
 		server_multiple_client
