@@ -10,7 +10,7 @@
 *	This node provides visual servoing functionalities on the arms of the robot.
 * 
 ***********************************************************************************/
-#include "arm_visual_servoing_node.hpp"
+#include "arm_visual_servoing/arm_visual_servoing_node.hpp"
 
 int main(int argc, char **argv)
 {   

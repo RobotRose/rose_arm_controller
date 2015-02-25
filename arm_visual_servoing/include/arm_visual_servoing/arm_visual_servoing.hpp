@@ -20,15 +20,19 @@
 
 #include <tf/transform_listener.h>
 
+#include "rose_common/common.hpp"
+
 #include "rose_arm_controller_msgs/move_to_tfAction.h"
 #include "rose_arm_controller_msgs/move_to_tfGoal.h"
 #include "rose_arm_controller_msgs/move_to_tfFeedback.h"
 #include "rose_arm_controller_msgs/move_to_tfResult.h"
 
-#include "rose_arm_controller_msgs/set_velocityAction"
-#include "rose_arm_controller_msgs/set_velocityGoal"
-#include "rose_arm_controller_msgs/set_velocityFeedback"
-#include "rose_arm_controller_msgs/set_velocityResult"
+#include "rose_arm_controller_msgs/set_velocityAction.h"
+#include "rose_arm_controller_msgs/set_velocityGoal.h"
+#include "rose_arm_controller_msgs/set_velocityFeedback.h"
+#include "rose_arm_controller_msgs/set_velocityResult.h"
+
+#include "rose_transformations/transformations.hpp"
 
 #include "server_multiple_client/server_multiple_client.hpp"
 
@@ -55,9 +59,9 @@ class ArmVisualServoing
 
   private:
 	/**
-	 * Add all arm as client of the SMC
+	 * Connect to the arm controller server
 	 */
-	void addArmClients();
+	void connectToArmController();
 	
 	/**
 	 * Callback when goal has been received
@@ -77,14 +81,13 @@ class ArmVisualServoing
 	 * @param state  End state
 	 * @param result Result message
 	 */
-	void CB_armActionSuccess( const actionlib::SimpleClientGoalState& state, const rose_arm_controller_msgs::set_velocityResultPtr& result );
-
+	void CB_armActionSuccess( const actionlib::SimpleClientGoalState& state, const rose_arm_controller_msgs::set_velocityResultConstPtr& result );
 	/**
 	 * Callback when arm action was \b not succesful
 	 * @param state  End state
 	 * @param result Result message
 	 */
-	void CB_armActionFail( const actionlib::SimpleClientGoalState& state, const rose_arm_controller_msgs::set_velocityResultPtr& result );
+	void CB_armActionFail( const actionlib::SimpleClientGoalState& state, const rose_arm_controller_msgs::set_velocityResultConstPtr& result );
 
 	/**
 	 * Callback when the arm server is active

@@ -10,7 +10,7 @@
 *	This class provides visual servoing functionalities on the arms of the robot.
 * 
 ***********************************************************************************/
-#include "arm_visual_servoing.hpp"
+#include "arm_visual_servoing/arm_visual_servoing.hpp"
 
 ArmVisualServoing::ArmVisualServoing( std::string name, ros::NodeHandle n )
 	: n_ ( n )
@@ -31,23 +31,24 @@ ArmVisualServoing::~ArmVisualServoing()
 
 void ArmVisualServoing::connectToArmController()
 {
-	smc_->addClient<rose_arm_controller_msgs::set_velocityAction>("arm_controller"), 
+	smc_->addClient<rose_arm_controller_msgs::set_velocityAction>("arm_controller", 
 			boost::bind(&ArmVisualServoing::CB_armActionSuccess, this, _1, _2),
 			boost::bind(&ArmVisualServoing::CB_armActionFail, this, _1, _2),
 			boost::bind(&ArmVisualServoing::CB_armActionActive, this),
-	   		boost::bind(&ArmVisualServoing::CB_armActionFeedback, this, _1));
+	   		boost::bind(&ArmVisualServoing::CB_armActionFeedback, this, _1)
+	);
 }
 
-void ArmVisualServoing::CB_armActionSuccess( const actionlib::SimpleClientGoalState& state, const arm_controller::manipulateResultConstPtr& result )
+void ArmVisualServoing::CB_armActionSuccess( const actionlib::SimpleClientGoalState& state, const rose_arm_controller_msgs::set_velocityResultConstPtr& result )
 {
     //ROS_INFO("ArmVisualServoing::CB_armActionSuccess");
-    result_ = result;
+    // result_ = result;
 }
 
-void ArmVisualServoing::CB_armActionFail( const actionlib::SimpleClientGoalState& state, const arm_controller::manipulateResultConstPtr& result )
+void ArmVisualServoing::CB_armActionFail( const actionlib::SimpleClientGoalState& state, const rose_arm_controller_msgs::set_velocityResultConstPtr& result )
 {
   	//ROS_INFO("ArmVisualServoing::CB_armActionFail");
-  	result_ = result;
+  	// result_ = result;
 }
 
 void ArmVisualServoing::CB_armActionActive()
@@ -55,15 +56,18 @@ void ArmVisualServoing::CB_armActionActive()
 	//ROS_INFO("ArmVisualServoing::CB_armActionActive");
 }
 
-void ArmVisualServoing::CB_armActionFeedback( const arm_controller::manipulateFeedbackConstPtr& feedback )
+void ArmVisualServoing::CB_armActionFeedback( const rose_arm_controller_msgs::set_velocityFeedbackConstPtr& feedback )
 {
 	//ROS_INFO("ArmVisualServoing::CB_armActionFeedback");
 }
 
-void ArmVisualServoing::CB_serverWork( const arm_controller::move_to_tfGoalConstPtr& goal, SMC* smc )
+void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_tfGoalConstPtr& goal, SMC* smc )
 {
+	// Get arm anme
+	std::string arm_name = goal->arm_name;
+
 	// Get frame_id
-	std::string frame_id = goal->tf;
+	std::string frame_id = goal->tf_name;
 
 	//! @todo MdL: Frame convertion?.
 	double limit_dist_xy = ( goal->max_xy_error == 0.0 ? std::numeric_limits<double>::max() : goal->max_xy_error); 
@@ -71,9 +75,6 @@ void ArmVisualServoing::CB_serverWork( const arm_controller::move_to_tfGoalConst
 	double limit_dist_yz = ( goal->max_yz_error == 0.0 ? std::numeric_limits<double>::max() : goal->max_yz_error);
 
 	ROS_DEBUG_NAMED(ROS_NAME, "Found the following limits xy: %f xz: %f yz: %f", limit_dist_xy, limit_dist_xz, limit_dist_yz );
-
-	// Get arm
-	ArmController::Arms arm = static_cast<ArmController::Arms>(goal->arm);
 
 	// Get max distance to goal
 	double max_distance 	= 0.005;
@@ -96,40 +97,40 @@ void ArmVisualServoing::CB_serverWork( const arm_controller::move_to_tfGoalConst
 
 	while ( smc_->hasActiveGoal() and not reached_goal and nr_fails < 15 and no_convergence < 15 )
 	{
-		PoseStamped error;
+		geometry_msgs::PoseStamped error;
 		bool found_error = true;
 		// Get error to tip in correct frame
-		if ( not rose_transformations::getFrameInFrame(tf_, frame_id, arm_controller_helper_->armToString(arm)+"_observed_gripper_tip", error, 0.0167) )
+		if ( not rose_transformations::getFrameInFrame(tf_, frame_id, arm_name+"_observed_gripper_tip", error, 0.0167) )
 		{
 			//! @todo MdL: Do something smart (of something stupid, if that works) to see the marker again. Maybe random.
 			ROS_ERROR("Cannot see gripper tip error");
 			nr_fails++;
 			found_error = false;
-			stopMovement(arm);
+			stopMovement(arm_name);
 		}
 		else
 			nr_fails = 0;
 
-		PoseStamped translation_between_frames;
+		geometry_msgs::PoseStamped translation_between_frames;
 		if (found_error)
 		{
 			// Error to arms frame
-			if ( not rose_transformations::getFrameInFrame( tf_, error.header.frame_id, arm_controller_helper_->getFrameFor(arm), translation_between_frames, 0.0167 ))
+			if ( not rose_transformations::getFrameInFrame( tf_, error.header.frame_id, arm_name, translation_between_frames, 0.0167 ))
 			{
-				ROS_ERROR("No transform found between %s and %s", error.header.frame_id.c_str(), arm_controller_helper_->getFrameFor(arm).c_str());
+				ROS_ERROR("No transform found between %s and %s", error.header.frame_id.c_str(), arm_name.c_str());
 				found_error = false;
-				stopMovement(arm);
+				stopMovement(arm_name);
 			}
 		}
 
-		PoseStamped arm_pose_stamped;
+		geometry_msgs::PoseStamped arm_pose_stamped;
 		if (found_error)
 		{
 			arm_pose_stamped.header.frame_id = error.header.frame_id;
 			arm_pose_stamped.pose 			 = error.pose;
-			if ( not rose_transformations::transformToFrameNow( tf_, arm_controller_helper_->getFrameFor(arm), arm_pose_stamped, 0.0167 ))
+			if ( not rose_transformations::transformToFrameNow( tf_, arm_name, arm_pose_stamped, 0.0167 ))
 			{
-				ROS_ERROR("Could not transform to frame %s", arm_controller_helper_->getFrameFor(arm).c_str());
+				ROS_ERROR("Could not transform to frame %s", arm_name.c_str());
 				found_error = false;
 				stopMovement(arm);
 			}
@@ -203,13 +204,13 @@ void ArmVisualServoing::CB_serverWork( const arm_controller::move_to_tfGoalConst
 	}
 }
 
-void ArmVisualServoing::stopMovement( const ArmController::Arms arm )
+void ArmVisualServoing::stopMovement( const std::string arm )
 {
 	ROS_DEBUG_NAMED(ROS_NAME, "Stop movement");
 	sendArmSpeeds(arm,0,0,0);
 }
 
-void ArmVisualServoing::sendArmSpeeds( const ArmController::Arms arm, const double x, const double y, const double z )
+void ArmVisualServoing::sendArmSpeeds( const std::string arm, const double x, const double y, const double z )
 {
 	ROS_DEBUG_NAMED(ROS_NAME, "Sending arm movement (%f, %f, %f)", x, y, z);
 	geometry_msgs::Twist arm_movement;
@@ -218,8 +219,11 @@ void ArmVisualServoing::sendArmSpeeds( const ArmController::Arms arm, const doub
 	arm_movement.linear.y = y;
 	arm_movement.linear.z = z;
 
-	arm_controller::manipulateGoal arm_goal = arm_controller_helper_->setVelocityMessage( arm, arm_movement );
-	smc_->sendGoal<arm_controller::manipulateAction>(arm_goal, arm_controller_helper_->getClientFor(arm));
+	rose_arm_controller_msgs::set_velocityGoal velocity_goal;
+	velocity_goal.arm 				= arm_name;
+	velocity_goal.required_velocity = arm_movement;
+
+	smc_->sendGoal<rose_arm_controller_msgs::set_velocityAction>(velocity_goal, "arm_controller");
 }
 
 void ArmVisualServoing::CB_serverCancel( SMC* smc )
@@ -227,9 +231,9 @@ void ArmVisualServoing::CB_serverCancel( SMC* smc )
 
 }
 
-void ArmVisualServoing::sendResult( const bool succes, const arm_controller::manipulateResultConstPtr& result )
+void ArmVisualServoing::sendResult( const bool succes, const arm_controller::set_velocityResultConstPtr& result )
 {
-	arm_controller::move_to_tfResult move_result;
+	rose_arm_controller_msgs::move_to_tfResult move_result;
 	// move_result.return_code = result->return_code;
 
 	smc_->sendServerResult( succes, move_result );
