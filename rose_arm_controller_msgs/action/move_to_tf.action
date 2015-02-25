@@ -1,0 +1,12 @@
+#Goal
+string arm_name
+string tf_name
+float32 max_xy_error
+float32 max_yz_error
+float32 max_xz_error
+---
+#result
+bool success
+---
+#feedback
+float32 error
