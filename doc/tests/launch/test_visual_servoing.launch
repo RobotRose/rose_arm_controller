@@ -76,4 +76,5 @@
 
     <!-- arm nodes -->
     <include file="$(find wpi_jaco_wrapper)/launch/arm.launch" />
+    <include file="$(find arm_controller)/launch/arms.launch" />
 </launch>
