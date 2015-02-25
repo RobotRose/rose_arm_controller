@@ -40,11 +40,13 @@ bool ArmControllerKinova::initialize( const std::string name )
 	// Register actionlib client for moveit
 	//! @todo MdL [IMPR]: Change to SMC?
 	move_it_client_ = new MoveItClient(moveit_server_name_, true);
+	//! @todo MdL [QSTN]: Do I have to wait for the server to be up?
 	// move_it_client_->waitForServer();
 
 	// Register actionlib client to the wpi_jaco driver for the gripper
 	gripper_client_ = new GripperClient(arm_prefix_ + std::string("/fingers_controller/gripper"), true);
-	gripper_client_->waitForServer();
+	//! @todo MdL [QSTN]: Do I have to wait for the server to be up?
+	// gripper_client_->waitForServer();
 
 	// Create all publishers to the wpi_jaco driver
 	arm_cartesian_command_publisher_	= n.advertise<wpi_jaco_msgs::CartesianCommand>(arm_prefix_ + std::string("/cartesian_cmd"), 1);
