@@ -1,0 +1,79 @@
+<launch>	
+    <!-- Do mapping argument -->
+    <arg name="mapping" default="false"/> 
+
+    <!-- Do not use machine files argument -->
+    <arg name="sim" default="false"/>
+
+    <!-- Hardware version -->
+    <arg name="hardware" default="simulation"/>
+
+    <!-- Get camera name argument-->
+    <arg name="kinect_camera_name" default="camera" />
+
+    <!-- Openni kinect  -->
+    <include file="$(find freenect_launch)/launch/freenect.launch">
+        <arg name="depth_registration" value="true"/> 
+        <arg name="num_worker_threads" value="8"/> 
+        <arg name="sw_registered_processing" value="false"/> 
+        <arg name="camera" value="$(arg kinect_camera_name)" />
+    </include>
+
+    <param name="/$(arg kinect_camera_name)/driver/image_mode" value="2" /> <!-- NO LOW RESOLUTION -->
+    <param name="/$(arg kinect_camera_name)/driver/depth_mode" value="2" /> <!-- NO LOW RESOLUTION -->
+    <param name="/$(arg kinect_camera_name)/driver/data_skip" value="2" /> <!-- DROP FRAMES http://answers.ros.org/question/54360/reduce-frame-rate-fps-kinect-openni_launch/ -->
+
+    <!-- Point cloud filters  -->
+    <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
+
+    <!-- Run a VoxelGrid filter to clean NaNs and downsample the data -->
+    <node pkg="nodelet" type="nodelet" name="voxel_grid" launch-prefix="nice"  args="load pcl/VoxelGrid pcl_manager" output="screen">
+        <remap from="~input"  to="/camera/depth_registered/points" />
+        <remap from="~output" to="/point_cloud/downsample" />
+        <rosparam>
+            leaf_size: 0.08
+            filter_field_name: z
+            filter_limit_min: 0.10
+            filter_limit_max: 3.00
+            filter_limit_negative: False
+        </rosparam>
+    </node>
+
+    <!-- Run a StatisticalOutlierRemoval filter to remove outliers -->
+    <node pkg="nodelet" type="nodelet" name="statistical_outlier_removal" launch-prefix="nice" args="load pcl/StatisticalOutlierRemoval pcl_manager" output="screen">
+        <remap from="~input"  to="/point_cloud/downsample" />
+        <remap from="~output" to="/point_cloud/downsample_outlier" />
+        <rosparam>
+            <!-- The number of points (k) to use for mean distance estimation Range: 2 to 100 -->
+            mean_k: 10
+            <!-- The standard deviation multiplier threshold. All points outside the mean +- sigma * std_mul will be considered outliers. Range: 0.0 to 5.0 -->
+            stddev: 1.0
+            <!-- Set whether the inliers should be returned (true) or the outliers (false) -->
+            negative: true
+        </rosparam>
+    </node>
+
+    <!-- AR track alvar -->
+    <arg name="marker_size" default="5.6" />
+    <arg name="max_new_marker_error" default="0.08" /> <!-- 0.08 -->
+    <arg name="max_track_error" default="0.2" />       <!-- 0.2 -->
+
+    <arg name="cam_image_topic" default="/camera/rgb/image_color" />
+    <arg name="cam_info_topic" default="/camera/rgb/camera_info" />
+    <arg name="output_frame" default="/camera_depth_optical_frame" />
+
+    <node name="ar_track_alvar" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" args="$(arg marker_size) $(arg max_new_marker_error) $(arg max_track_error) $(arg cam_image_topic) $(arg cam_info_topic) $(arg output_frame)" />
+
+    <!-- Possible ar markers on the gripper -->
+    <node pkg="tf" type="static_transform_publisher" name="ar_marker_2_rename" args="0 0 0 0 0 0 /ar_marker_2 /left_arm_grippermarker_observed 10" />
+
+    <!-- TFs test setting -->
+    <node pkg="tf" type="static_transform_publisher" name="table_to_arm" args="0 0 0.34 0 0 0 /table /jaco_arm 10" />
+    <node pkg="tf" type="static_transform_publisher" name="arm_to_kinect_mount" args="0 0 0.475 0 0 0 /jaco_arm /camera_mount 10" />
+    <node pkg="tf" type="static_transform_publisher" name="kinect_rotation" args="0 0 0 0 0.85 0 /camera_mount /camera_link 10" />
+    <!-- <node pkg="tf" type="static_transform_publisher" name="arm_mount" args="0 0 0 0 0 0 /ar_marker_2 /left_arm_grippermarker_observed 10" /> -->
+
+
+    <!-- arm nodes -->
+    <include file="$(find wpi_jaco)/launch/arm.launch" />
+</launch>
