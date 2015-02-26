@@ -66,7 +66,10 @@ void ArmVisualServoing::CB_armActionFeedback( const rose_arm_controller_msgs::se
 
 void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_tfGoalConstPtr& goal, SMC* smc )
 {
-	// Get arm anme
+	//! @todo MdL [IMPR]: Store the current orientation of the gripper. Try to keep this orientation, checking the difference
+	//					  between the stored orientation and the current orientation and make up for the difference.
+
+	// Get arm name
 	std::string arm_name = goal->arm_name;
 
 	// Get frame_id
@@ -87,7 +90,7 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 	double max_speed 		= 0.01;
 	double closest_distance = std::numeric_limits<double>::max();
 	double speed_scale 		= 1.5;//0.5; //! @todo MdL [CONF]: Make configurable (arm specific).
-	double rotation_scale 	= 0.4; //! @todo MdL [CONF]: Make configurable (arm specific).
+	double rotation_scale 	= 1.5; //! @todo MdL [CONF]: Make configurable (arm specific).
 
 	// Check thresholds
 	//! @todo MdL: Add thresholds.
@@ -150,29 +153,23 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 			continue; // Restart the while loop
 		}
 
+
 		// Calculate the error distance (both in arm frame now)
 		arm_pose_stamped.pose.position.x    -= translation_between_frames.pose.position.x;
 		arm_pose_stamped.pose.position.y    -= translation_between_frames.pose.position.y;
 		arm_pose_stamped.pose.position.z    -= translation_between_frames.pose.position.z; 
 
-		// Calculate the difference in rotation
-		tf::Quaternion translation_quat, arm_pose_quat;
-		tf::quaternionMsgToTF(translation_between_frames.pose.orientation, translation_quat);
-		tf::quaternionMsgToTF(arm_pose_stamped.pose.orientation, arm_pose_quat);
+		geometry_msgs::Vector3 error_rpy 	= rose_conversions::quaternionToRPY(error.pose.orientation);
 
-		arm_pose_quat = arm_pose_quat - translation_quat;
-
-		tf::quaternionTFToMsg(arm_pose_quat, arm_pose_stamped.pose.orientation);
-
-		geometry_msgs::Vector3 arm_pose_stamped_rpy = rose_conversions::quaternionToRPY(arm_pose_stamped.pose.orientation);
+		// geometry_msgs::Vector3 arm_pose_stamped_rpy = rose_conversions::quaternionToRPY(arm_pose_stamped.pose.orientation);
 
 		ROS_DEBUG_NAMED(ROS_NAME, "Error = (%f,%f,%f):(%f,%f,%f)", 
 			arm_pose_stamped.pose.position.x, 
 			arm_pose_stamped.pose.position.y, 
 			arm_pose_stamped.pose.position.z,
-			arm_pose_stamped_rpy.x,
-			arm_pose_stamped_rpy.y,
-			arm_pose_stamped_rpy.z
+			error_rpy.x,
+			error_rpy.y,
+			error_rpy.z
 		);
 
 		// Check if we have reached the goal
@@ -208,14 +205,15 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 		double speed_x 			= speed_scale * arm_pose_stamped.pose.position.x;
 		double speed_y 			= speed_scale * arm_pose_stamped.pose.position.y;
 		double speed_z 			= speed_scale * arm_pose_stamped.pose.position.z;
-		double rotate_roll 		= rotation_scale * arm_pose_stamped_rpy.x;
-		double rotate_pitch 	= rotation_scale * arm_pose_stamped_rpy.y;
-		double rotate_yaw 		= rotation_scale * arm_pose_stamped_rpy.z;
+		double rotate_roll 		= rotation_scale * error_rpy.x;
+		double rotate_pitch 	= rotation_scale * error_rpy.y;
+		double rotate_yaw 		= rotation_scale * error_rpy.z;
 
 		// Set limits if needed
 		double x = arm_pose_stamped.pose.position.x;
 		double y = arm_pose_stamped.pose.position.y;
 		double z = arm_pose_stamped.pose.position.z;
+
 		if (distance(x,y) > limit_dist_xy and no_convergence < 5)
 			speed_z = 0.0;
 		if (distance(x,z) > limit_dist_xz and no_convergence < 5)
@@ -229,11 +227,9 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 			nr_fails = 30;
 		}
 
-		//! @todo MdL [TEST]: Remove test code (I do not want the arm to move its position)
-		speed_x = 0.0; speed_y = 0.0; speed_z = 0.0; // Set speeds to 0 for testing
-
+		// If orientation is not to be changed, send only the speeds
 		if ( change_orientation )
-			sendArmSpeeds(arm_name, speed_x, speed_y, speed_z, rotate_roll, rotate_pitch, rotate_yaw);
+			sendArmSpeeds(arm_name, speed_x, speed_y, speed_z, -rotate_pitch, -rotate_yaw, rotate_roll);
 		else
 			sendArmSpeeds(arm_name, speed_x, speed_y, speed_z);
 	}
