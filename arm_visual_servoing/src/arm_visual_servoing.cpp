@@ -121,7 +121,7 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 		}
 
 		//! @todo MdL [CONF]: Magic number; How old is allowed for the transform?
-		if ( error.header.stamp < ros::Time::now() - ros::Duration(1.0))
+		if ( error.header.stamp < ros::Time::now() - ros::Duration(0.3))
 		{
 			ROS_ERROR("Error transform too old");
 			ROS_DEBUG_NAMED(ROS_NAME, "Error time=%f", error.header.stamp.toSec());
@@ -180,6 +180,8 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 
 		if ( error_distance < max_distance)
 		{
+			//! @todo MdL [TEST]: Remove the next "continue;" when testing is over.
+			continue;
 			ROS_DEBUG_NAMED(ROS_NAME, "Goal reached");
 			sendResult(true, result_);
 			return;
