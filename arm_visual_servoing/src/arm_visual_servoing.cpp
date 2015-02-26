@@ -72,6 +72,9 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 	// Get frame_id
 	std::string frame_id = goal->tf_name;
 
+	// Do we also have to visual servo the orientation?
+	bool change_orientation = (not goal->only_position);
+
 	//! @todo MdL: Frame convertion?.
 	double limit_dist_xy = ( goal->max_xy_error == 0.0 ? std::numeric_limits<double>::max() : goal->max_xy_error); 
 	double limit_dist_xz = ( goal->max_xz_error == 0.0 ? std::numeric_limits<double>::max() : goal->max_xz_error);
@@ -183,23 +186,6 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 
 		// All is well, reset the number of fails
 		nr_fails = 0; 
-
-		// Store the values in easier variables
-		double x 		= arm_pose_stamped.pose.position.x;
-		double y 		= arm_pose_stamped.pose.position.y;
-		double z 		= arm_pose_stamped.pose.position.z;
-
-		double roll 	= arm_pose_stamped_rpy.x;
-		double pitch 	= arm_pose_stamped_rpy.y;
-		double yaw 		= arm_pose_stamped_rpy.z;
-
-		double speed_x 		= x * speed_scale;
-		double speed_y 		= y * speed_scale;
-		double speed_z 		= z * speed_scale;
-
-		double rotate_roll	= roll 	* rotation_scale;
-		double rotate_pitch	= pitch * rotation_scale;
-		double rotate_yaw 	= yaw 	* rotation_scale;
 		
 		if ( error_distance < closest_distance )
 		{
@@ -215,6 +201,9 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 		closest_distance = std::min(closest_distance, error_distance);
 
 		//limit speeds, if needed
+		double x = arm_pose_stamped.pose.position.x;
+		double y = arm_pose_stamped.pose.position.y;
+		double z = arm_pose_stamped.pose.position.z;
 		if (distance(x,y) > limit_dist_xy and no_convergence < 5)
 			speed_z = 0.0;
 		if (distance(x,z) > limit_dist_xz and no_convergence < 5)
@@ -228,8 +217,19 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 			nr_fails = 30;
 		}
 
-		sendArmSpeeds(arm_name, speed_x, speed_y, speed_z);
-		// sendArmSpeeds(arm_name, speed_x, speed_y, speed_z, rotate_roll, rotate_pitch, rotate_yaw);
+		// Scale the values
+		double speed_x 		= speed_scale * arm_pose_stamped.pose.position.x;
+		double speed_y 		= speed_scale * arm_pose_stamped.pose.position.y;
+		double speed_z 		= speed_scale * arm_pose_stamped.pose.position.z;
+
+		double rotate_roll 	= rotation_scale * arm_pose_stamped_rpy.x;
+		double rotate_pitch = rotation_scale * arm_pose_stamped_rpy.y;
+		double rotate_yaw 	= rotation_scale * arm_pose_stamped_rpy.z;
+
+		if ( change_orientation )
+			sendArmSpeeds(arm_name, speed_x, speed_y, speed_z, rotate_roll, rotate_pitch, rotate_yaw);
+		else
+			sendArmSpeeds(arm_name, speed_x, speed_y, speed_z);
 	}
 
 	// While loop ended on fails, hence the goal has not been reached
