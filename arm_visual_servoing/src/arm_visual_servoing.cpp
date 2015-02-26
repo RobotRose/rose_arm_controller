@@ -101,8 +101,8 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 	while ( smc_->hasActiveGoal() and nr_fails < 15 and no_convergence < 15 )
 	{
 		//! @todo MdL [TEST]: Test code (I want an infinite loop)
-		// nr_fails 		= 0; 
-		// no_convergence 	= 0;
+		nr_fails 		= 0; 
+		no_convergence 	= 0;
 
 		// Error between tip and goal pose
 		geometry_msgs::PoseStamped error;
@@ -230,7 +230,7 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 		}
 
 		//! @todo MdL [TEST]: Remove test code (I do not want the arm to move its position)
-		// speed_x = 0.0; speed_y = 0.0; speed_z = 0.0; // Set speeds to 0 for testing
+		speed_x = 0.0; speed_y = 0.0; speed_z = 0.0; // Set speeds to 0 for testing
 
 		if ( change_orientation )
 			sendArmSpeeds(arm_name, speed_x, speed_y, speed_z, rotate_roll, rotate_pitch, rotate_yaw);
