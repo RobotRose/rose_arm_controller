@@ -115,7 +115,7 @@ class ArmVisualServoing
 													const double roll = 0.0, const double pitch = 0.0, const double yaw = 0.0 );
 	
 	double distance(const double& x, const double& y);
-	
+
   	ros::NodeHandle 	 n_;		//!< NodeHandle
   	std::string 		 name_;     //!< Name of the node
 
