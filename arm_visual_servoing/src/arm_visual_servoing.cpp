@@ -100,7 +100,7 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 		// Error between tip and goal pose
 		geometry_msgs::PoseStamped error;
 
-		// Get error to tip in correct frame
+		// Get error to tip in the frame of the required position
 		if ( not rose_transformations::getFrameInFrame(tf_, frame_id, arm_name+"_observed_gripper_tip", error, 0.0167) )
 		{
 			//! @todo MdL: Do something smart (of something stupid, if that works) to see the marker again. Maybe random.
@@ -121,7 +121,7 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 			continue; // Restart the while loop
 		}
 
-		// The origin of the error frame (in the TF of arm_name, arn_name is origin)
+		// Get the origin of the error frame in the arm frame
 		geometry_msgs::PoseStamped translation_between_frames;
 		if ( not rose_transformations::getFrameInFrame( tf_, error.header.frame_id, arm_name, translation_between_frames, 0.0167 ))
 		{
@@ -131,6 +131,7 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 			continue; // Restart the while loop
 		}
 
+		// Get the error position in the arm frame
 		geometry_msgs::PoseStamped arm_pose_stamped;
 		arm_pose_stamped.header.frame_id = error.header.frame_id;
 		arm_pose_stamped.pose 			 = error.pose;
