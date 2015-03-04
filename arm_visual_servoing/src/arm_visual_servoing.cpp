@@ -114,7 +114,7 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 		if ( not rose_transformations::getFrameInFrame(tf_, frame_id, arm_name+"_observed_gripper_tip", error, 0.0167) )
 		{
 			//! @todo MdL: Do something smart (of something stupid, if that works) to see the marker again. Maybe random.
-			ROS_ERROR("Cannot see gripper tip");
+			ROS_ERROR_NAMED(ROS_NAME, "Cannot see gripper tip");
 			nr_fails++;
 			stopMovement(arm_name);
 			continue; // Restart the while loop
@@ -123,7 +123,7 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 		//! @todo MdL [CONF]: Magic number; How old is allowed for the transform?
 		if ( error.header.stamp < ros::Time::now() - ros::Duration(0.3))
 		{
-			ROS_ERROR("Error transform too old");
+			ROS_ERROR_NAMED(ROS_NAME, "Error transform too old");
 			ROS_DEBUG_NAMED(ROS_NAME, "Error time=%f", error.header.stamp.toSec());
 			ROS_DEBUG_NAMED(ROS_NAME, "Current time=%f",ros::Time::now().toSec());
 			nr_fails++;
@@ -135,7 +135,7 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 		geometry_msgs::PoseStamped translation_between_frames;
 		if ( not rose_transformations::getFrameInFrame( tf_, error.header.frame_id, arm_name, translation_between_frames, 0.0167 ))
 		{
-			ROS_ERROR("No transform found between %s and %s", error.header.frame_id.c_str(), arm_name.c_str());
+			ROS_ERROR_NAMED(ROS_NAME, "No transform found between %s and %s", error.header.frame_id.c_str(), arm_name.c_str());
 			nr_fails++;
 			stopMovement(arm_name);
 			continue; // Restart the while loop
@@ -147,7 +147,7 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 		arm_pose_stamped.pose 			 = error.pose;
 		if ( not rose_transformations::transformToFrameNow( tf_, arm_name, arm_pose_stamped, 0.0167 ))
 		{
-			ROS_ERROR("Could not transform to frame %s", arm_name.c_str());
+			ROS_ERROR_NAMED(ROS_NAME, "Could not transform to frame %s", arm_name.c_str());
 			nr_fails++;
 			stopMovement(arm_name);
 			continue; // Restart the while loop
@@ -222,7 +222,7 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 
 		if (speed_x == 0.0 and speed_y == 0.0 and speed_z == 0.0)
 		{
-			ROS_ERROR("Limits are not properly set (speeds are all zero)");
+			ROS_ERROR_NAMED(ROS_NAME, "Limits are not properly set (speeds are all zero)");
 			nr_fails = 30;
 		}
 
@@ -238,7 +238,7 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 	// Stop movement
 	stopMovement(arm_name);
 
-	ROS_ERROR("Goal NOT reached!");
+	ROS_ERROR_NAMED(ROS_NAME, "Goal NOT reached!");
 	sendResult(false);
 
 }
