@@ -19,7 +19,7 @@ Still needs to be tested:
 
 Test setup
 ----------
-The test setup at Aachen consists of a Mico arm mounted sideways. The control will be directly done via the command line.
+The test setup at Rose consists of a Mico arm mounted not at the table top, but tilted 90 degrees. This way, it can act like an arm and shoulder. The control will be directly done via the command line.
 * actionlibs axclient (rosrun actionlib axclient.pysrun), or;
 * publishers (via rostopic pub), or; 
 * servicecalls (rosservice).
