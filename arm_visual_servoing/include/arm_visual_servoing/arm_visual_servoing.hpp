@@ -114,6 +114,15 @@ class ArmVisualServoing
 	void sendArmSpeeds( const std::string arm_name, const double x, const double y, const double z,
 													const double roll = 0.0, const double pitch = 0.0, const double yaw = 0.0 );
 	
+	/**
+	 * @brief This function calculates the distance in a plane. 
+	 * @details It is used for the constrained based visual servoing: When the distance in a certain place it too far from a point, it cannot move outside of the plance.
+	 * 
+	 * @param x First coordinate
+	 * @param y Second coordinate
+	 * 
+	 * @return Distance in a place
+	 */
 	double distance(const double& x, const double& y);
 
   	ros::NodeHandle 	 n_;		//!< NodeHandle
