@@ -101,17 +101,13 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 	bool 	no_convergence = 0; 
 
 	//! @todo MdL [CONF]: Fix magix numbers.
-	while ( smc_->hasActiveGoal() and nr_fails < 15 and no_convergence < 15 )
+	while ( smc_->hasActiveGoal() and nr_fails < MAX_NR_FAILS and no_convergence < MAX_NR_NO_CONVERGENCES )
 	{
-		//! @todo MdL [TEST]: Test code (I want an infinite loop)
-		nr_fails 		= 0; 
-		no_convergence 	= 0;
-
 		// Error between tip and goal pose
 		geometry_msgs::PoseStamped error;
 
 		// Get error to tip in the frame of the required position
-		if ( not rose_transformations::getFrameInFrame(tf_, frame_id, arm_name+"_observed_gripper_tip", error, 0.0167) )
+		if ( not rose_transformations::getFrameInFrame(tf_, frame_id, arm_name+"_observed_gripper_tip", error, TRANFORM_TIMEOUT) )
 		{
 			//! @todo MdL: Do something smart (of something stupid, if that works) to see the marker again. Maybe random.
 			ROS_ERROR_NAMED(ROS_NAME, "Cannot see gripper tip");
@@ -121,7 +117,7 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 		}
 
 		//! @todo MdL [CONF]: Magic number; How old is allowed for the transform?
-		if ( error.header.stamp < ros::Time::now() - ros::Duration(0.3))
+		if ( error.header.stamp < ros::Time::now() - ros::Duration(MAX_DIFFERENCE_BETWEEN_TFS))
 		{
 			ROS_ERROR_NAMED(ROS_NAME, "Error transform too old");
 			ROS_DEBUG_NAMED(ROS_NAME, "Error time=%f", error.header.stamp.toSec());
@@ -133,7 +129,7 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 
 		// Get the origin of the error frame in the arm frame
 		geometry_msgs::PoseStamped translation_between_frames;
-		if ( not rose_transformations::getFrameInFrame( tf_, error.header.frame_id, arm_name, translation_between_frames, 0.0167 ))
+		if ( not rose_transformations::getFrameInFrame( tf_, error.header.frame_id, arm_name, translation_between_frames, TRANFORM_TIMEOUT ))
 		{
 			ROS_ERROR_NAMED(ROS_NAME, "No transform found between %s and %s", error.header.frame_id.c_str(), arm_name.c_str());
 			nr_fails++;
@@ -145,7 +141,7 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 		geometry_msgs::PoseStamped arm_pose_stamped;
 		arm_pose_stamped.header.frame_id = error.header.frame_id;
 		arm_pose_stamped.pose 			 = error.pose;
-		if ( not rose_transformations::transformToFrameNow( tf_, arm_name, arm_pose_stamped, 0.0167 ))
+		if ( not rose_transformations::transformToFrameNow( tf_, arm_name, arm_pose_stamped, TRANFORM_TIMEOUT ))
 		{
 			ROS_ERROR_NAMED(ROS_NAME, "Could not transform to frame %s", arm_name.c_str());
 			nr_fails++;
@@ -177,8 +173,6 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 
 		if ( error_distance < max_distance)
 		{
-			//! @todo MdL [TEST]: Remove the next "continue;" when testing is over.
-			continue;
 			ROS_DEBUG_NAMED(ROS_NAME, "Goal reached");
 			sendResult(true);
 			return;
@@ -213,17 +207,19 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 		double y = arm_pose_stamped.pose.position.y;
 		double z = arm_pose_stamped.pose.position.z;
 
-		if (distance(x,y) > limit_dist_xy and no_convergence < 5)
+		//! @todo MdL [CONF]: Magic numbers.
+
+		if (distance(x,y) > limit_dist_xy and no_convergence < MAX_NR_CONSTRAINED_CONVERGENCES)
 			speed_z = 0.0;
-		if (distance(x,z) > limit_dist_xz and no_convergence < 5)
+		if (distance(x,z) > limit_dist_xz and no_convergence < MAX_NR_CONSTRAINED_CONVERGENCES)
 			speed_y = 0.0;
-		if (distance(y,z) > limit_dist_yz and no_convergence < 5)
+		if (distance(y,z) > limit_dist_yz and no_convergence < MAX_NR_CONSTRAINED_CONVERGENCES)
 			speed_x = 0.0;
 
 		if (speed_x == 0.0 and speed_y == 0.0 and speed_z == 0.0)
 		{
 			ROS_ERROR_NAMED(ROS_NAME, "Limits are not properly set (speeds are all zero)");
-			nr_fails = 30;
+			nr_fails = MAX_NR_FAILS; 
 		}
 
 		// If orientation is not to be changed, send only the speeds

@@ -38,6 +38,12 @@
 
 #include "server_multiple_client/server_multiple_client.hpp"
 
+#define MAX_NR_CONSTRAINED_CONVERGENCES 	5
+#define MAX_NR_FAILS						15
+#define MAX_NR_NO_CONVERGENCES 				15
+#define TRANFORM_TIMEOUT 					0.0167	//[s]
+#define MAX_DIFFERENCE_BETWEEN_TFS			0.3 	//[s]
+
 /**
  * This class provides visual servoing functionalities on the arms of the robot.
  */
