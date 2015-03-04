@@ -23,8 +23,8 @@
 
 #include "arm_controller_base/arm_controller_base.hpp"
 
-#include "rose20_common/common.hpp"
-#include "rose20_common/server_multiple_client/server_multiple_client.hpp"
+#include "rose_common/common.hpp"
+#include "server_multiple_client/server_multiple_client.hpp"
 
 #include "rose_arm_controller_msgs/set_positionAction.h"
 #include "rose_arm_controller_msgs/set_positionGoal.h"
@@ -42,10 +42,12 @@
 #include "rose_arm_controller_msgs/set_wrenchGoal.h"
 #include "rose_arm_controller_msgs/set_wrenchResult.h"
 
+#include "rose_arm_controller_msgs/get_arms.h"
+
 // #include "action_result_message.hpp"
 
 #include "rose_watchdogs/watchdog.hpp"
-#include "shared_variables/shared_variable.hpp"
+#include "rose_shared_variables/shared_variable.hpp"
 
 namespace arm_controller_core {
 
@@ -56,9 +58,10 @@ namespace arm_controller_core {
 using geometry_msgs::Pose;
 using geometry_msgs::Vector3;
 using geometry_msgs::Twist;
-using shared_variables::SharedVariable;
+using rose_shared_variables::SharedVariable;
 using std::find;
 using std::map;
+using std::string;
 using std::vector;
 
 /**
@@ -123,6 +126,8 @@ class ArmController
     void CB_cancelVelocityForArms();
     void CB_emergency(const bool& emergency);
     void CB_updateJointStates();
+    bool CB_get_arms(rose_arm_controller_msgs::get_arms::Request &req,
+                     rose_arm_controller_msgs::get_arms::Response &res );
 
     std::string         name_;
     ros::NodeHandle     n_;
@@ -131,10 +136,12 @@ class ArmController
     int                                     nr_of_arms_;
     std::map<std::string, std::string>      arm_plugins_;
 
-    SMC_position*  set_position_smc_;
-    SMC_velocity*  set_velocity_smc_;
-    SMC_gripper*   set_gripper_width_smc_;
-    SMC_wrench*    set_wrench_smc_;
+    SMC_position*           set_position_smc_;
+    SMC_velocity*           set_velocity_smc_;
+    SMC_gripper*            set_gripper_width_smc_;
+    SMC_wrench*             set_wrench_smc_;
+
+    ros::ServiceServer      get_arms_service_;
 
     pluginlib::ClassLoader<arm_controller_base::ArmControllerBase>                    arm_controller_plugin_loader_;
 

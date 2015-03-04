@@ -157,6 +157,11 @@ void ArmController::initializePublishersAndServices()
     }
 
     joint_state_timer_ = n_.createTimer(ros::Duration(0.0333), boost::bind(&ArmController::CB_updateJointStates, this));
+
+    ROS_INFO("Initializing services");
+
+    get_arms_service_ = n_.advertiseService("/" + name_ + "/get_arms", &ArmController::CB_get_arms, this);
+
     ROS_INFO("Done");
 }
 
@@ -303,7 +308,7 @@ void ArmController::CB_receivePositionGoal(const rose_arm_controller_msgs::set_p
 
     //! @todo MdL [IMPL]: Result message.
     rose_arm_controller_msgs::set_positionResult result;
-    smc->sendServerResult<rose_arm_controller_msgs::set_positionAction>(arm_controller->setEndEffectorPose(goal_pose), result );    
+    smc->sendServerResult(arm_controller->setEndEffectorPose(goal_pose), result );    
 }
 
 void ArmController::CB_receivePositionCancel(SMC_position* smc)
@@ -352,7 +357,7 @@ void ArmController::CB_receiveVelocityGoal(const rose_arm_controller_msgs::set_v
 
     //! @todo MdL [IMPL]: Result message.
     rose_arm_controller_msgs::set_velocityResult result;
-    smc->sendServerResult<rose_arm_controller_msgs::set_velocityAction>(arm_controller->setEndEffectorVelocity(goal_twist), result );
+    smc->sendServerResult(arm_controller->setEndEffectorVelocity(goal_twist), result );
 }
 
 void ArmController::CB_receiveVelocityCancel(SMC_velocity* smc)
@@ -389,7 +394,7 @@ void ArmController::CB_receiveGripperGoal(const rose_arm_controller_msgs::set_gr
         return;
 
     rose_arm_controller_msgs::set_gripper_widthResult result;
-    smc->sendServerResult<rose_arm_controller_msgs::set_gripper_widthAction>(arm_controller->setGripperWidth(goal->required_width), result );
+    smc->sendServerResult(arm_controller->setGripperWidth(goal->required_width), result );
 }
 
 void ArmController::CB_receiveGripperCancel(SMC_gripper* smc)
@@ -425,7 +430,7 @@ void ArmController::CB_receiveWrenchGoal(const rose_arm_controller_msgs::set_wre
 
     //! @todo MdL [IMPL]: Result message.
     rose_arm_controller_msgs::set_wrenchResult result;
-    smc->sendServerResult<rose_arm_controller_msgs::set_wrenchAction>(arm_controller->setEndEffectorWrench(goal->required_wrench), result );
+    smc->sendServerResult(arm_controller->setEndEffectorWrench(goal->required_wrench), result );
 }
 
 void ArmController::CB_receiveWrenchCancel(SMC_wrench* smc)
@@ -469,5 +474,11 @@ void ArmController::CB_updateJointStates()
     updateJointStates();
 }
 
+bool ArmController::CB_get_arms(rose_arm_controller_msgs::get_arms::Request &req,
+                                rose_arm_controller_msgs::get_arms::Response &res )
+{
+    for ( const auto& arm_controller : arm_controllers_)
+        res.arms.push_back(arm_controller.first);
+}
 
 }; // namespace

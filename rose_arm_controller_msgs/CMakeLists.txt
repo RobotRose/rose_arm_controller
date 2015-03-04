@@ -25,12 +25,14 @@ find_package(catkin
 add_service_files(
 	FILES
 		emergency_stop.srv
+		get_arms.srv
 		reset_emergency_stop.srv
 )
 
 # Generate actions in the 'action' folder
 add_action_files(
 	FILES
+		move_to_tf.action
 		set_position.action
 		set_velocity.action
 		set_gripper_width.action

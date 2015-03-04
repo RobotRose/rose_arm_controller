@@ -1,0 +1,3 @@
+<launch>
+	<node name="arm_visual_servoing" pkg="arm_visual_servoing" type="arm_visual_servoing" output="screen" />
+</launch>

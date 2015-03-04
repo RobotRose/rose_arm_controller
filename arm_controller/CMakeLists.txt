@@ -6,18 +6,28 @@ find_package(catkin REQUIRED
 		arm_controller_base
 		pluginlib
 		roscpp
-		rose20_common
+		rose_common
 		rose_arm_controller_msgs
 		rose_watchdogs
-		shared_variables
-        tf
+		rose_shared_variables
+		server_multiple_client
+        	tf
 )
 
 catkin_package(
 	INCLUDE_DIRS 
 		include
 #  LIBRARIES arm_controller
-#  CATKIN_DEPENDS other_catkin_pkg
+   CATKIN_DEPENDS
+		arm_controller_base
+		pluginlib
+		roscpp
+		rose_common
+		rose_arm_controller_msgs
+		rose_watchdogs
+		rose_shared_variables
+		server_multiple_client
+        	tf
 #  DEPENDS system_lib
 )
 

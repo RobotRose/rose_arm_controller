@@ -10,7 +10,7 @@ find_package(catkin
 		pluginlib
 		roscpp
 		rose_arm_controller_msgs
-		third_party
+		rose_third_party
 		tf
 )
 
@@ -24,7 +24,7 @@ catkin_package(
 		pluginlib
 		roscpp
 		rose_arm_controller_msgs
-		third_party
+		rose_third_party
 		tf
 #  DEPENDS system_lib
 )
@@ -34,18 +34,18 @@ catkin_package(
 ###########
 
 link_directories(
-	${third_party_INCLUDE_DIRS}/../lib/ 
+	${rose_third_party_INCLUDE_DIRS}/../lib/ 
 	# ${Boost_LIBS}
 )
 
-set(REMOTE_COMMAND_CLIENT ${third_party_INCLUDE_DIRS}/../bin/remoteCommandClientPlugin.ecp)
-set(MANIPULATION_PLUGIN   ${third_party_INCLUDE_DIRS}/../bin/manipulationActionExecPlugin.ecp)
-set(CYTON_PLUGIN          ${third_party_INCLUDE_DIRS}/../bin/cytonPlugin.ecp)
+set(REMOTE_COMMAND_CLIENT ${rose_third_party_INCLUDE_DIRS}/../bin/remoteCommandClientPlugin.ecp)
+set(MANIPULATION_PLUGIN   ${rose_third_party_INCLUDE_DIRS}/../bin/manipulationActionExecPlugin.ecp)
+set(CYTON_PLUGIN          ${rose_third_party_INCLUDE_DIRS}/../bin/cytonPlugin.ecp)
 
 include_directories(
 	include
 	${catkin_INCLUDE_DIRS}
-	${third_party_INCLUDE_DIRS}
+	${rose_third_party_INCLUDE_DIRS}
 )
 
 add_library( arm_controller_robai
