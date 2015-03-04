@@ -107,7 +107,7 @@ class ArmVisualServoing
 	 * @param succes If the action was successful
 	 * @param result The result message (return code)
 	 */
-	void sendResult( const bool succes, const rose_arm_controller_msgs::set_velocityResultConstPtr& result );
+	void sendResult( const bool success );
 
 	void stopMovement( const std::string arm_name );
 

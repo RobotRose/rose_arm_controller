@@ -153,15 +153,12 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 			continue; // Restart the while loop
 		}
 
-
 		// Calculate the error distance (both in arm frame now)
 		arm_pose_stamped.pose.position.x    -= translation_between_frames.pose.position.x;
 		arm_pose_stamped.pose.position.y    -= translation_between_frames.pose.position.y;
 		arm_pose_stamped.pose.position.z    -= translation_between_frames.pose.position.z; 
 
 		geometry_msgs::Vector3 error_rpy 	= rose_conversions::quaternionToRPY(error.pose.orientation);
-
-		// geometry_msgs::Vector3 arm_pose_stamped_rpy = rose_conversions::quaternionToRPY(arm_pose_stamped.pose.orientation);
 
 		ROS_DEBUG_NAMED(ROS_NAME, "Error = (%f,%f,%f):(%f,%f,%f)", 
 			arm_pose_stamped.pose.position.x, 
@@ -183,7 +180,7 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 			//! @todo MdL [TEST]: Remove the next "continue;" when testing is over.
 			continue;
 			ROS_DEBUG_NAMED(ROS_NAME, "Goal reached");
-			sendResult(true, result_);
+			sendResult(true);
 			return;
 		}
 
@@ -242,7 +239,7 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 	stopMovement(arm_name);
 
 	ROS_ERROR("Goal NOT reached!");
-	sendResult(false, result_);
+	sendResult(false);
 
 }
 
@@ -279,12 +276,12 @@ void ArmVisualServoing::CB_serverCancel( SMC* smc )
 
 }
 
-void ArmVisualServoing::sendResult( const bool succes, const rose_arm_controller_msgs::set_velocityResultConstPtr& result )
+void ArmVisualServoing::sendResult( const bool success )
 {
 	rose_arm_controller_msgs::move_to_tfResult move_result;
-	// move_result.return_code = result->return_code;
+	move_result.success = success;
 
-	smc_->sendServerResult( succes, move_result );
+	smc_->sendServerResult( success, move_result );
 }
 
 double ArmVisualServoing::distance(const double& x, const double& y)
