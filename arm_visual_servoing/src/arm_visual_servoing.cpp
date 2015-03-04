@@ -108,7 +108,7 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 
 		// Get error to tip in the frame of the required position
 		//! @todo MdL [CONF]: The gripper tip? Make the name configurable, or make sure the arm uses this.
-		if ( not rose_transformations::getFrameInFrame(tf_, frame_id, arm_name+"_observed_gripper_tip", error, TRANFORM_TIMEOUT) )
+		if ( not rose_transformations::getFrameInFrame(tf_, frame_id, arm_name+"_observed_gripper_tip", error, TRANSFORM_TIMEOUT) )
 		{
 			//! @todo MdL: Do something smart (of something stupid, if that works) to see the marker again. Maybe random.
 			ROS_ERROR_NAMED(ROS_NAME, "Cannot see gripper tip");
@@ -130,7 +130,7 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 
 		// Get the origin of the error frame in the arm frame
 		geometry_msgs::PoseStamped translation_between_frames;
-		if ( not rose_transformations::getFrameInFrame( tf_, error.header.frame_id, arm_name, translation_between_frames, TRANFORM_TIMEOUT ))
+		if ( not rose_transformations::getFrameInFrame( tf_, error.header.frame_id, arm_name, translation_between_frames, TRANSFORM_TIMEOUT ))
 		{
 			ROS_ERROR_NAMED(ROS_NAME, "No transform found between %s and %s", error.header.frame_id.c_str(), arm_name.c_str());
 			nr_fails++;
@@ -142,7 +142,7 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 		geometry_msgs::PoseStamped arm_pose_stamped;
 		arm_pose_stamped.header.frame_id = error.header.frame_id;
 		arm_pose_stamped.pose 			 = error.pose;
-		if ( not rose_transformations::transformToFrameNow( tf_, arm_name, arm_pose_stamped, TRANFORM_TIMEOUT ))
+		if ( not rose_transformations::transformToFrameNow( tf_, arm_name, arm_pose_stamped, TRANSFORM_TIMEOUT ))
 		{
 			ROS_ERROR_NAMED(ROS_NAME, "Could not transform to frame %s", arm_name.c_str());
 			nr_fails++;

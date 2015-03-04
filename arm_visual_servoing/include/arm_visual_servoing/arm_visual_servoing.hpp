@@ -42,7 +42,7 @@
 #define MAX_NR_CONSTRAINED_CONVERGENCES 	5
 #define MAX_NR_FAILS						15
 #define MAX_NR_NO_CONVERGENCES 				15
-#define TRANFORM_TIMEOUT 					0.0167	//[s]
+#define TRANSFORM_TIMEOUT 					0.0167	//[s]
 #define MAX_DIFFERENCE_BETWEEN_TFS			0.3 	//[s]
 
 /**
