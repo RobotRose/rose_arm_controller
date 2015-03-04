@@ -107,6 +107,7 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 		geometry_msgs::PoseStamped error;
 
 		// Get error to tip in the frame of the required position
+		//! @todo MdL [CONF]: The gripper tip? Make the name configurable, or make sure the arm uses this.
 		if ( not rose_transformations::getFrameInFrame(tf_, frame_id, arm_name+"_observed_gripper_tip", error, TRANFORM_TIMEOUT) )
 		{
 			//! @todo MdL: Do something smart (of something stupid, if that works) to see the marker again. Maybe random.
