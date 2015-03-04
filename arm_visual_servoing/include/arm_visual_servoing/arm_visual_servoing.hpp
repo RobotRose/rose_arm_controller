@@ -38,6 +38,7 @@
 
 #include "server_multiple_client/server_multiple_client.hpp"
 
+//! @todo MdL [CONF]: Make these values configurable.
 #define MAX_NR_CONSTRAINED_CONVERGENCES 	5
 #define MAX_NR_FAILS						15
 #define MAX_NR_NO_CONVERGENCES 				15
