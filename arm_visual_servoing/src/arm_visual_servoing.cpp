@@ -89,7 +89,7 @@ void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_t
 	double max_distance 	= 0.005;
 	double max_speed 		= 0.01;
 	double closest_distance = std::numeric_limits<double>::max();
-	double speed_scale 		= 1.5;//0.5; //! @todo MdL [CONF]: Make configurable (arm specific).
+	double speed_scale 		= 1.5; //! @todo MdL [CONF]: Make configurable (arm specific).
 	double rotation_scale 	= 1.5; //! @todo MdL [CONF]: Make configurable (arm specific).
 
 	// Check thresholds
