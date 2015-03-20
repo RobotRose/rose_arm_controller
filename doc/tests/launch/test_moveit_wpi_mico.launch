@@ -1,0 +1,59 @@
+<launch>
+    <include file="$(find mico_moveit_config)/launch/planning_and_execution.launch" />
+    <!-- <include file="$(find wpi_jaco_wrapper)/launch/arm.launch" /> -->
+
+    <!-- Get camera name argument-->
+    <arg name="kinect_camera_name" default="camera" />
+
+    <!-- Openni kinect  -->
+    <include file="$(find freenect_launch)/launch/freenect.launch">
+        <arg name="depth_registration" value="true"/> 
+        <arg name="num_worker_threads" value="8"/> 
+        <arg name="sw_registered_processing" value="false"/> 
+        <arg name="camera" value="$(arg kinect_camera_name)" />
+    </include>
+
+    <param name="/$(arg kinect_camera_name)/driver/image_mode" value="2" /> <!-- NO LOW RESOLUTION -->
+    <param name="/$(arg kinect_camera_name)/driver/depth_mode" value="2" /> <!-- NO LOW RESOLUTION -->
+    <param name="/$(arg kinect_camera_name)/driver/data_skip" value="2" /> <!-- DROP FRAMES http://answers.ros.org/question/54360/reduce-frame-rate-fps-kinect-openni_launch/ -->
+
+    <!-- Point cloud filters  -->
+    <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
+
+    <!-- Run a VoxelGrid filter to clean NaNs and downsample the data -->
+    <node pkg="nodelet" type="nodelet" name="voxel_grid" launch-prefix="nice"  args="load pcl/VoxelGrid pcl_manager" output="screen">
+        <remap from="~input"  to="/camera/depth_registered/points" />
+        <remap from="~output" to="/point_cloud/downsample" />
+        <rosparam>
+            leaf_size: 0.08
+            filter_field_name: z
+            filter_limit_min: 0.10
+            filter_limit_max: 3.00
+            filter_limit_negative: False
+        </rosparam>
+    </node>
+
+    <!-- Run a StatisticalOutlierRemoval filter to remove outliers -->
+    <node pkg="nodelet" type="nodelet" name="statistical_outlier_removal" launch-prefix="nice" args="load pcl/StatisticalOutlierRemoval pcl_manager" output="screen">
+        <remap from="~input"  to="/point_cloud/downsample" />
+        <remap from="~output" to="/point_cloud/downsample_outlier" />
+        <rosparam>
+            <!-- The number of points (k) to use for mean distance estimation Range: 2 to 100 -->
+            mean_k: 10
+            <!-- The standard deviation multiplier threshold. All points outside the mean +- sigma * std_mul will be considered outliers. Range: 0.0 to 5.0 -->
+            stddev: 1.0
+            <!-- Set whether the inliers should be returned (true) or the outliers (false) -->
+            negative: true
+        </rosparam>
+    </node>
+
+    <!-- TFs test setting -->
+    <!-- Arm stands on table -->
+    <node pkg="tf" type="static_transform_publisher" name="table_to_arm" args="0 0 0 0 0 0 /table /mico_mount 10" />
+    <node pkg="tf" type="static_transform_publisher" name="arm_base_rotation" args="0 0 0 0.0 0.0 0.0 /mico_mount /mico 10" />
+
+    <node pkg="tf" type="static_transform_publisher" name="arm_to_kinect_mount" args="-0.175 0.0616 0.731 0 0 0 /mico_mount /camera_mount 10" />
+    <node pkg="tf" type="static_transform_publisher" name="kinect_rotation" args="0 0 0 -1.575 0.85 0.0 /camera_mount /camera_link 10" />
+
+    <include file="$(find arm_controller)/launch/arms.launch" />
+</launch>
