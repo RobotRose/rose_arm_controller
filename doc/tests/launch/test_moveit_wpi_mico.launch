@@ -1,12 +1,6 @@
-<launch>	
-    <!-- Do mapping argument -->
-    <arg name="mapping" default="false"/> 
-
-    <!-- Do not use machine files argument -->
-    <arg name="sim" default="false"/>
-
-    <!-- Hardware version -->
-    <arg name="hardware" default="simulation"/>
+<launch>
+    <include file="$(find mico_moveit_config)/launch/planning_and_execution.launch" />
+    <!-- <include file="$(find wpi_jaco_wrapper)/launch/arm.launch" /> -->
 
     <!-- Get camera name argument-->
     <arg name="kinect_camera_name" default="camera" />
@@ -53,33 +47,13 @@
         </rosparam>
     </node>
 
-    <!-- AR track alvar -->
-    <arg name="marker_size" default="5.6" />
-    <arg name="max_new_marker_error" default="0.08" /> <!-- 0.08 -->
-    <arg name="max_track_error" default="0.2" />       <!-- 0.2 -->
-
-    <arg name="cam_image_topic" default="/camera/rgb/image_color" />
-    <arg name="cam_info_topic" default="/camera/rgb/camera_info" />
-    <arg name="output_frame" default="/camera_depth_optical_frame" />
-
-    <node name="ar_track_alvar" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" args="$(arg marker_size) $(arg max_new_marker_error) $(arg max_track_error) $(arg cam_image_topic) $(arg cam_info_topic) $(arg output_frame)" />
-
-    <!-- Possible ar markers on the gripper -->
-    <node pkg="tf" type="static_transform_publisher" name="ar_marker_2_rename" args="0 0 0 0 0 0 /ar_marker_2 /mico_grippermarker_observed 10" />
-    <node pkg="tf" type="static_transform_publisher" name="ar_marker_2_gripper" args="0.14 0 0.05 0 0 0 /mico_grippermarker_observed /mico_observed_gripper_tip 10" />
-
     <!-- TFs test setting -->
-    <node pkg="tf" type="static_transform_publisher" name="table_to_arm" args="0 0 0.34 0 0 0 /table /mico_mount 10" />
-    <node pkg="tf" type="static_transform_publisher" name="arm_base_rotation" args="0 0 0 2.3562 -1.5707 0.7853 /mico_mount /mico 10" />
-    <node pkg="tf" type="static_transform_publisher" name="arm_to_kinect_mount" args="0 0 0.51 0 0 0 /mico_mount /camera_mount 10" />
-    <node pkg="tf" type="static_transform_publisher" name="kinect_rotation" args="0 0 0 1.575 0.85 0.0 /camera_mount /camera_link 10" />
+    <!-- Arm stands on table -->
+    <node pkg="tf" type="static_transform_publisher" name="table_to_arm" args="0 0 0 0 0 0 /table /mico_mount 10" />
+    <node pkg="tf" type="static_transform_publisher" name="arm_base_rotation" args="0 0 0 0.0 0.0 0.0 /mico_mount /mico 10" />
 
-    <!-- arm nodes -->
-    <include file="$(find wpi_jaco_wrapper)/launch/arm.launch" >
-        <arg name="arm_name" value="mico_arm" />
-    </include>
+    <node pkg="tf" type="static_transform_publisher" name="arm_to_kinect_mount" args="-0.175 0.0616 0.731 0 0 0 /mico_mount /camera_mount 10" />
+    <node pkg="tf" type="static_transform_publisher" name="kinect_rotation" args="0 0 0 -1.575 0.85 0.0 /camera_mount /camera_link 10" />
+
     <include file="$(find arm_controller)/launch/arms.launch" />
-
-    <!-- visual servoing node -->
-    <include file="$(find arm_visual_servoing)/launch/visual_servoing.launch" />    
 </launch>
