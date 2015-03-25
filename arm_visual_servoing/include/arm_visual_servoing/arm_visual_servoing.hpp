@@ -77,7 +77,7 @@ class ArmVisualServoing
 	 * @param goal Goal
 	 * @param smc  Sever multiple client object
 	 */
-	void CB_serverWork( const rose_arm_controller_msgs::move_to_tfGoalConstPtr& goal, SMC* smc );
+	void CB_serverWork( const rose_arm_controller_msgs::move_to_tfGoalConstPtr& goal );
 
 	/**
 	 * Callback when cancel has been received
