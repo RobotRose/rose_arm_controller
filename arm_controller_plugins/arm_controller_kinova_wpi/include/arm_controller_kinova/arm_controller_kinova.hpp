@@ -162,11 +162,13 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
   protected:
     bool loadParameters();
     bool loadMoveitConfiguration();
+    bool updatePlanningScene();
 
     bool setAngularJointValues(const vector<double>& values, const bool& position);
     void CB_joint_state_received(const sensor_msgs::JointState::ConstPtr& joint_state);
 
     bool inCollision();
+    bool updateCollisions();
 
     ros::NodeHandle     n_;
     std::string         name_;
@@ -187,6 +189,9 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
     JointState          joint_states_;
     ros::Subscriber     joint_state_sub_;
     bool                joint_states_initialized_;
+
+    std::mutex          colision_mutex_;
+    bool                in_collision_;
 
     // Parameters
     std::string         arm_prefix_;

@@ -20,6 +20,7 @@ ArmControllerKinova::ArmControllerKinova()
 	, joint_states_initialized_(false)
 	, emergency_(false)
 	, gripper_width_(0.0)
+	, in_collision_(false)
 {
 
 }
@@ -61,7 +62,7 @@ bool ArmControllerKinova::initialize( const std::string name )
 	get_cartesian_position_client_ 		= n.serviceClient<wpi_jaco_msgs::GetCartesianPosition>(arm_prefix_ + std::string("/get_cartesian_position"));
 
 	// Create all timers
-	collision_check_timer_ 				= n.createTimer(ros::Duration(0.1), boost::bind(&ArmControllerKinova::inCollision, this));
+	collision_check_timer_ 				= n.createTimer(ros::Duration(0.1), boost::bind(&ArmControllerKinova::updateCollisions, this));
 
 	return true;
 }
@@ -278,12 +279,9 @@ bool ArmControllerKinova::setEndEffectorWrench(const Wrench& Wrench)
 
 bool ArmControllerKinova::getJointPositions(vector<double>& joint_positions)
 {
-	joint_states_mutex_.lock();
+	std::lock_guard<std::mutex> lock(joint_states_mutex_);
 	
 	joint_positions = joint_states_.position;
-
-	joint_states_mutex_.unlock();
-
 	return true;
 }
 
@@ -294,12 +292,9 @@ bool ArmControllerKinova::setJointPositions(const vector<double>& joint_position
 
 bool ArmControllerKinova::getJointVelocities(vector<double>& joint_velocities)
 {
-	joint_states_mutex_.lock();
+	std::lock_guard<std::mutex> lock(joint_states_mutex_);
 	
 	joint_velocities = joint_states_.velocity;
-
-	joint_states_mutex_.unlock();
-
 	return true;
 }
 
@@ -310,12 +305,9 @@ bool ArmControllerKinova::setJointVelocities(const vector<double>& joint_velocit
 
 bool ArmControllerKinova::getJointEfforts(vector<double>& joint_angular_forces)
 {
-	joint_states_mutex_.lock();
+	std::lock_guard<std::mutex> lock(joint_states_mutex_);
 	
 	joint_angular_forces = joint_states_.effort;
-
-	joint_states_mutex_.unlock();
-
 	return true;
 }
 
@@ -346,9 +338,19 @@ bool ArmControllerKinova::loadMoveitConfiguration()
 {
 	ROS_INFO("Loading MoveIt! configuration for <%s>", name_.c_str());
 
-	std::string service_name = "/get_planning_scene";
+	updatePlanningScene();
 
+	ROS_INFO("MoveIt! configuration loaded");
+
+	//! @todo MdL [IMPR]: Return if MoveIt loading was successful
+	return true;
+}
+
+bool ArmControllerKinova::updatePlanningScene()
+{
 	//! @todo MdL [IMPR]: Planning scene topic.
+	std::string service_name = "/get_planning_scene";
+	
 	ros::ServiceClient client = n_.serviceClient<moveit_msgs::GetPlanningScene>(service_name);
 	moveit_msgs::GetPlanningScene srv;
 	srv.request.components.components = 
@@ -370,22 +372,26 @@ bool ArmControllerKinova::loadMoveitConfiguration()
 	  client.waitForExistence(ros::Duration(15.0));
 	}
 
-	ROS_INFO("Loading planning scene");
+	ROS_DEBUG("Loading planning scene");
 	robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
-
-	ROS_INFO("Loading..");
 	robot_model::RobotModelPtr 	kinematic_model;
 
-	while (not kinematic_model)
+	int nr_fails = 0;
+	while (not kinematic_model && nr_fails < 100)
 	{
-		ROS_INFO("Loading..");
+		ROS_DEBUG("Loading..");
 		kinematic_model = robot_model_loader.getModel();		
+		nr_fails++;
 	}
+	if ( not kinematic_model )
+		return false;
 
-	ROS_INFO("Loading..");
 	planning_scene_ = new planning_scene::PlanningScene(kinematic_model);
 
-	ROS_INFO("Calling planning scene service");
+	if ( not planning_scene_ )
+		return false;
+
+	ROS_DEBUG("Calling planning scene service");
 	if (client.call(srv))
 	{
    		planning_scene_->usePlanningSceneMsg(srv.response.scene);
@@ -395,21 +401,14 @@ bool ArmControllerKinova::loadMoveitConfiguration()
    		ROS_WARN("Failed to call service %s", service_name.c_str());
    		return false;
 	}	
-
-	ROS_INFO("MoveIt! configuration loaded");
-
-	//! @todo MdL [IMPR]: Return if MoveIt loading was successful
-	return true;
 }
 
 void ArmControllerKinova::CB_joint_state_received(const sensor_msgs::JointState::ConstPtr& joint_state)
 {
-	joint_states_mutex_.lock();
+	std::lock_guard<std::mutex> lock(joint_states_mutex_);
 
 	joint_states_initialized_ = true;
 	joint_states_ 			  = *joint_state;
-
-	joint_states_mutex_.unlock();
 }
 
 bool ArmControllerKinova::setAngularJointValues(const vector<double>& values, const bool& position)
@@ -443,7 +442,16 @@ bool ArmControllerKinova::setAngularJointValues(const vector<double>& values, co
 }
 
 bool ArmControllerKinova::inCollision()
+{
+	std::lock_guard<std::mutex> lock(colision_mutex_);
+
+	return in_collision_;
+}
+
+bool ArmControllerKinova::updateCollisions()
 {	
+	updatePlanningScene();
+
 	if (planning_scene_ == NULL)
 	{
 		ROS_ERROR("No planning scene set");
@@ -458,9 +466,17 @@ bool ArmControllerKinova::inCollision()
 
 	collision_result.clear();
 	planning_scene_->checkCollision(collision_request, collision_result, copied_state, acm);
-	ROS_INFO("Test: Current state is %s collision", (collision_result.collision ? "in" : "not in"));  
 
-	return false;
+	colision_mutex_.lock();
+	in_collision_ = collision_result.collision;
+	colision_mutex_.unlock();
+
+	ROS_DEBUG_NAMED("Test: Current state is %s collision", (collision_result.collision ? "in" : "not in"));  
+	
+	if ( collision_result.collision )
+		ROS_WARN("Collision detected!");
+
+	return true;
 }
 
 } // namespace
