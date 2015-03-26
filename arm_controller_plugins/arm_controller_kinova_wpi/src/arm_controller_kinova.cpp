@@ -330,7 +330,7 @@ bool ArmControllerKinova::loadParameters()
     n_.param("/" + name_ + "_configuration/gripper_value_open", gripper_value_open_, 0.0);
     n_.param("/" + name_ + "_configuration/gripper_value_closed", gripper_value_closed_, 40.0);
     n_.param("/" + name_ + "_configuration/nr_fingers", nr_fingers_, 3);
-    n_.param("/" + name_ + "_configuration/moveit_server_name", moveit_server_name_, std::string("rose_moveit_controller"));
+    // n_.param("/" + name_ + "_configuration/moveit_server_name", moveit_server_name_, std::string("rose_moveit_controller"));
 
     ROS_INFO("Parameters loaded.");
 
