@@ -423,9 +423,6 @@ void ArmController::CB_receiveGripperCancel(SMC_gripper* smc)
         return;
     }
 
-    if (goal == NULL)
-        ROS_WARN_NAMED(ROS_NAME, "Last goal is NULL");
-
     ROS_DEBUG_NAMED(ROS_NAME, "Get arm controller %s", (goal->arm).c_str());
     boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller;
     if ( not getArmController(goal->arm, arm_controller))
