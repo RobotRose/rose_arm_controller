@@ -8,11 +8,18 @@ find_package(catkin
 		roscpp
 		geometry_msgs
 		pluginlib
+		moveit_core
+		moveit_planners_ompl
+		moveit_ros_move_group
+		moveit_ros_planning
+		moveit_ros_visualization
 		roscpp
 		rose_arm_controller_msgs
 		tf
 		wpi_jaco_msgs
 )
+
+find_package(Eigen REQUIRED)
 
 catkin_package(
   	INCLUDE_DIRS 
@@ -22,11 +29,17 @@ catkin_package(
 		arm_controller_base
 		geometry_msgs
 		pluginlib
+		moveit_core
+		moveit_planners_ompl
+		moveit_ros_move_group
+		moveit_ros_planning
+		moveit_ros_visualization
 		roscpp
 		rose_arm_controller_msgs
 		tf
 		wpi_jaco_msgs
-#  DEPENDS system_lib
+	DEPENDS 
+		Eigen
 )
 
 set(CMAKE_CXX_FLAGS "-std=c++0x -g") # TODO OH: -g is DEBUG FLAG
@@ -35,9 +48,10 @@ set(CMAKE_CXX_FLAGS "-std=c++0x -g") # TODO OH: -g is DEBUG FLAG
 ## Build ##
 ###########
 
-include_directories(
+include_directories( SYSTEM 
 	include
 	${catkin_INCLUDE_DIRS}
+	${EIGEN_INCLUDE_DIRS}
 )
 
 # Kinova base
@@ -47,13 +61,15 @@ add_library( arm_controller_kinova
 
 add_dependencies(arm_controller_kinova ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_generate_messages_cpp)
 
+target_link_libraries(arm_controller_kinova ${catkin_LIBRARIES})
+
 # Mico arm
 add_library( arm_controller_mico
 	src/arm_controller_mico.cpp
 )
 
 add_dependencies(arm_controller_mico ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_generate_messages_cpp)
-target_link_libraries(arm_controller_mico arm_controller_kinova)
+target_link_libraries(arm_controller_mico arm_controller_kinova ${catkin_LIBRARIES})
 
 # Jaco arm
 add_library( arm_controller_jaco
@@ -61,7 +77,7 @@ add_library( arm_controller_jaco
 )
 
 add_dependencies(arm_controller_jaco ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_generate_messages_cpp)
-target_link_libraries(arm_controller_jaco arm_controller_kinova)
+target_link_libraries(arm_controller_jaco arm_controller_kinova ${catkin_LIBRARIES})
 
 
 install( 

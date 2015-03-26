@@ -1,4 +1,4 @@
-\/***********************************************************************************
+/***********************************************************************************
 * Copyright: Rose B.V. (2014)
 *
 * Revision History:
@@ -34,6 +34,7 @@ bool ArmControllerKinova::initialize( const std::string name )
 	name_ = name;
 	ROS_INFO("Initializing arm <%s>", name.c_str());
 	loadParameters();
+	loadMoveitConfiguration();
 
 	ros::NodeHandle n;
 
@@ -53,11 +54,14 @@ bool ArmControllerKinova::initialize( const std::string name )
 
 	// Create all subscribers to the wpi_jaco driver
 	//! @todo MdL [HACK]: fix this back, is was for testing.
-	joint_state_sub_ 					= n.subscribe(std::string("/joint_states"), 1, &ArmControllerKinova::CB_joint_state_received, this);
+	joint_state_sub_ 					= n.subscribe(arm_prefix_ + std::string("/joint_states"), 1, &ArmControllerKinova::CB_joint_state_received, this);
 	// joint_state_sub_ 					= n.subscribe(arm_prefix_ + std::string("/joint_states"), 1, &ArmControllerKinova::CB_joint_state_received, this);
 
 	// Create all service clients to the wpi_jaco driver
 	get_cartesian_position_client_ 		= n.serviceClient<wpi_jaco_msgs::GetCartesianPosition>(arm_prefix_ + std::string("/get_cartesian_position"));
+
+	// Create all timers
+	collision_check_timer_ 				= n.createTimer(ros::Duration(0.1), boost::bind(&ArmControllerKinova::inCollision, this));
 
 	return true;
 }
@@ -334,8 +338,68 @@ bool ArmControllerKinova::loadParameters()
 
     ROS_INFO("Parameters loaded.");
 
-    //! @todo MdL [IMPR]: Return is values are all correctly loaded.
+    //! @todo MdL [IMPR]: Return if values are all correctly loaded.
     return true;
+}
+
+bool ArmControllerKinova::loadMoveitConfiguration()
+{
+	ROS_INFO("Loading MoveIt! configuration for <%s>", name_.c_str());
+
+	std::string service_name = "/get_planning_scene";
+
+	//! @todo MdL [IMPR]: Planning scene topic.
+	ros::ServiceClient client = n_.serviceClient<moveit_msgs::GetPlanningScene>(service_name);
+	moveit_msgs::GetPlanningScene srv;
+	srv.request.components.components = 
+		srv.request.components.SCENE_SETTINGS |
+		srv.request.components.ROBOT_STATE |
+		srv.request.components.ROBOT_STATE_ATTACHED_OBJECTS |
+		srv.request.components.WORLD_OBJECT_NAMES |
+		srv.request.components.WORLD_OBJECT_GEOMETRY |
+		srv.request.components.OCTOMAP |
+		srv.request.components.TRANSFORMS |
+		srv.request.components.ALLOWED_COLLISION_MATRIX |
+		srv.request.components.LINK_PADDING_AND_SCALING |
+		srv.request.components.OBJECT_COLORS;
+
+	// Make sure client is connected to server
+	if (!client.exists())
+	{
+	  ROS_DEBUG("Waiting for service %s to exist.", service_name.c_str());
+	  client.waitForExistence(ros::Duration(15.0));
+	}
+
+	ROS_INFO("Loading planning scene");
+	robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
+
+	ROS_INFO("Loading..");
+	robot_model::RobotModelPtr 	kinematic_model;
+
+	while (not kinematic_model)
+	{
+		ROS_INFO("Loading..");
+		kinematic_model = robot_model_loader.getModel();		
+	}
+
+	ROS_INFO("Loading..");
+	planning_scene_ = new planning_scene::PlanningScene(kinematic_model);
+
+	ROS_INFO("Calling planning scene service");
+	if (client.call(srv))
+	{
+   		planning_scene_->usePlanningSceneMsg(srv.response.scene);
+	}
+	else
+	{
+   		ROS_WARN("Failed to call service %s", service_name.c_str());
+   		return false;
+	}	
+
+	ROS_INFO("MoveIt! configuration loaded");
+
+	//! @todo MdL [IMPR]: Return if MoveIt loading was successful
+	return true;
 }
 
 void ArmControllerKinova::CB_joint_state_received(const sensor_msgs::JointState::ConstPtr& joint_state)
@@ -376,6 +440,27 @@ bool ArmControllerKinova::setAngularJointValues(const vector<double>& values, co
 	arm_angular_command_publisher_.publish(angular_cmd);
 
 	return true;
+}
+
+bool ArmControllerKinova::inCollision()
+{	
+	if (planning_scene_ == NULL)
+	{
+		ROS_ERROR("No planning scene set");
+		return false; 
+	}
+
+	collision_detection::CollisionRequest 	collision_request;
+	collision_detection::CollisionResult 	collision_result;
+
+	collision_detection::AllowedCollisionMatrix acm = planning_scene_->getAllowedCollisionMatrix();  
+	robot_state::RobotState copied_state 			= planning_scene_->getCurrentState();  
+
+	collision_result.clear();
+	planning_scene_->checkCollision(collision_request, collision_result, copied_state, acm);
+	ROS_INFO("Test: Current state is %s collision", (collision_result.collision ? "in" : "not in"));  
+
+	return false;
 }
 
 } // namespace

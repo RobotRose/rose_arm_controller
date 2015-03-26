@@ -1,6 +1,6 @@
 <launch>
     <include file="$(find mico_moveit_config)/launch/planning_and_execution.launch" />
-    <include file="$(find wpi_jaco_wrapper)/launch/arm.launch" />
+    <!-- <include file="$(find wpi_jaco_wrapper)/launch/arm.launch" /> -->
 
     <!-- Get camera name argument-->
     <arg name="kinect_camera_name" default="camera" />

@@ -21,6 +21,12 @@
 #include <pluginlib/class_list_macros.h>
 #include <tf/tf.h>
 
+#include <moveit/kinematic_constraints/utils.h>
+#include <moveit/planning_scene/planning_scene.h>
+#include <moveit/rdf_loader/rdf_loader.h>
+#include <moveit/robot_model_loader/robot_model_loader.h>
+#include <moveit_msgs/GetPlanningScene.h>
+
 #include "arm_controller_base/arm_controller_base.hpp"
 
 #include "control_msgs/GripperCommand.h"
@@ -155,9 +161,12 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
 
   protected:
     bool loadParameters();
+    bool loadMoveitConfiguration();
 
     bool setAngularJointValues(const vector<double>& values, const bool& position);
     void CB_joint_state_received(const sensor_msgs::JointState::ConstPtr& joint_state);
+
+    bool inCollision();
 
     ros::NodeHandle     n_;
     std::string         name_;
@@ -165,6 +174,8 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
     ros::Publisher      arm_cartesian_command_publisher_;
     ros::Publisher      arm_angular_command_publisher_;
     ros::ServiceClient  get_cartesian_position_client_;
+
+    ros::Timer          collision_check_timer_;
 
     GripperClient*      gripper_client_;
 
@@ -183,6 +194,9 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
     double              gripper_value_open_;
     double              gripper_value_closed_;
     int                 nr_fingers_;
+
+    // MoveIt variables
+    planning_scene::PlanningScene*   planning_scene_;
 };
 
 } //namespace
