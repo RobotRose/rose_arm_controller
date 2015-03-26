@@ -19,7 +19,7 @@ ArmController::ArmController( std::string name, ros::NodeHandle n )
     , n_ ( n )
     , arm_controller_plugin_loader_("arm_controller_base", "arm_controller_base::ArmControllerBase")
     , sh_emergency_(SharedVariable<bool>("emergency"))
-    , velocity_watchdog_("arm_velocity_watchdog", n, VELOCITY_TIMEOUT, boost::bind(&ArmController::CB_cancelVelocityForArms, this))
+    , velocity_watchdog_("arm_velocity_watchdog", VELOCITY_TIMEOUT, boost::bind(&ArmController::CB_cancelVelocityForArms, this))
 {
     ROS_INFO_NAMED(ROS_NAME, "Starting arm controller...");
 
