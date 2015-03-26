@@ -16,7 +16,7 @@ ArmVisualServoing::ArmVisualServoing( std::string name, ros::NodeHandle n )
 	: n_ ( n )
 	, name_ ( name )
 {
-	smc_ = new SMC(n_, name_, boost::bind(&ArmVisualServoing::CB_serverWork, this, _1, _2),
+	smc_ = new SMC(n_, name_, boost::bind(&ArmVisualServoing::CB_serverWork, this, _1),
 						      boost::bind(&ArmVisualServoing::CB_serverCancel, this, _1));
 
 	//! @todo MdL [CONF]: Make this configurable.
@@ -64,7 +64,7 @@ void ArmVisualServoing::CB_armActionFeedback( const rose_arm_controller_msgs::se
 	//ROS_INFO("ArmVisualServoing::CB_armActionFeedback");
 }
 
-void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_tfGoalConstPtr& goal, SMC* smc )
+void ArmVisualServoing::CB_serverWork( const rose_arm_controller_msgs::move_to_tfGoalConstPtr& goal )
 {
 	//! @todo MdL [IMPR]: Store the current orientation of the gripper. Try to keep this orientation, checking the difference
 	//					  between the stored orientation and the current orientation and make up for the difference.

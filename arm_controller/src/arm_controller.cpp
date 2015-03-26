@@ -19,7 +19,7 @@ ArmController::ArmController( std::string name, ros::NodeHandle n )
     , n_ ( n )
     , arm_controller_plugin_loader_("arm_controller_base", "arm_controller_base::ArmControllerBase")
     , sh_emergency_(SharedVariable<bool>("emergency"))
-    , velocity_watchdog_("arm_velocity_watchdog", n, VELOCITY_TIMEOUT, boost::bind(&ArmController::CB_cancelVelocityForArms, this))
+    , velocity_watchdog_("arm_velocity_watchdog", VELOCITY_TIMEOUT, boost::bind(&ArmController::CB_cancelVelocityForArms, this))
 {
     ROS_INFO_NAMED(ROS_NAME, "Starting arm controller...");
 
@@ -72,19 +72,19 @@ std::vector<std::string> ArmController::getArms()
 void ArmController::createSMCs()
 {
     set_position_smc_ = new SMC_position(n_, name_+"/position",
-            boost::bind(&ArmController::CB_receivePositionGoal, this, _1, _2),
+            boost::bind(&ArmController::CB_receivePositionGoal, this, _1),
             boost::bind(&ArmController::CB_receivePositionCancel, this, _1)
     );
     set_velocity_smc_ = new SMC_velocity(n_, name_+"/velocity",
-            boost::bind(&ArmController::CB_receiveVelocityGoal, this, _1, _2),
+            boost::bind(&ArmController::CB_receiveVelocityGoal, this, _1),
             boost::bind(&ArmController::CB_receiveVelocityCancel, this, _1)
     );
     set_gripper_width_smc_ = new SMC_gripper(n_, name_+"/gripper_width",
-            boost::bind(&ArmController::CB_receiveGripperGoal, this, _1, _2),
+            boost::bind(&ArmController::CB_receiveGripperGoal, this, _1),
             boost::bind(&ArmController::CB_receiveGripperCancel, this, _1)
     );    
     set_wrench_smc_ = new SMC_wrench(n_, name_+"/wrench",
-            boost::bind(&ArmController::CB_receiveWrenchGoal, this, _1, _2),
+            boost::bind(&ArmController::CB_receiveWrenchGoal, this, _1),
             boost::bind(&ArmController::CB_receiveWrenchCancel, this, _1)
     );
 }
@@ -112,11 +112,12 @@ void ArmController::loadArmParameters()
 
 void ArmController::loadArmPlugins()
 {
-    ROS_INFO("Loading %d plugins", (int)arm_plugins_.size());
+    ROS_INFO_NAMED(ROS_NAME, "Loading %d plugins", (int)arm_plugins_.size());
 
     arm_controllers_.clear();
     for( const auto& arm_plugin : arm_plugins_ ) 
     {
+        ROS_INFO_NAMED(ROS_NAME, "Loading %s", arm_plugin.first.c_str());
         try
         {
             boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller;
@@ -126,26 +127,26 @@ void ArmController::loadArmPlugins()
         }
         catch(pluginlib::PluginlibException& ex)
         {
-            ROS_ERROR("Arm controller was not added, the plugin failed to load: %s", ex.what());
+            ROS_ERROR_NAMED(ROS_NAME, "Arm controller was not added, the plugin failed to load: %s", ex.what());
         }
     }
 
-    ROS_INFO("Loaded %d arm_controllers", (int)arm_controllers_.size());
+    ROS_INFO_NAMED(ROS_NAME, "Loaded %d arm_controllers", (int)arm_controllers_.size());
 }
 
 void ArmController::initializeArmControllers()
 {
-    ROS_INFO("Initializing arm controllers...");
+    ROS_INFO_NAMED(ROS_NAME, "Initializing arm controllers...");
     for (const auto& arm_controller : arm_controllers_ )
         if ( not arm_controller.second->initialize(arm_controller.first) )
             ROS_ERROR("Could not initialize arm controller" );
 
-    ROS_INFO("Done.");
+    ROS_INFO_NAMED(ROS_NAME, "Done.");
 }
 
 void ArmController::initializePublishersAndServices()
 {
-    ROS_INFO("Initializing pub/sub");
+    ROS_INFO_NAMED(ROS_NAME, "Initializing pub/sub");
     // attach_item_service_    = n_.advertiseService("/" + name_ + "/set_item_attachment",      &ArmController::CB_attach_item,  this);
     // query_attached_items_service_    = n_.advertiseService("/" + name_ + "/get_item_attachment",      &ArmController::CB_query_attached_items,  this);
 
@@ -158,11 +159,11 @@ void ArmController::initializePublishersAndServices()
 
     joint_state_timer_ = n_.createTimer(ros::Duration(0.0333), boost::bind(&ArmController::CB_updateJointStates, this));
 
-    ROS_INFO("Initializing services");
+    ROS_INFO_NAMED(ROS_NAME, "Initializing services");
 
     get_arms_service_ = n_.advertiseService("/" + name_ + "/get_arms", &ArmController::CB_get_arms, this);
 
-    ROS_INFO("Done");
+    ROS_INFO_NAMED(ROS_NAME, "Done");
 }
 
 void ArmController::registerSharedVariables()
@@ -175,14 +176,14 @@ void ArmController::registerSharedVariables()
 
 void ArmController::testArmMovement()
 {
-    ROS_INFO("Testing arm movement...");
+    ROS_INFO_NAMED(ROS_NAME, "Testing arm movement...");
     bool allow_first_movement;
     n_.param("/open_close_gripper_on_init", allow_first_movement, true);
 
     if (allow_first_movement)
         testMovementGrippers();
 
-    ROS_INFO("Done");
+    ROS_INFO_NAMED(ROS_NAME, "Done");
 }
 
 void ArmController::closeAllArmControllers()
@@ -216,9 +217,9 @@ void ArmController::testMovementGrippers()
     for ( const auto& arm_controller : arm_controllers_ )
     {
         if ( not arm_controller.second->setGripperWidth(0.001))
-            ROS_ERROR("Gripper could not close"); //0.02 m
+            ROS_ERROR_NAMED(ROS_NAME, "Gripper could not close"); //0.02 m
         if ( not arm_controller.second->setGripperWidth(0.08)) //0.08 m
-            ROS_ERROR("Gripper could not open");
+            ROS_ERROR_NAMED(ROS_NAME, "Gripper could not open");
     }
 }
 
@@ -226,7 +227,7 @@ bool ArmController::armControllerExists(const std::string name)
 {
     if ( arm_controllers_.find(name) == arm_controllers_.end())
     {
-        ROS_ERROR("Arm controller \'%s\' does not exist", name.c_str());
+        ROS_ERROR_NAMED(ROS_NAME, "Arm controller \'%s\' does not exist", name.c_str());
         return false;
     }
 
@@ -287,7 +288,7 @@ void ArmController::updateJointStates()
 
 // Callback functions
 
-void ArmController::CB_receivePositionGoal(const rose_arm_controller_msgs::set_positionGoalConstPtr& goal, SMC_position* smc)
+void ArmController::CB_receivePositionGoal(const rose_arm_controller_msgs::set_positionGoalConstPtr& goal)
 {
     if(sh_emergency_)
     {
@@ -308,15 +309,19 @@ void ArmController::CB_receivePositionGoal(const rose_arm_controller_msgs::set_p
 
     //! @todo MdL [IMPL]: Result message.
     rose_arm_controller_msgs::set_positionResult result;
-    smc->sendServerResult(arm_controller->setEndEffectorPose(goal_pose), result );    
+    set_position_smc_->sendServerResult(arm_controller->setEndEffectorPose(goal_pose), result );
 }
 
 void ArmController::CB_receivePositionCancel(SMC_position* smc)
 {
-    ROS_INFO("Position cancel received");
+    ROS_INFO_NAMED(ROS_NAME, "Position cancel received");
     rose_arm_controller_msgs::set_positionGoalConstPtr goal;
     if(smc->hasActiveGoal())
-        goal = smc->getLastGoal();
+        if ( not smc->getCurrentGoal(goal) )
+        {
+            ROS_WARN_NAMED(ROS_NAME, "Could not get current goal. Not cancelling.");
+            return;
+        }
     else
     {
         ROS_WARN_NAMED(ROS_NAME, "Setting arm position cancelled, but there was no active goal.");
@@ -331,7 +336,7 @@ void ArmController::CB_receivePositionCancel(SMC_position* smc)
     arm_controller->cancel();
 }
 
-void ArmController::CB_receiveVelocityGoal(const rose_arm_controller_msgs::set_velocityGoalConstPtr& goal, SMC_velocity* smc)
+void ArmController::CB_receiveVelocityGoal(const rose_arm_controller_msgs::set_velocityGoalConstPtr& goal)
 {
     if(sh_emergency_)
     {
@@ -339,7 +344,7 @@ void ArmController::CB_receiveVelocityGoal(const rose_arm_controller_msgs::set_v
         return;
     }
 
-    ROS_INFO("Received velocity request for arm %s", goal->arm.c_str());
+    ROS_DEBUG_NAMED(ROS_NAME, "Received velocity request for arm %s", goal->arm.c_str());
 
     // get arm controller. 
     boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller;
@@ -357,14 +362,18 @@ void ArmController::CB_receiveVelocityGoal(const rose_arm_controller_msgs::set_v
 
     //! @todo MdL [IMPL]: Result message.
     rose_arm_controller_msgs::set_velocityResult result;
-    smc->sendServerResult(arm_controller->setEndEffectorVelocity(goal_twist), result );
+    set_velocity_smc_->sendServerResult(arm_controller->setEndEffectorVelocity(goal_twist), result );
 }
 
 void ArmController::CB_receiveVelocityCancel(SMC_velocity* smc)
 {
     rose_arm_controller_msgs::set_velocityGoalConstPtr goal;
     if(smc->hasActiveGoal())
-        goal = smc->getLastGoal();
+        if ( not smc->getCurrentGoal(goal) )
+        {
+            ROS_WARN_NAMED(ROS_NAME, "Could not get current goal. Not cancelling.");
+            return;
+        }
     else
     {
         ROS_WARN_NAMED(ROS_NAME, "Arm velocity cancelled, but there was no active goal.");
@@ -377,10 +386,10 @@ void ArmController::CB_receiveVelocityCancel(SMC_velocity* smc)
         return;
 
     if ( not stopArmMovement(arm_controller))
-        ROS_ERROR("Could not stop arm movement");
+        ROS_ERROR_NAMED(ROS_NAME, "Could not stop arm movement");
 }
 
-void ArmController::CB_receiveGripperGoal(const rose_arm_controller_msgs::set_gripper_widthGoalConstPtr& goal, SMC_gripper* smc)
+void ArmController::CB_receiveGripperGoal(const rose_arm_controller_msgs::set_gripper_widthGoalConstPtr& goal)
 {
     if(sh_emergency_)
     {
@@ -394,20 +403,27 @@ void ArmController::CB_receiveGripperGoal(const rose_arm_controller_msgs::set_gr
         return;
 
     rose_arm_controller_msgs::set_gripper_widthResult result;
-    smc->sendServerResult(arm_controller->setGripperWidth(goal->required_width), result );
+    set_gripper_width_smc_->sendServerResult(arm_controller->setGripperWidth(goal->required_width), result );
 }
 
 void ArmController::CB_receiveGripperCancel(SMC_gripper* smc)
 {
+    ROS_DEBUG_NAMED(ROS_NAME, "CB_receiveGripperCancel");
     rose_arm_controller_msgs::set_gripper_widthGoalConstPtr goal;
+    ROS_DEBUG_NAMED(ROS_NAME, "Get active goal");
     if(smc->hasActiveGoal())
-        goal = smc->getLastGoal();
+        if ( not smc->getCurrentGoal(goal) )
+        {
+            ROS_WARN_NAMED(ROS_NAME, "Could not get current goal. Not cancelling.");
+            return;
+        }
     else
     {
         ROS_WARN_NAMED(ROS_NAME, "Setting arm gripper width cancelled, but there was no active goal.");
         return;
     }
 
+    ROS_DEBUG_NAMED(ROS_NAME, "Get arm controller %s", (goal->arm).c_str());
     boost::shared_ptr<arm_controller_base::ArmControllerBase> arm_controller;
     if ( not getArmController(goal->arm, arm_controller))
         return;
@@ -415,7 +431,7 @@ void ArmController::CB_receiveGripperCancel(SMC_gripper* smc)
     arm_controller->cancel();
 }
 
-void ArmController::CB_receiveWrenchGoal(const rose_arm_controller_msgs::set_wrenchGoalConstPtr& goal, SMC_wrench* smc)
+void ArmController::CB_receiveWrenchGoal(const rose_arm_controller_msgs::set_wrenchGoalConstPtr& goal)
 {
     if(sh_emergency_)
     {
@@ -430,14 +446,18 @@ void ArmController::CB_receiveWrenchGoal(const rose_arm_controller_msgs::set_wre
 
     //! @todo MdL [IMPL]: Result message.
     rose_arm_controller_msgs::set_wrenchResult result;
-    smc->sendServerResult(arm_controller->setEndEffectorWrench(goal->required_wrench), result );
+    set_wrench_smc_->sendServerResult(arm_controller->setEndEffectorWrench(goal->required_wrench), result );
 }
 
 void ArmController::CB_receiveWrenchCancel(SMC_wrench* smc)
 {
     rose_arm_controller_msgs::set_wrenchGoalConstPtr goal;
     if(smc->hasActiveGoal())
-        goal = smc->getLastGoal();
+        if ( not smc->getCurrentGoal(goal) )
+        {
+            ROS_WARN_NAMED(ROS_NAME, "Could not get current goal. Not cancelling.");
+            return;
+        }
     else
     {
         ROS_WARN_NAMED(ROS_NAME, "Setting arm wrench cancelled, but there was no active goal.");
@@ -456,7 +476,7 @@ void ArmController::CB_cancelVelocityForArms()
     // Stop all arm velocities
     for ( const auto& arm_controller : arm_controllers_ )
         if ( not stopArmMovement(arm_controller.second))
-            ROS_ERROR("Could not stop arm movement");
+            ROS_ERROR_NAMED(ROS_NAME, "Could not stop arm movement");
 }
 
 void ArmController::CB_emergency(const bool& emergency)

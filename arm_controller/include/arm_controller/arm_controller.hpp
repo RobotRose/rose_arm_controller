@@ -114,13 +114,13 @@ class ArmController
 
     void updateJointStates();
 
-    void CB_receivePositionGoal(const rose_arm_controller_msgs::set_positionGoalConstPtr& goal, SMC_position* smc);
+    void CB_receivePositionGoal(const rose_arm_controller_msgs::set_positionGoalConstPtr& goal);
     void CB_receivePositionCancel(SMC_position* smc);
-    void CB_receiveVelocityGoal(const rose_arm_controller_msgs::set_velocityGoalConstPtr& goal, SMC_velocity* smc);
+    void CB_receiveVelocityGoal(const rose_arm_controller_msgs::set_velocityGoalConstPtr& goal);
     void CB_receiveVelocityCancel(SMC_velocity* smc);
-    void CB_receiveGripperGoal(const rose_arm_controller_msgs::set_gripper_widthGoalConstPtr& goal, SMC_gripper* smc);
+    void CB_receiveGripperGoal(const rose_arm_controller_msgs::set_gripper_widthGoalConstPtr& goal);
     void CB_receiveGripperCancel(SMC_gripper* smc);    
-    void CB_receiveWrenchGoal(const rose_arm_controller_msgs::set_wrenchGoalConstPtr& goal, SMC_wrench* smc);
+    void CB_receiveWrenchGoal(const rose_arm_controller_msgs::set_wrenchGoalConstPtr& goal);
     void CB_receiveWrenchCancel(SMC_wrench* smc);
 
     void CB_cancelVelocityForArms();
