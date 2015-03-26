@@ -1,4 +1,4 @@
-/***********************************************************************************
+\/***********************************************************************************
 * Copyright: Rose B.V. (2014)
 *
 * Revision History:
@@ -39,7 +39,7 @@ bool ArmControllerKinova::initialize( const std::string name )
 
 	// Register actionlib client for moveit
 	//! @todo MdL [IMPR]: Change to SMC?
-	move_it_client_ = new MoveItClient(moveit_server_name_, true);
+	// move_it_client_ = new MoveItClient(moveit_server_name_, true);
 	//! @todo MdL [QSTN]: Do I have to wait for the server to be up?
 	// move_it_client_->waitForServer();
 
@@ -131,13 +131,13 @@ bool ArmControllerKinova::setEndEffectorPose(const Pose& end_effector_pose)
 	if (emergency_)
 		return false;
 
-	rose_moveit_controller::arm_goalGoal goal;
-	goal.goal_pose.pose = end_effector_pose;
+	// rose_moveit_controller::arm_goalGoal goal;
+	// goal.goal_pose.pose = end_effector_pose;
 
-	move_it_client_->sendGoal(goal);
-	move_it_client_->waitForResult(ros::Duration(0.0)); // infinite?
+	// move_it_client_->sendGoal(goal);
+	// move_it_client_->waitForResult(ros::Duration(0.0)); // infinite?
 
-	return true;
+	return false;
 }
 
 bool ArmControllerKinova::getEndEffectorVelocity(Twist& twist)

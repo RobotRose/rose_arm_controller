@@ -10,7 +10,6 @@ find_package(catkin
 		pluginlib
 		roscpp
 		rose_arm_controller_msgs
-		rose_moveit_controller
 		tf
 		wpi_jaco_msgs
 )
@@ -25,7 +24,6 @@ catkin_package(
 		pluginlib
 		roscpp
 		rose_arm_controller_msgs
-		rose_moveit_controller
 		tf
 		wpi_jaco_msgs
 #  DEPENDS system_lib

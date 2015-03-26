@@ -23,11 +23,6 @@
 
 #include "arm_controller_base/arm_controller_base.hpp"
 
-#include "rose_moveit_controller/arm_goalAction.h"
-#include "rose_moveit_controller/arm_goalGoal.h"
-#include "rose_moveit_controller/arm_goalFeedback.h"
-#include "rose_moveit_controller/arm_goalResult.h"
-
 #include "control_msgs/GripperCommand.h"
 #include "control_msgs/GripperCommandAction.h"
 #include "control_msgs/GripperCommandGoal.h"
@@ -55,7 +50,6 @@ using std::vector;
   */
 class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
   public:
-    typedef actionlib::SimpleActionClient<rose_moveit_controller::arm_goalAction>   MoveItClient;
     typedef actionlib::SimpleActionClient<control_msgs::GripperCommandAction>       GripperClient;
 
     /**
@@ -172,7 +166,6 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
     ros::Publisher      arm_angular_command_publisher_;
     ros::ServiceClient  get_cartesian_position_client_;
 
-    MoveItClient*       move_it_client_;
     GripperClient*      gripper_client_;
 
     bool                emergency_;
@@ -186,7 +179,6 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
 
     // Parameters
     std::string         arm_prefix_;
-    std::string         moveit_server_name_;
     double              max_gripper_width_;
     double              gripper_value_open_;
     double              gripper_value_closed_;

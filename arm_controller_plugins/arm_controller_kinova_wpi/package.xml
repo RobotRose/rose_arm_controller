@@ -16,7 +16,6 @@
   <build_depend>pluginlib</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>rose_arm_controller_msgs</build_depend>
-  <build_depend>rose_moveit_controller</build_depend>
   <build_depend>tf</build_depend>
   <build_depend>wpi_jaco_msgs</build_depend>
   
@@ -31,7 +30,6 @@
   <run_depend>robot_state_publisher</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>rose_arm_controller_msgs</run_depend>
-  <run_depend>rose_moveit_controller</run_depend>
   <run_depend>tf</run_depend>
   <run_depend>wpi_jaco_msgs</run_depend>
   <run_depend>xacro</run_depend>
