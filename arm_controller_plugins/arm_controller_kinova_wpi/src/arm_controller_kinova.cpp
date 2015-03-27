@@ -338,43 +338,19 @@ bool ArmControllerKinova::loadMoveitConfiguration()
 {
 	ROS_INFO("Loading MoveIt! configuration for <%s>", name_.c_str());
 
-	updatePlanningScene();
-
-	ROS_INFO("MoveIt! configuration loaded");
-
-	//! @todo MdL [IMPR]: Return if MoveIt loading was successful
-	return true;
-}
-
-bool ArmControllerKinova::updatePlanningScene()
-{
-	//! @todo MdL [IMPR]: Planning scene topic.
-	std::string service_name = "/get_planning_scene";
-	
-	ros::ServiceClient client = n_.serviceClient<moveit_msgs::GetPlanningScene>(service_name);
-	moveit_msgs::GetPlanningScene srv;
-	srv.request.components.components = 
-		srv.request.components.SCENE_SETTINGS |
-		srv.request.components.ROBOT_STATE |
-		srv.request.components.ROBOT_STATE_ATTACHED_OBJECTS |
-		srv.request.components.WORLD_OBJECT_NAMES |
-		srv.request.components.WORLD_OBJECT_GEOMETRY |
-		srv.request.components.OCTOMAP |
-		srv.request.components.TRANSFORMS |
-		srv.request.components.ALLOWED_COLLISION_MATRIX |
-		srv.request.components.LINK_PADDING_AND_SCALING |
-		srv.request.components.OBJECT_COLORS;
-
-	// Make sure client is connected to server
-	if (!client.exists())
-	{
-	  ROS_DEBUG("Waiting for service %s to exist.", service_name.c_str());
-	  client.waitForExistence(ros::Duration(15.0));
-	}
+	// Initialize service client
+	planning_scene_service_client_ 		= n_.serviceClient<moveit_msgs::GetPlanningScene>("/get_planning_scene");
 
 	ROS_DEBUG("Loading planning scene");
 	robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
 	robot_model::RobotModelPtr 	kinematic_model;
+
+	// Make sure MoveIt! is running
+	if (!planning_scene_service_client_.exists())
+	{
+	  ROS_DEBUG("Waiting for service %s to exist.", planning_scene_service_client_.getService().c_str());
+	  planning_scene_service_client_.waitForExistence(ros::Duration(60.0));
+	}
 
 	int nr_fails = 0;
 	while (not kinematic_model && nr_fails < 100)
@@ -391,16 +367,83 @@ bool ArmControllerKinova::updatePlanningScene()
 	if ( not planning_scene_ )
 		return false;
 
-	ROS_DEBUG("Calling planning scene service");
-	if (client.call(srv))
+	if ( not updatePlanningScene() )
+		return false;
+
+	ROS_INFO("MoveIt! configuration loaded");
+
+	addWall();
+	return true;
+}
+
+bool ArmControllerKinova::updatePlanningScene()
+{	
+	moveit_msgs::GetPlanningScene srv;
+	srv.request.components.components = 
+		srv.request.components.SCENE_SETTINGS |
+		srv.request.components.ROBOT_STATE |
+		srv.request.components.ROBOT_STATE_ATTACHED_OBJECTS |
+		srv.request.components.WORLD_OBJECT_NAMES |
+		srv.request.components.WORLD_OBJECT_GEOMETRY |
+		srv.request.components.OCTOMAP |
+		srv.request.components.TRANSFORMS |
+		srv.request.components.ALLOWED_COLLISION_MATRIX |
+		srv.request.components.LINK_PADDING_AND_SCALING |
+		srv.request.components.OBJECT_COLORS;
+
+	// Make sure client is connected to server
+	if ( not planning_scene_service_client_.exists() )
 	{
-   		planning_scene_->usePlanningSceneMsg(srv.response.scene);
+	  ROS_ERROR_ONCE("Service %s does not exist.", planning_scene_service_client_.getService().c_str());
+	  return false;
 	}
+
+	ROS_DEBUG("Calling planning scene service");
+	if ( planning_scene_service_client_.call(srv) )
+   		planning_scene_->usePlanningSceneMsg(srv.response.scene);
 	else
 	{
-   		ROS_WARN("Failed to call service %s", service_name.c_str());
+   		ROS_WARN_ONCE("Failed to call service %s", planning_scene_service_client_.getService().c_str());
    		return false;
-	}	
+	}
+
+	return true;
+}
+
+bool ArmControllerKinova::addWall()
+{
+	ROS_INFO("Adding box");
+
+	planning_scene_interface_.removeCollisionObjects(planning_scene_interface_.getKnownObjectNames(false));
+
+	moveit_msgs::CollisionObject 	collision_object;
+	shape_msgs::SolidPrimitive 		primitive;
+
+	collision_object.id 				= "box1";
+
+	primitive.type = primitive.BOX;
+	primitive.dimensions.resize(3); 
+	primitive.dimensions[0] = 5.0;
+	primitive.dimensions[1] = 0.05;
+	primitive.dimensions[2] = 5.0;
+
+	geometry_msgs::Pose box_pose; //,box_pose1,box_pose2,box_pose3;
+	box_pose.orientation.w 	= 1.0;
+	box_pose.position.x 	= 0.0;
+	box_pose.position.y 	= 0.20;
+	box_pose.position.z 	= 0.0;
+
+	collision_object.primitives.push_back(primitive);
+	collision_object.primitive_poses.push_back(box_pose);
+	collision_object.operation = collision_object.ADD;
+
+	std::vector<moveit_msgs::CollisionObject> collision_objects;  
+	collision_objects.push_back(collision_object);  
+
+	ROS_INFO("Add objects into the world");  
+	planning_scene_interface_.addCollisionObjects(collision_objects);
+
+	return true;
 }
 
 void ArmControllerKinova::CB_joint_state_received(const sensor_msgs::JointState::ConstPtr& joint_state)
@@ -450,13 +493,14 @@ bool ArmControllerKinova::inCollision()
 
 bool ArmControllerKinova::updateCollisions()
 {	
-	updatePlanningScene();
-
 	if (planning_scene_ == NULL)
 	{
 		ROS_ERROR("No planning scene set");
 		return false; 
 	}
+
+	if ( not updatePlanningScene() )
+		return false;
 
 	collision_detection::CollisionRequest 	collision_request;
 	collision_detection::CollisionResult 	collision_result;

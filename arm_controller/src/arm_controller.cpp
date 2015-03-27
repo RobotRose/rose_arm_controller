@@ -246,7 +246,7 @@ vector<string> ArmController::generateJointNames(const std::string arm_name, con
 {
     vector<string> names;
     for ( int i = 0 ; i < nr_of_joints ; i++ )
-        names.push_back(arm_name + "_link" + std::to_string(i));
+        names.push_back(arm_name + "_link_" + std::to_string(i));
 
     return names;
 }

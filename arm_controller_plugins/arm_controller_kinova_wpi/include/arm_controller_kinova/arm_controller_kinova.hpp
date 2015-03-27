@@ -23,6 +23,7 @@
 
 #include <moveit/kinematic_constraints/utils.h>
 #include <moveit/planning_scene/planning_scene.h>
+#include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit/rdf_loader/rdf_loader.h>
 #include <moveit/robot_model_loader/robot_model_loader.h>
 #include <moveit_msgs/GetPlanningScene.h>
@@ -162,7 +163,9 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
   protected:
     bool loadParameters();
     bool loadMoveitConfiguration();
+
     bool updatePlanningScene();
+    bool addWall();
 
     bool setAngularJointValues(const vector<double>& values, const bool& position);
     void CB_joint_state_received(const sensor_msgs::JointState::ConstPtr& joint_state);
@@ -176,6 +179,7 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
     ros::Publisher      arm_cartesian_command_publisher_;
     ros::Publisher      arm_angular_command_publisher_;
     ros::ServiceClient  get_cartesian_position_client_;
+    ros::ServiceClient  planning_scene_service_client_;
 
     ros::Timer          collision_check_timer_;
 
@@ -201,7 +205,8 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
     int                 nr_fingers_;
 
     // MoveIt variables
-    planning_scene::PlanningScene*   planning_scene_;
+    planning_scene::PlanningScene*                      planning_scene_;
+    moveit::planning_interface::PlanningSceneInterface  planning_scene_interface_;
 };
 
 } //namespace
