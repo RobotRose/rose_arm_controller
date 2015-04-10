@@ -161,7 +161,7 @@ void ArmController::initializePublishersAndServices()
 
     ROS_INFO_NAMED(ROS_NAME, "Initializing services");
 
-    get_arms_service_ = n_.advertiseService("/" + name_ + "/get_arms", &ArmController::CB_get_arms, this);
+    get_arms_service_ = n_.advertiseService("/" + name_ + "/get_arms", &ArmController::CB_getArms, this);
 
     ROS_INFO_NAMED(ROS_NAME, "Done");
 }
