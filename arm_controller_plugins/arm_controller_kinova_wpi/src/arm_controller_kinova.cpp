@@ -559,7 +559,7 @@ bool ArmControllerKinova::showEndEffectorGoalPose( const geometry_msgs::Pose& po
     marker.type 			= visualization_msgs::Marker::SPHERE;
     marker.action 			= visualization_msgs::Marker::ADD;
     marker.pose 			= pose;
-	marker.scale.x 			= 1;
+	marker.scale.x 			= 0.1;
 	marker.scale.y 			= 0.1;
 	marker.scale.z 			= 0.1;
 	marker.color.a 			= 1.0; // Don't forget to set the alpha!
