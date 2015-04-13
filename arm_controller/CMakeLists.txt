@@ -10,8 +10,9 @@ find_package(catkin REQUIRED
 		rose_arm_controller_msgs
 		rose_watchdogs
 		rose_shared_variables
+		rose_transformations
 		server_multiple_client
-        	tf
+        tf
 )
 
 catkin_package(
@@ -26,8 +27,9 @@ catkin_package(
 		rose_arm_controller_msgs
 		rose_watchdogs
 		rose_shared_variables
+		rose_transformations
 		server_multiple_client
-        	tf
+        tf
 #  DEPENDS system_lib
 )
 

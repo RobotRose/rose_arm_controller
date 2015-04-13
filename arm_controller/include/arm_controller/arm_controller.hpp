@@ -44,6 +44,8 @@
 
 #include "rose_arm_controller_msgs/get_arms.h"
 
+#include "rose_transformations/transformations.hpp"
+
 // #include "action_result_message.hpp"
 
 #include "rose_watchdogs/watchdog.hpp"
@@ -150,6 +152,8 @@ class ArmController
 
     SharedVariable<bool>    sh_emergency_;      //!< Shared variable
     rose::Watchdog          velocity_watchdog_; //!< Watchdog for velocities
+
+    tf::TransformListener   tf_listener_;
 
 }; // ArmController
 }; //namespace
