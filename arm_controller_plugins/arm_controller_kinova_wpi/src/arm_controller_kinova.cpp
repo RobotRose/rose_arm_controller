@@ -552,16 +552,16 @@ bool ArmControllerKinova::updateCollisions()
 bool ArmControllerKinova::showEndEffectorGoalPose( const geometry_msgs::Pose& pose )
 {
 	visualization_msgs::Marker marker;
-    marker.header.frame_id 	= "base_link";
+    marker.header.frame_id 	= "table";
     marker.header.stamp 	= ros::Time();
     marker.ns 				= name_ + "_arm";
     marker.id 				= 123;
     marker.type 			= visualization_msgs::Marker::SPHERE;
     marker.action 			= visualization_msgs::Marker::ADD;
     marker.pose 			= pose;
-	marker.scale.x 			= 0.5;
-	marker.scale.y 			= 0.5;
-	marker.scale.z 			= 0.5;
+	marker.scale.x 			= 0.1;
+	marker.scale.y 			= 0.1;
+	marker.scale.z 			= 0.1;
 	marker.color.a 			= 1.0; // Don't forget to set the alpha!
 	marker.color.r 			= 1.0;
 	marker.color.g 			= 0.0;
