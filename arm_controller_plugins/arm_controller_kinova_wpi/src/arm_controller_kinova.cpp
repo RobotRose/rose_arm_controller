@@ -414,7 +414,7 @@ bool ArmControllerKinova::loadMoveitConfiguration()
 
 	ROS_INFO("MoveIt! configuration loaded");
 
-	move_group_ = new moveit::planning_interface::MoveGroup(name_ + "_arm");
+	move_group_ = new moveit::planning_interface::MoveGroup(arm_prefix_);
 
 	addWall();
 	return true;
@@ -572,7 +572,7 @@ bool ArmControllerKinova::showEndEffectorGoalPose( const geometry_msgs::Pose& po
 	visualization_msgs::Marker marker;
     marker.header.frame_id 	= name_;
     marker.header.stamp 	= ros::Time();
-    marker.ns 				= name_ + "_arm";
+    marker.ns 				= arm_prefix_;
     marker.id 				= 123;
     marker.type 			= visualization_msgs::Marker::SPHERE;
     marker.action 			= visualization_msgs::Marker::ADD;
