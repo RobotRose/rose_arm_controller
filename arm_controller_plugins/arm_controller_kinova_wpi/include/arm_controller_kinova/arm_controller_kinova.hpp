@@ -30,6 +30,8 @@
 #include <moveit_msgs/GetPlanningScene.h>
 #include <moveit/move_group_interface/move_group.h>
 
+#include <visualization_msgs/Marker.h>
+
 #include "arm_controller_base/arm_controller_base.hpp"
 
 #include "control_msgs/GripperCommand.h"
