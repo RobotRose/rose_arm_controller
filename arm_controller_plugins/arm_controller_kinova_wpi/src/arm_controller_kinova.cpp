@@ -57,7 +57,7 @@ bool ArmControllerKinova::initialize( const std::string name )
 	get_cartesian_position_client_ 		= n.serviceClient<wpi_jaco_msgs::GetCartesianPosition>(arm_prefix_ + std::string("/get_cartesian_position"));
 
 	// Create all timers
-	collision_check_timer_ 				= n.createTimer(ros::Duration(0.1), boost::bind(&ArmControllerKinova::updateCollisions, this));
+	// collision_check_timer_ 				= n.createTimer(ros::Duration(0.1), boost::bind(&ArmControllerKinova::updateCollisions, this));
 
 	// For visualization
 	visualization_pub_  				= n.advertise<visualization_msgs::Marker>(arm_prefix_ + std::string("/goal_pose"), 1);
@@ -151,22 +151,29 @@ bool ArmControllerKinova::setEndEffectorPose(const Pose& end_effector_pose)
 	move_group_->setStartState(start_state);
 
 	//! @todo MdL [IMPR]: Configurable?.
-	std::string planner_plugin_name = "RRTkConfigDefault";
-	double 		planning_time 		= 0.5;
-	double 	    goal_tolerance  	= 0.005;
-	unsigned int num_planning_attempts = 3;
-	
+	std::string  planner_plugin_name 	= "RRTkConfigDefault";
+	double 		 planning_time 			= 0.5;
+	double 	     goal_tolerance  		= 0.005;
+	unsigned int num_planning_attempts 	= 3;
+
 	// Timing planning and execution
 	ros::Time timer = ros::Time::now();
 
 	ROS_INFO("Computing plan");
 	// Compute plan
 	moveit::planning_interface::MoveGroup::Plan plan;
+	ROS_INFO("Set (1)");
 	move_group_->setPlannerId(planner_plugin_name);
+	ROS_INFO("Set (2");
 	move_group_->setPlanningTime(planning_time);
+	ROS_INFO("Set (3)");
 	move_group_->setNumPlanningAttempts (num_planning_attempts);
+	ROS_INFO("Set (4)");
 	move_group_->setGoalTolerance(goal_tolerance);
+	ROS_INFO("Set (5)");
 	move_group_->setPoseTarget(end_effector_pose);
+	ROS_INFO("Set (6)");
+
 	if ( not move_group_->plan(plan) )
 		return false; // Planning failed
 
