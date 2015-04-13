@@ -60,7 +60,7 @@ bool ArmControllerKinova::initialize( const std::string name )
 	collision_check_timer_ 				= n.createTimer(ros::Duration(0.1), boost::bind(&ArmControllerKinova::updateCollisions, this));
 
 	// For visualization
-	visualization_pub_  				= n.advertise<visualization_msgs::Marker>(arm_prefix_ + std::string("/goal_pose"), 0);
+	visualization_pub_  				= n.advertise<visualization_msgs::Marker>(arm_prefix_ + std::string("/goal_pose"), 1);
 
 	return true;
 }
@@ -555,7 +555,7 @@ bool ArmControllerKinova::showEndEffectorGoalPose( const geometry_msgs::Pose& po
     marker.header.frame_id 	= "base_link";
     marker.header.stamp 	= ros::Time();
     marker.ns 				= name_ + "_arm";
-    marker.id 				= 0;
+    marker.id 				= 123;
     marker.type 			= visualization_msgs::Marker::SPHERE;
     marker.action 			= visualization_msgs::Marker::ADD;
     marker.pose 			= pose;
@@ -567,7 +567,7 @@ bool ArmControllerKinova::showEndEffectorGoalPose( const geometry_msgs::Pose& po
 	marker.color.g 			= 1.0;
 	marker.color.b 			= 0.0;
 
-   visualization_pub_.publish( marker );
+   visualization_pub_.publish(marker);
 
    return true;
 }
