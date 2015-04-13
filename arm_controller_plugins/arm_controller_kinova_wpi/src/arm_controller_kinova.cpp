@@ -574,7 +574,7 @@ bool ArmControllerKinova::showEndEffectorGoalPose( const geometry_msgs::Pose& po
     marker.header.stamp 	= ros::Time();
     marker.ns 				= arm_prefix_;
     marker.id 				= 123;
-    marker.type 			= visualization_msgs::Marker::SPHERE;
+    marker.type 			= visualization_msgs::Marker::ARROW;
     marker.action 			= visualization_msgs::Marker::ADD;
     marker.pose 			= pose;
 	marker.scale.x 			= 0.1;
