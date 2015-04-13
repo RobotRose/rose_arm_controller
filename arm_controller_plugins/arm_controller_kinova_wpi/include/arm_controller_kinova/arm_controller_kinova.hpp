@@ -175,6 +175,8 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
     bool inCollision();
     bool updateCollisions();
 
+    bool showEndEffectorGoalPose( const geometry_msgs::Pose& pose );
+
     ros::NodeHandle     n_;
     std::string         name_;
     

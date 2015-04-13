@@ -546,7 +546,7 @@ bool ArmControllerKinova::updateCollisions()
 	return true;
 }
 
-bool ArmControllerKinova::showEndEffectorGoalPose( const geometry_msgs::Pose pose )
+bool ArmControllerKinova::showEndEffectorGoalPose( const geometry_msgs::Pose& pose )
 {
 	visualization_msgs::Marker marker;
     marker.header.frame_id = "base_link";
@@ -565,6 +565,8 @@ bool ArmControllerKinova::showEndEffectorGoalPose( const geometry_msgs::Pose pos
 	marker.color.b = 0.0;
 
    visualization_pub_.publish( marker );
+
+   return true;
 }
 
 } // namespace
