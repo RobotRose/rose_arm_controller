@@ -32,18 +32,13 @@ ArmControllerKinova::~ArmControllerKinova()
 
 bool ArmControllerKinova::initialize( const std::string name )
 {
+	ros::NodeHandle n;
+
 	name_ = name;
+
 	ROS_INFO("Initializing arm <%s>", name.c_str());
 	loadParameters();
 	loadMoveitConfiguration();
-
-	ros::NodeHandle n;
-
-	// Register actionlib client for moveit
-	//! @todo MdL [IMPR]: Change to SMC?
-	// move_it_client_ = new MoveItClient(moveit_server_name_, true);
-	//! @todo MdL [QSTN]: Do I have to wait for the server to be up?
-	// move_it_client_->waitForServer();
 
 	// Register actionlib client to the wpi_jaco driver for the gripper
 	gripper_client_ = new GripperClient(arm_prefix_ + std::string("/fingers_controller/gripper"), true);
@@ -63,6 +58,9 @@ bool ArmControllerKinova::initialize( const std::string name )
 
 	// Create all timers
 	collision_check_timer_ 				= n.createTimer(ros::Duration(0.1), boost::bind(&ArmControllerKinova::updateCollisions, this));
+
+	// For visualization
+	visualization_pub_ =				= n.advertise<visualization_msgs::Marker>( arm_prefix_ + std::string("/goal_pose"), 0 );
 
 	return true;
 }
@@ -136,11 +134,34 @@ bool ArmControllerKinova::setEndEffectorPose(const Pose& end_effector_pose)
 	if (emergency_)
 		return false;
 
-	// rose_moveit_controller::arm_goalGoal goal;
-	// goal.goal_pose.pose = end_effector_pose;
+	if (planning_scene_ == NULL)
+	{
+		ROS_ERROR("No planning scene set");
+		return false; 
+	}
 
-	// move_it_client_->sendGoal(goal);
-	// move_it_client_->waitForResult(ros::Duration(0.0)); // infinite?
+	if ( not updatePlanningScene() )
+		return false;
+
+
+	robot_state::RobotState start_state(*move_group_->getCurrentState());
+	move_group_->setStartState(start_state);
+
+	//! @todo MdL [IMPR]: Configurable?.
+	std::string planner_plugin_name = "RRTkConfigDefault";
+	double 		planning_time 		= 0.5;
+	double 	    goal_tolerance  	= 0.005;
+
+	ROS_INFO("Computing plan");
+	// Compute plan
+	moveit::planning_interface::MoveGroup::Plan plan;
+	move_group_->setPlannerId(planner_plugin_name);
+	move_group_->setPlanningTime(planning_time);
+	move_group_->setGoalTolerance(goal_tolerance);
+	move_group_->setPoseTarget(end_effector_pose);
+	move_group_->plan(plan);
+
+	ROS_INFO("Plan computed");
 
 	return false;
 }
@@ -372,6 +393,8 @@ bool ArmControllerKinova::loadMoveitConfiguration()
 
 	ROS_INFO("MoveIt! configuration loaded");
 
+	move_group_ = new moveit::planning_interface::MoveGroup(name_ + "_arm");
+
 	addWall();
 	return true;
 }
@@ -521,6 +544,27 @@ bool ArmControllerKinova::updateCollisions()
 		ROS_WARN("Collision detected!");
 
 	return true;
+}
+
+bool ArmControllerKinova::showEndEffectorGoalPose( const geometry_msgs::Pose pose )
+{
+	visualization_msgs::Marker marker;
+    marker.header.frame_id = "base_link";
+    marker.header.stamp = ros::Time();
+    marker.ns = name_ + "_arm";
+    marker.id = 0;
+    marker.type = visualization_msgs::Marker::SPHERE;
+    marker.action = visualization_msgs::Marker::ADD;
+    marker.pose.pose;
+	marker.scale.x = 1;
+	marker.scale.y = 0.1;
+	marker.scale.z = 0.1;
+	marker.color.a = 1.0; // Don't forget to set the alpha!
+	marker.color.r = 0.0;
+	marker.color.g = 1.0;
+	marker.color.b = 0.0;
+
+   visualization_pub_.publish( marker );
 }
 
 } // namespace

@@ -19,6 +19,7 @@
 #include <actionlib/client/simple_action_client.h>
 #include <mutex>  
 #include <pluginlib/class_list_macros.h>
+#include <pluginlib/class_loader.h>
 #include <tf/tf.h>
 
 #include <moveit/kinematic_constraints/utils.h>
@@ -27,6 +28,7 @@
 #include <moveit/rdf_loader/rdf_loader.h>
 #include <moveit/robot_model_loader/robot_model_loader.h>
 #include <moveit_msgs/GetPlanningScene.h>
+#include <moveit/move_group_interface/move_group.h>
 
 #include "arm_controller_base/arm_controller_base.hpp"
 
@@ -207,6 +209,10 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
     // MoveIt variables
     planning_scene::PlanningScene*                      planning_scene_;
     moveit::planning_interface::PlanningSceneInterface  planning_scene_interface_;
+    moveit::planning_interface::MoveGroup*              move_group_;
+
+    // Visualization
+    ros::Publisher visualization_pub_;
 };
 
 } //namespace
