@@ -561,11 +561,12 @@ bool ArmControllerKinova::showEndEffectorGoalPose( const geometry_msgs::Pose& po
     marker.pose 			= pose;
 	marker.scale.x 			= 0.5;
 	marker.scale.y 			= 0.5;
-	marker.scale.z 			= 0.5;
+	marker.scale.z 			= 0.5
 	marker.color.a 			= 1.0; // Don't forget to set the alpha!
 	marker.color.r 			= 1.0;
 	marker.color.g 			= 0.0;
 	marker.color.b 			= 0.0;
+	marker.lifetime 		= ros::Duration(); // A value of ros::Duration() means never to auto-delete
 
    visualization_pub_.publish(marker);
 
