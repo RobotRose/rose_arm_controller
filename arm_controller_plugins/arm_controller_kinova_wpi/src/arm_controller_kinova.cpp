@@ -154,19 +154,30 @@ bool ArmControllerKinova::setEndEffectorPose(const Pose& end_effector_pose)
 	std::string planner_plugin_name = "RRTkConfigDefault";
 	double 		planning_time 		= 0.5;
 	double 	    goal_tolerance  	= 0.005;
+	unsigned int num_planning_attempts = 3;
+	
+	// Timing planning and execution
+	ros::Time timer = ros::Time::now();
 
 	ROS_INFO("Computing plan");
 	// Compute plan
 	moveit::planning_interface::MoveGroup::Plan plan;
 	move_group_->setPlannerId(planner_plugin_name);
 	move_group_->setPlanningTime(planning_time);
+	move_group_->setNumPlanningAttempts (num_planning_attempts);
 	move_group_->setGoalTolerance(goal_tolerance);
 	move_group_->setPoseTarget(end_effector_pose);
-	move_group_->plan(plan);
+	if ( not move_group_->plan(plan) )
+		return false; // Planning failed
 
-	ROS_INFO("Plan computed");
+	ROS_INFO("Planning took %f seconds", (ros::Time::now() - timer).toSec() );
 
-	return false;
+	timer = ros::Time::now();
+	ROS_INFO("Executing plan");
+	move_group_->execute(plan);
+	ROS_INFO("Plan executed in %f seconds", (ros::Time::now() - timer).toSec() );
+
+	return true;
 }
 
 bool ArmControllerKinova::getEndEffectorVelocity(Twist& twist)
@@ -552,7 +563,7 @@ bool ArmControllerKinova::updateCollisions()
 bool ArmControllerKinova::showEndEffectorGoalPose( const geometry_msgs::Pose& pose )
 {
 	visualization_msgs::Marker marker;
-    marker.header.frame_id 	= "table";
+    marker.header.frame_id 	= name_;
     marker.header.stamp 	= ros::Time();
     marker.ns 				= name_ + "_arm";
     marker.id 				= 123;
