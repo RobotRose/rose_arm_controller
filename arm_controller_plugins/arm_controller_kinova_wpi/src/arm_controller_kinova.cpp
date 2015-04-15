@@ -168,17 +168,22 @@ bool ArmControllerKinova::setEndEffectorPose(const Pose& end_effector_pose)
 	move_group_->setGoalTolerance(goal_tolerance);
 	move_group_->setPoseTarget(end_effector_pose);
 
-	//! @todo MdL [IMPR]: Add feedback.
 	if ( not move_group_->plan(plan) )
+	{
+		ROS_ERROR_NAMED("path-planning", "No plan found");
 		return false; // Planning failed
+	}
 
 	ROS_INFO("Planning took %f seconds", (ros::Time::now() - timer).toSec() );
 
 	timer = ros::Time::now();
 	ROS_INFO("Executing plan");
-	//! @todo MdL [IMPR]: Add feedback.
 	if ( not move_group_->execute(plan) )
+	{
+		ROS_ERROR_NAMED("path-planning", "Could not execute plan");
 		return false; // Execution failed
+	}
+
 	ROS_INFO("Plan executed in %f seconds", (ros::Time::now() - timer).toSec() );
 
 	return true;
