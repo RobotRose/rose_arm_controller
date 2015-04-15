@@ -162,18 +162,13 @@ bool ArmControllerKinova::setEndEffectorPose(const Pose& end_effector_pose)
 	ROS_INFO("Computing plan");
 	// Compute plan
 	moveit::planning_interface::MoveGroup::Plan plan;
-	ROS_INFO("Set (1)");
 	move_group_->setPlannerId(planner_plugin_name);
-	ROS_INFO("Set (2");
 	move_group_->setPlanningTime(planning_time);
-	ROS_INFO("Set (3)");
 	move_group_->setNumPlanningAttempts (num_planning_attempts);
-	ROS_INFO("Set (4)");
 	move_group_->setGoalTolerance(goal_tolerance);
-	ROS_INFO("Set (5)");
 	move_group_->setPoseTarget(end_effector_pose);
-	ROS_INFO("Set (6)");
 
+	//! @todo MdL [IMPR]: Add feedback.
 	if ( not move_group_->plan(plan) )
 		return false; // Planning failed
 
@@ -181,7 +176,9 @@ bool ArmControllerKinova::setEndEffectorPose(const Pose& end_effector_pose)
 
 	timer = ros::Time::now();
 	ROS_INFO("Executing plan");
-	move_group_->execute(plan);
+	//! @todo MdL [IMPR]: Add feedback.
+	if ( not move_group_->execute(plan) )
+		return false; // Execution failed
 	ROS_INFO("Plan executed in %f seconds", (ros::Time::now() - timer).toSec() );
 
 	return true;
@@ -474,7 +471,7 @@ bool ArmControllerKinova::addWall()
 	geometry_msgs::Pose box_pose; //,box_pose1,box_pose2,box_pose3;
 	box_pose.orientation.w 	= 1.0;
 	box_pose.position.x 	= 0.0;
-	box_pose.position.y 	= 0.20;
+	box_pose.position.y 	= 0.15;
 	box_pose.position.z 	= 0.0;
 
 	collision_object.primitives.push_back(primitive);
