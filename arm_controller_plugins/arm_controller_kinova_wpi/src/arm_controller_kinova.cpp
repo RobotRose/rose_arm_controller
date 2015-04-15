@@ -149,6 +149,8 @@ bool ArmControllerKinova::setEndEffectorPose(const Pose& end_effector_pose)
 		return false;
 	}
 
+	// Stop old movement, if needed
+	move_group_->stop();
 
 	robot_state::RobotState start_state(*move_group_->getCurrentState());
 	move_group_->setStartState(start_state);
