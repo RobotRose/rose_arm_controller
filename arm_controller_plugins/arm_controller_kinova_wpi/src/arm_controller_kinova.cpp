@@ -139,12 +139,15 @@ bool ArmControllerKinova::setEndEffectorPose(const Pose& end_effector_pose)
 
 	if (planning_scene_ == NULL)
 	{
-		ROS_ERROR("No planning scene set");
+		ROS_ERROR_NAMED("path-planning", "No planning scene set");
 		return false; 
 	}
 
 	if ( not updatePlanningScene() )
+	{
+		ROS_ERROR_NAMED("path-planning", "Could not update planning scene");
 		return false;
+	}
 
 
 	robot_state::RobotState start_state(*move_group_->getCurrentState());
