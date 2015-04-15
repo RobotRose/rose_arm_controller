@@ -45,8 +45,9 @@
 #include "wpi_jaco_msgs/AngularCommand.h"
 #include "wpi_jaco_msgs/GetCartesianPosition.h"
 
-#define ARM_NAME            "jaco_arm" //! @todo MdL [CONF]: Make configurable, or dependend on roslaunch parameters.
-#define NR_JOINTS           6 // Jaco has three, Mico uses this software and sets properties of the third finger to 0.0
+#define ARM_NAME                "jaco_arm"  //! @todo MdL [CONF]: Make configurable, or dependend on roslaunch parameters.
+#define NR_JOINTS               6           // Jaco has three, Mico uses this software and sets properties of the third finger to 0.0
+#define COLLISION_CHECK_TIMER   0.5         // collision updates in seconds
 
 namespace arm_controller_plugins {    
 
@@ -169,7 +170,7 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
     bool loadMoveitConfiguration();
 
     bool updatePlanningScene();
-    bool addWall();
+    bool addDummyRobot();
 
     bool setAngularJointValues(const vector<double>& values, const bool& position);
     void CB_joint_state_received(const sensor_msgs::JointState::ConstPtr& joint_state);

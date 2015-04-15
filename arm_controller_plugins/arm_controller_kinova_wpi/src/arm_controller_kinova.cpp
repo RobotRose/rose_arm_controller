@@ -57,7 +57,7 @@ bool ArmControllerKinova::initialize( const std::string name )
 	get_cartesian_position_client_ 		= n.serviceClient<wpi_jaco_msgs::GetCartesianPosition>(arm_prefix_ + std::string("/get_cartesian_position"));
 
 	// Create all timers
-	// collision_check_timer_ 				= n.createTimer(ros::Duration(0.1), boost::bind(&ArmControllerKinova::updateCollisions, this));
+	collision_check_timer_ 				= n.createTimer(ros::Duration(COLLISION_CHECK_TIMER), boost::bind(&ArmControllerKinova::updateCollisions, this));
 
 	// For visualization
 	visualization_pub_  				= n.advertise<visualization_msgs::Marker>(arm_prefix_ + std::string("/goal_pose"), 1);
@@ -181,7 +181,7 @@ bool ArmControllerKinova::setEndEffectorPose(const Pose& end_effector_pose)
 
 	timer = ros::Time::now();
 	ROS_INFO("Executing plan");
-	if ( not move_group_->execute(plan) )
+	if ( not move_group_->asyncExecute(plan) )
 	{
 		ROS_ERROR_NAMED("path-planning", "Could not execute plan");
 		return false; // Execution failed
@@ -299,14 +299,6 @@ bool ArmControllerKinova::setGripperWidth(const double required_width)
 	gripper_width_ = result->position;
 
 	return result->reached_goal;
-
-	// The two fingers on the MICO have a range of 
-	// approximately 0 (fully open) to 6400 (fully closed). 
-	// (http://wiki.ros.org/jaco_ros)
-
-	// Limit to the min and max values (0, max_gripper_width_)
-	
-	return true;
 }
 
 bool ArmControllerKinova::getEndEffectorWrench(Wrench& wrench)
@@ -421,12 +413,14 @@ bool ArmControllerKinova::loadMoveitConfiguration()
 
 	move_group_ = new moveit::planning_interface::MoveGroup(arm_prefix_);
 
-	addWall();
+	addDummyRobot();
+
 	return true;
 }
 
 bool ArmControllerKinova::updatePlanningScene()
 {	
+	ROS_INFO("Update planning scene");
 	moveit_msgs::GetPlanningScene srv;
 	srv.request.components.components = 
 		srv.request.components.SCENE_SETTINGS |
@@ -443,7 +437,7 @@ bool ArmControllerKinova::updatePlanningScene()
 	// Make sure client is connected to server
 	if ( not planning_scene_service_client_.exists() )
 	{
-	  ROS_ERROR_ONCE("Service %s does not exist.", planning_scene_service_client_.getService().c_str());
+	  ROS_ERROR("Service %s does not exist.", planning_scene_service_client_.getService().c_str());
 	  return false;
 	}
 
@@ -452,42 +446,64 @@ bool ArmControllerKinova::updatePlanningScene()
    		planning_scene_->usePlanningSceneMsg(srv.response.scene);
 	else
 	{
-   		ROS_WARN_ONCE("Failed to call service %s", planning_scene_service_client_.getService().c_str());
+   		ROS_WARN("Failed to call service %s", planning_scene_service_client_.getService().c_str());
    		return false;
 	}
 
 	return true;
 }
 
-bool ArmControllerKinova::addWall()
+bool ArmControllerKinova::addDummyRobot()
 {
 	ROS_INFO("Adding box");
 
 	planning_scene_interface_.removeCollisionObjects(planning_scene_interface_.getKnownObjectNames(false));
 
-	moveit_msgs::CollisionObject 	collision_object;
+	// Helper variables
 	shape_msgs::SolidPrimitive 		primitive;
+	geometry_msgs::Pose 			box_pose;
+	
+	// Front side robot
+	moveit_msgs::CollisionObject 	robot_front;
+	robot_front.id 			= "robot_front";
 
-	collision_object.id 				= "box1";
-
-	primitive.type = primitive.BOX;
+	primitive.type 			= primitive.BOX;
 	primitive.dimensions.resize(3); 
-	primitive.dimensions[0] = 5.0;
-	primitive.dimensions[1] = 0.05;
-	primitive.dimensions[2] = 5.0;
+	primitive.dimensions[0] = 1.0;  // Breedte
+	primitive.dimensions[1] = 0.05; // Dikte
+	primitive.dimensions[2] = 2.0;  // Hoogte
 
-	geometry_msgs::Pose box_pose; //,box_pose1,box_pose2,box_pose3;
 	box_pose.orientation.w 	= 1.0;
-	box_pose.position.x 	= 0.0;
+	box_pose.position.x 	= -0.175;
 	box_pose.position.y 	= 0.15;
-	box_pose.position.z 	= 0.0;
+	box_pose.position.z 	= 1.15;
 
-	collision_object.primitives.push_back(primitive);
-	collision_object.primitive_poses.push_back(box_pose);
-	collision_object.operation = collision_object.ADD;
+	robot_front.primitives.push_back(primitive);
+	robot_front.primitive_poses.push_back(box_pose);
+	robot_front.operation = robot_front.ADD;
+
+	// Screen robot
+	moveit_msgs::CollisionObject 	robot_screen;
+	robot_screen.id 		= "robot_screen";
+
+	primitive.type 		    = primitive.BOX;
+	primitive.dimensions.resize(3); 
+	primitive.dimensions[0] = 0.25;  // Breedte 
+	primitive.dimensions[1] = 0.05;  // Dikte
+	primitive.dimensions[2] = 0.20;  // Hoogte
+
+	box_pose.orientation.w 	= 1.0;
+	box_pose.position.x 	= -0.175;
+	box_pose.position.y 	= 0.0;
+	box_pose.position.z 	= 0.40;
+
+	robot_screen.primitives.push_back(primitive);
+	robot_screen.primitive_poses.push_back(box_pose);
+	robot_screen.operation = robot_screen.ADD;
 
 	std::vector<moveit_msgs::CollisionObject> collision_objects;  
-	collision_objects.push_back(collision_object);  
+	collision_objects.push_back(robot_front);  
+	collision_objects.push_back(robot_screen);  
 
 	ROS_INFO("Add objects into the world");  
 	planning_scene_interface_.addCollisionObjects(collision_objects);
@@ -542,32 +558,49 @@ bool ArmControllerKinova::inCollision()
 
 bool ArmControllerKinova::updateCollisions()
 {	
+	ROS_INFO_NAMED("collision-checking", "Checking for collision");
 	if (planning_scene_ == NULL)
 	{
-		ROS_ERROR("No planning scene set");
+		ROS_ERROR_NAMED("collision-checking", "No planning scene set");
 		return false; 
 	}
 
 	if ( not updatePlanningScene() )
+	{
+		ROS_ERROR_NAMED("collision-checking", "Could not update planning scene");
 		return false;
+	}
 
 	collision_detection::CollisionRequest 	collision_request;
 	collision_detection::CollisionResult 	collision_result;
 
-	collision_detection::AllowedCollisionMatrix acm = planning_scene_->getAllowedCollisionMatrix();  
-	robot_state::RobotState copied_state 			= planning_scene_->getCurrentState();  
+	// collision_detection::AllowedCollisionMatrix acm = planning_scene_->getAllowedCollisionMatrix();  
+	// robot_state::RobotState copied_state 			= planning_scene_->getCurrentState();  
+
+	collision_request.contacts = true; // We would like to know where the contacts are
+	collision_request.verbose  = true; // We would like to know where the contacts are
 
 	collision_result.clear();
-	planning_scene_->checkCollision(collision_request, collision_result, copied_state, acm);
+	planning_scene_->checkCollision(collision_request, collision_result/*, copied_state, acm*/);
 
 	colision_mutex_.lock();
 	in_collision_ = collision_result.collision;
 	colision_mutex_.unlock();
 
-	ROS_DEBUG_NAMED("Test: Current state is %s collision", (collision_result.collision ? "in" : "not in"));  
+	ROS_INFO_NAMED("collision-checking", "Test: Current state is %s collision", (collision_result.collision ? "in" : "not in"));  
 	
-	if ( collision_result.collision )
-		ROS_WARN("Collision detected!");
+	if ( inCollision() )
+	{
+		ROS_WARN_NAMED("collision-checking", "%d Collision(s) detected! Stopping execution if needed.", (int)collision_result.contact_count);
+		for ( const auto& contact : collision_result.contacts )
+			ROS_INFO_NAMED("collision-checking", "Collisions: %s - %s ", contact.first.first.c_str(), contact.first.second.c_str());
+
+		move_group_->stop();
+	}
+	else
+	{
+		ROS_INFO_NAMED("collision-checking", "No collision detected.");
+	}
 
 	return true;
 }
