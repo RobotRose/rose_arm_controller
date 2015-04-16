@@ -176,6 +176,7 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
     void CB_joint_state_received(const sensor_msgs::JointState::ConstPtr& joint_state);
 
     bool inCollision();
+    bool checkForCollisions();
     bool updateCollisions();
 
     bool showEndEffectorGoalPose( const geometry_msgs::Pose& pose );
@@ -202,6 +203,7 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
     bool                joint_states_initialized_;
 
     std::mutex          colision_mutex_;
+    std::mutex          planning_scene_mutex_;
     bool                in_collision_;
 
     // Parameters

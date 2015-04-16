@@ -155,22 +155,12 @@ bool ArmControllerKinova::setEndEffectorPose(const Pose& end_effector_pose)
 	robot_state::RobotState start_state(*move_group_->getCurrentState());
 	move_group_->setStartState(start_state);
 
-	//! @todo MdL [IMPR]: Configurable?.
-	std::string  planner_plugin_name 	= "RRTkConfigDefault";
-	double 		 planning_time 			= 0.5;
-	double 	     goal_tolerance  		= 0.005;
-	unsigned int num_planning_attempts 	= 3;
-
 	// Timing planning and execution
 	ros::Time timer = ros::Time::now();
 
 	ROS_INFO("Computing plan");
 	// Compute plan
 	moveit::planning_interface::MoveGroup::Plan plan;
-	move_group_->setPlannerId(planner_plugin_name);
-	move_group_->setPlanningTime(planning_time);
-	move_group_->setNumPlanningAttempts (num_planning_attempts);
-	move_group_->setGoalTolerance(goal_tolerance);
 	move_group_->setPoseTarget(end_effector_pose);
 
 	if ( not move_group_->plan(plan) )
@@ -415,6 +405,17 @@ bool ArmControllerKinova::loadMoveitConfiguration()
 
 	move_group_ = new moveit::planning_interface::MoveGroup(arm_prefix_);
 
+	//! @todo MdL [IMPR]: Make configurable.
+	std::string  planner_plugin_name 	= "RRTkConfigDefault";
+	double 		 planning_time 			= 0.5;
+	double 	     goal_tolerance  		= 0.005;
+	unsigned int num_planning_attempts 	= 10;
+	
+	move_group_->setPlannerId(planner_plugin_name);
+	move_group_->setPlanningTime(planning_time);
+	move_group_->setNumPlanningAttempts (num_planning_attempts);
+	move_group_->setGoalTolerance(goal_tolerance);
+
 	addDummyRobot();
 
 	return true;
@@ -422,6 +423,8 @@ bool ArmControllerKinova::loadMoveitConfiguration()
 
 bool ArmControllerKinova::updatePlanningScene()
 {	
+	std::lock_guard<std::mutex> lock(planning_scene_mutex_);
+
 	ROS_INFO("Update planning scene");
 	moveit_msgs::GetPlanningScene srv;
 	srv.request.components.components = 
@@ -471,13 +474,13 @@ bool ArmControllerKinova::addDummyRobot()
 
 	primitive.type 			= primitive.BOX;
 	primitive.dimensions.resize(3); 
-	primitive.dimensions[0] = 1.0;  // Breedte
-	primitive.dimensions[1] = 0.05; // Dikte
-	primitive.dimensions[2] = 2.0;  // Hoogte
+	primitive.dimensions[shape_msgs::SolidPrimitive::BOX_X] = 1.0;  // Breedte
+	primitive.dimensions[shape_msgs::SolidPrimitive::BOX_Y] = 0.00000001; // Dikte
+	primitive.dimensions[shape_msgs::SolidPrimitive::BOX_Z] = 2.0;  // Hoogte
 
 	box_pose.orientation.w 	= 1.0;
 	box_pose.position.x 	= -0.175;
-	box_pose.position.y 	= 0.15;
+	box_pose.position.y 	= 0.05;
 	box_pose.position.z 	= 1.15;
 
 	robot_front.primitives.push_back(primitive);
@@ -490,22 +493,61 @@ bool ArmControllerKinova::addDummyRobot()
 
 	primitive.type 		    = primitive.BOX;
 	primitive.dimensions.resize(3); 
-	primitive.dimensions[0] = 0.25;  // Breedte 
-	primitive.dimensions[1] = 0.05;  // Dikte
-	primitive.dimensions[2] = 0.20;  // Hoogte
+	primitive.dimensions[shape_msgs::SolidPrimitive::BOX_X] = 0.25;  // Breedte 
+	primitive.dimensions[shape_msgs::SolidPrimitive::BOX_Y] = 0.055;  // Dikte
+	primitive.dimensions[shape_msgs::SolidPrimitive::BOX_Z] = 0.18;  // Hoogte
 
 	box_pose.orientation.w 	= 1.0;
 	box_pose.position.x 	= -0.175; // Left
-	box_pose.position.y 	= 0.0 - primitive.dimensions[1]/2.0; // Subtract half of the depth to have the front be at 0.0
-	box_pose.position.z 	= 0.40;
+	box_pose.position.y 	= -0.005 + primitive.dimensions[1]/2.0; // Subtract half of the depth to have the front be at 0.0
+	box_pose.position.z 	= 0.385 + primitive.dimensions[shape_msgs::SolidPrimitive::BOX_Z]/2.0;
 
 	robot_screen.primitives.push_back(primitive);
 	robot_screen.primitive_poses.push_back(box_pose);
 	robot_screen.operation = robot_screen.ADD;
 
+	// Camera possible locations
+	moveit_msgs::CollisionObject 	robot_camera;
+	robot_camera.id 		= "robot_camera";
+
+	primitive.type 		    = primitive.CONE;
+	primitive.dimensions.resize(3); 
+	primitive.dimensions[shape_msgs::SolidPrimitive::CONE_HEIGHT] = 0.40;  // Hoogte
+	primitive.dimensions[shape_msgs::SolidPrimitive::CONE_RADIUS] = 0.37;  // Dikte
+
+	box_pose.orientation.w 	= 1.0;
+	box_pose.position.x 	= -0.175; // Left
+	box_pose.position.y 	= 0.17;
+	box_pose.position.z 	= 0.67 + primitive.dimensions[shape_msgs::SolidPrimitive::CONE_HEIGHT]/2.0;
+
+	robot_camera.primitives.push_back(primitive);
+	robot_camera.primitive_poses.push_back(box_pose);
+	robot_camera.operation = robot_screen.ADD;
+
+	// Camera possible locations
+	moveit_msgs::CollisionObject 	robot_bakje;
+	robot_bakje.id 		= "robot_bakje";
+
+	primitive.type 		    = primitive.BOX;
+	primitive.dimensions.resize(3); 
+	primitive.dimensions[shape_msgs::SolidPrimitive::BOX_X] = 0.20;  // Breedte 
+	primitive.dimensions[shape_msgs::SolidPrimitive::BOX_Y] = 0.20;  // "naar voren"
+	primitive.dimensions[shape_msgs::SolidPrimitive::BOX_Z] = 0.05;  // Hoogte
+
+	box_pose.orientation.w 	= 1.0;
+	box_pose.position.x 	= -0.150; // Left
+	box_pose.position.y 	= -0.05;
+	box_pose.position.z 	= -0.015;
+
+	robot_bakje.primitives.push_back(primitive);
+	robot_bakje.primitive_poses.push_back(box_pose);
+	robot_bakje.operation = robot_screen.ADD;
+
 	std::vector<moveit_msgs::CollisionObject> collision_objects;  
 	collision_objects.push_back(robot_front);  
 	collision_objects.push_back(robot_screen);  
+	collision_objects.push_back(robot_camera);
+	collision_objects.push_back(robot_bakje);
 
 	ROS_INFO("Add objects into the world");  
 	planning_scene_interface_.addCollisionObjects(collision_objects);
@@ -558,20 +600,9 @@ bool ArmControllerKinova::inCollision()
 	return in_collision_;
 }
 
-bool ArmControllerKinova::updateCollisions()
-{	
-	ROS_INFO_NAMED("collision-checking", "Checking for collision");
-	if (planning_scene_ == NULL)
-	{
-		ROS_ERROR_NAMED("collision-checking", "No planning scene set");
-		return false; 
-	}
-
-	if ( not updatePlanningScene() )
-	{
-		ROS_ERROR_NAMED("collision-checking", "Could not update planning scene");
-		return false;
-	}
+bool ArmControllerKinova::checkForCollisions()
+{
+	std::lock_guard<std::mutex> lock(planning_scene_mutex_);
 
 	collision_detection::CollisionRequest 	collision_request;
 	collision_detection::CollisionResult 	collision_result;
@@ -604,7 +635,26 @@ bool ArmControllerKinova::updateCollisions()
 		ROS_INFO_NAMED("collision-checking", "No collision detected.");
 	}
 
-	return true;
+	return inCollision();
+}
+
+bool ArmControllerKinova::updateCollisions()
+{	
+
+	ROS_INFO_NAMED("collision-checking", "Checking for collision");
+	if (planning_scene_ == NULL)
+	{
+		ROS_ERROR_NAMED("collision-checking", "No planning scene set");
+		return false; 
+	}
+
+	if ( not updatePlanningScene() )
+	{
+		ROS_ERROR_NAMED("collision-checking", "Could not update planning scene");
+		return false;
+	}
+	
+	return checkForCollisions();
 }
 
 bool ArmControllerKinova::showEndEffectorGoalPose( const geometry_msgs::Pose& pose )
