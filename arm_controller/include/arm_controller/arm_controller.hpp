@@ -126,7 +126,7 @@ class ArmController
     void CB_cancelVelocityForArms();
     void CB_emergency(const bool& emergency);
     void CB_updateJointStates();
-    bool CB_get_arms(rose_arm_controller_msgs::get_arms::Request &req,
+    bool CB_getArms(rose_arm_controller_msgs::get_arms::Request &req,
                      rose_arm_controller_msgs::get_arms::Response &res );
 
     std::string         name_;

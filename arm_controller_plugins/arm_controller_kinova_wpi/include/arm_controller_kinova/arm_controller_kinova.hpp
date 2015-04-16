@@ -21,12 +21,14 @@
 #include <pluginlib/class_list_macros.h>
 #include <tf/tf.h>
 
-#include "arm_controller_base/arm_controller_base.hpp"
+#include <moveit/kinematic_constraints/utils.h>
+#include <moveit/planning_scene/planning_scene.h>
+#include <moveit/planning_scene_interface/planning_scene_interface.h>
+#include <moveit/rdf_loader/rdf_loader.h>
+#include <moveit/robot_model_loader/robot_model_loader.h>
+#include <moveit_msgs/GetPlanningScene.h>
 
-#include "rose_moveit_controller/arm_goalAction.h"
-#include "rose_moveit_controller/arm_goalGoal.h"
-#include "rose_moveit_controller/arm_goalFeedback.h"
-#include "rose_moveit_controller/arm_goalResult.h"
+#include "arm_controller_base/arm_controller_base.hpp"
 
 #include "control_msgs/GripperCommand.h"
 #include "control_msgs/GripperCommandAction.h"
@@ -55,7 +57,6 @@ using std::vector;
   */
 class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
   public:
-    typedef actionlib::SimpleActionClient<rose_moveit_controller::arm_goalAction>   MoveItClient;
     typedef actionlib::SimpleActionClient<control_msgs::GripperCommandAction>       GripperClient;
 
     /**
@@ -161,9 +162,16 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
 
   protected:
     bool loadParameters();
+    bool loadMoveitConfiguration();
+
+    bool updatePlanningScene();
+    bool addWall();
 
     bool setAngularJointValues(const vector<double>& values, const bool& position);
     void CB_joint_state_received(const sensor_msgs::JointState::ConstPtr& joint_state);
+
+    bool inCollision();
+    bool updateCollisions();
 
     ros::NodeHandle     n_;
     std::string         name_;
@@ -171,8 +179,10 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
     ros::Publisher      arm_cartesian_command_publisher_;
     ros::Publisher      arm_angular_command_publisher_;
     ros::ServiceClient  get_cartesian_position_client_;
+    ros::ServiceClient  planning_scene_service_client_;
 
-    MoveItClient*       move_it_client_;
+    ros::Timer          collision_check_timer_;
+
     GripperClient*      gripper_client_;
 
     bool                emergency_;
@@ -184,13 +194,19 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
     ros::Subscriber     joint_state_sub_;
     bool                joint_states_initialized_;
 
+    std::mutex          colision_mutex_;
+    bool                in_collision_;
+
     // Parameters
     std::string         arm_prefix_;
-    std::string         moveit_server_name_;
     double              max_gripper_width_;
     double              gripper_value_open_;
     double              gripper_value_closed_;
     int                 nr_fingers_;
+
+    // MoveIt variables
+    planning_scene::PlanningScene*                      planning_scene_;
+    moveit::planning_interface::PlanningSceneInterface  planning_scene_interface_;
 };
 
 } //namespace

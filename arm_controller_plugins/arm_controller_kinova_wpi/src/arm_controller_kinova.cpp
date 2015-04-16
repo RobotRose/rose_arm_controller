@@ -20,6 +20,7 @@ ArmControllerKinova::ArmControllerKinova()
 	, joint_states_initialized_(false)
 	, emergency_(false)
 	, gripper_width_(0.0)
+	, in_collision_(false)
 {
 
 }
@@ -34,12 +35,13 @@ bool ArmControllerKinova::initialize( const std::string name )
 	name_ = name;
 	ROS_INFO("Initializing arm <%s>", name.c_str());
 	loadParameters();
+	loadMoveitConfiguration();
 
 	ros::NodeHandle n;
 
 	// Register actionlib client for moveit
 	//! @todo MdL [IMPR]: Change to SMC?
-	move_it_client_ = new MoveItClient(moveit_server_name_, true);
+	// move_it_client_ = new MoveItClient(moveit_server_name_, true);
 	//! @todo MdL [QSTN]: Do I have to wait for the server to be up?
 	// move_it_client_->waitForServer();
 
@@ -53,11 +55,14 @@ bool ArmControllerKinova::initialize( const std::string name )
 
 	// Create all subscribers to the wpi_jaco driver
 	//! @todo MdL [HACK]: fix this back, is was for testing.
-	joint_state_sub_ 					= n.subscribe(std::string("/joint_states"), 1, &ArmControllerKinova::CB_joint_state_received, this);
+	joint_state_sub_ 					= n.subscribe(arm_prefix_ + std::string("/joint_states"), 1, &ArmControllerKinova::CB_joint_state_received, this);
 	// joint_state_sub_ 					= n.subscribe(arm_prefix_ + std::string("/joint_states"), 1, &ArmControllerKinova::CB_joint_state_received, this);
 
 	// Create all service clients to the wpi_jaco driver
 	get_cartesian_position_client_ 		= n.serviceClient<wpi_jaco_msgs::GetCartesianPosition>(arm_prefix_ + std::string("/get_cartesian_position"));
+
+	// Create all timers
+	collision_check_timer_ 				= n.createTimer(ros::Duration(0.1), boost::bind(&ArmControllerKinova::updateCollisions, this));
 
 	return true;
 }
@@ -131,13 +136,13 @@ bool ArmControllerKinova::setEndEffectorPose(const Pose& end_effector_pose)
 	if (emergency_)
 		return false;
 
-	rose_moveit_controller::arm_goalGoal goal;
-	goal.goal_pose.pose = end_effector_pose;
+	// rose_moveit_controller::arm_goalGoal goal;
+	// goal.goal_pose.pose = end_effector_pose;
 
-	move_it_client_->sendGoal(goal);
-	move_it_client_->waitForResult(ros::Duration(0.0)); // infinite?
+	// move_it_client_->sendGoal(goal);
+	// move_it_client_->waitForResult(ros::Duration(0.0)); // infinite?
 
-	return true;
+	return false;
 }
 
 bool ArmControllerKinova::getEndEffectorVelocity(Twist& twist)
@@ -274,12 +279,9 @@ bool ArmControllerKinova::setEndEffectorWrench(const Wrench& Wrench)
 
 bool ArmControllerKinova::getJointPositions(vector<double>& joint_positions)
 {
-	joint_states_mutex_.lock();
+	std::lock_guard<std::mutex> lock(joint_states_mutex_);
 	
 	joint_positions = joint_states_.position;
-
-	joint_states_mutex_.unlock();
-
 	return true;
 }
 
@@ -290,12 +292,9 @@ bool ArmControllerKinova::setJointPositions(const vector<double>& joint_position
 
 bool ArmControllerKinova::getJointVelocities(vector<double>& joint_velocities)
 {
-	joint_states_mutex_.lock();
+	std::lock_guard<std::mutex> lock(joint_states_mutex_);
 	
 	joint_velocities = joint_states_.velocity;
-
-	joint_states_mutex_.unlock();
-
 	return true;
 }
 
@@ -306,12 +305,9 @@ bool ArmControllerKinova::setJointVelocities(const vector<double>& joint_velocit
 
 bool ArmControllerKinova::getJointEfforts(vector<double>& joint_angular_forces)
 {
-	joint_states_mutex_.lock();
+	std::lock_guard<std::mutex> lock(joint_states_mutex_);
 	
 	joint_angular_forces = joint_states_.effort;
-
-	joint_states_mutex_.unlock();
-
 	return true;
 }
 
@@ -330,22 +326,132 @@ bool ArmControllerKinova::loadParameters()
     n_.param("/" + name_ + "_configuration/gripper_value_open", gripper_value_open_, 0.0);
     n_.param("/" + name_ + "_configuration/gripper_value_closed", gripper_value_closed_, 40.0);
     n_.param("/" + name_ + "_configuration/nr_fingers", nr_fingers_, 3);
-    n_.param("/" + name_ + "_configuration/moveit_server_name", moveit_server_name_, std::string("rose_moveit_controller"));
+    // n_.param("/" + name_ + "_configuration/moveit_server_name", moveit_server_name_, std::string("rose_moveit_controller"));
 
     ROS_INFO("Parameters loaded.");
 
-    //! @todo MdL [IMPR]: Return is values are all correctly loaded.
+    //! @todo MdL [IMPR]: Return if values are all correctly loaded.
     return true;
+}
+
+bool ArmControllerKinova::loadMoveitConfiguration()
+{
+	ROS_INFO("Loading MoveIt! configuration for <%s>", name_.c_str());
+
+	// Initialize service client
+	planning_scene_service_client_ 		= n_.serviceClient<moveit_msgs::GetPlanningScene>("/get_planning_scene");
+
+	ROS_DEBUG("Loading planning scene");
+	robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
+	robot_model::RobotModelPtr 	kinematic_model;
+
+	// Make sure MoveIt! is running
+	if (!planning_scene_service_client_.exists())
+	{
+	  ROS_DEBUG("Waiting for service %s to exist.", planning_scene_service_client_.getService().c_str());
+	  planning_scene_service_client_.waitForExistence(ros::Duration(60.0));
+	}
+
+	int nr_fails = 0;
+	while (not kinematic_model && nr_fails < 100)
+	{
+		ROS_DEBUG("Loading..");
+		kinematic_model = robot_model_loader.getModel();		
+		nr_fails++;
+	}
+	if ( not kinematic_model )
+		return false;
+
+	planning_scene_ = new planning_scene::PlanningScene(kinematic_model);
+
+	if ( not planning_scene_ )
+		return false;
+
+	if ( not updatePlanningScene() )
+		return false;
+
+	ROS_INFO("MoveIt! configuration loaded");
+
+	addWall();
+	return true;
+}
+
+bool ArmControllerKinova::updatePlanningScene()
+{	
+	moveit_msgs::GetPlanningScene srv;
+	srv.request.components.components = 
+		srv.request.components.SCENE_SETTINGS |
+		srv.request.components.ROBOT_STATE |
+		srv.request.components.ROBOT_STATE_ATTACHED_OBJECTS |
+		srv.request.components.WORLD_OBJECT_NAMES |
+		srv.request.components.WORLD_OBJECT_GEOMETRY |
+		srv.request.components.OCTOMAP |
+		srv.request.components.TRANSFORMS |
+		srv.request.components.ALLOWED_COLLISION_MATRIX |
+		srv.request.components.LINK_PADDING_AND_SCALING |
+		srv.request.components.OBJECT_COLORS;
+
+	// Make sure client is connected to server
+	if ( not planning_scene_service_client_.exists() )
+	{
+	  ROS_ERROR_ONCE("Service %s does not exist.", planning_scene_service_client_.getService().c_str());
+	  return false;
+	}
+
+	ROS_DEBUG("Calling planning scene service");
+	if ( planning_scene_service_client_.call(srv) )
+   		planning_scene_->usePlanningSceneMsg(srv.response.scene);
+	else
+	{
+   		ROS_WARN_ONCE("Failed to call service %s", planning_scene_service_client_.getService().c_str());
+   		return false;
+	}
+
+	return true;
+}
+
+bool ArmControllerKinova::addWall()
+{
+	ROS_INFO("Adding box");
+
+	planning_scene_interface_.removeCollisionObjects(planning_scene_interface_.getKnownObjectNames(false));
+
+	moveit_msgs::CollisionObject 	collision_object;
+	shape_msgs::SolidPrimitive 		primitive;
+
+	collision_object.id 				= "box1";
+
+	primitive.type = primitive.BOX;
+	primitive.dimensions.resize(3); 
+	primitive.dimensions[0] = 5.0;
+	primitive.dimensions[1] = 0.05;
+	primitive.dimensions[2] = 5.0;
+
+	geometry_msgs::Pose box_pose; //,box_pose1,box_pose2,box_pose3;
+	box_pose.orientation.w 	= 1.0;
+	box_pose.position.x 	= 0.0;
+	box_pose.position.y 	= 0.20;
+	box_pose.position.z 	= 0.0;
+
+	collision_object.primitives.push_back(primitive);
+	collision_object.primitive_poses.push_back(box_pose);
+	collision_object.operation = collision_object.ADD;
+
+	std::vector<moveit_msgs::CollisionObject> collision_objects;  
+	collision_objects.push_back(collision_object);  
+
+	ROS_INFO("Add objects into the world");  
+	planning_scene_interface_.addCollisionObjects(collision_objects);
+
+	return true;
 }
 
 void ArmControllerKinova::CB_joint_state_received(const sensor_msgs::JointState::ConstPtr& joint_state)
 {
-	joint_states_mutex_.lock();
+	std::lock_guard<std::mutex> lock(joint_states_mutex_);
 
 	joint_states_initialized_ = true;
 	joint_states_ 			  = *joint_state;
-
-	joint_states_mutex_.unlock();
 }
 
 bool ArmControllerKinova::setAngularJointValues(const vector<double>& values, const bool& position)
@@ -374,6 +480,45 @@ bool ArmControllerKinova::setAngularJointValues(const vector<double>& values, co
 	}
 
 	arm_angular_command_publisher_.publish(angular_cmd);
+
+	return true;
+}
+
+bool ArmControllerKinova::inCollision()
+{
+	std::lock_guard<std::mutex> lock(colision_mutex_);
+
+	return in_collision_;
+}
+
+bool ArmControllerKinova::updateCollisions()
+{	
+	if (planning_scene_ == NULL)
+	{
+		ROS_ERROR("No planning scene set");
+		return false; 
+	}
+
+	if ( not updatePlanningScene() )
+		return false;
+
+	collision_detection::CollisionRequest 	collision_request;
+	collision_detection::CollisionResult 	collision_result;
+
+	collision_detection::AllowedCollisionMatrix acm = planning_scene_->getAllowedCollisionMatrix();  
+	robot_state::RobotState copied_state 			= planning_scene_->getCurrentState();  
+
+	collision_result.clear();
+	planning_scene_->checkCollision(collision_request, collision_result, copied_state, acm);
+
+	colision_mutex_.lock();
+	in_collision_ = collision_result.collision;
+	colision_mutex_.unlock();
+
+	ROS_DEBUG_NAMED("Test: Current state is %s collision", (collision_result.collision ? "in" : "not in"));  
+	
+	if ( collision_result.collision )
+		ROS_WARN("Collision detected!");
 
 	return true;
 }

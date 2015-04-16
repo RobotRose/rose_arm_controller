@@ -161,7 +161,7 @@ void ArmController::initializePublishersAndServices()
 
     ROS_INFO_NAMED(ROS_NAME, "Initializing services");
 
-    get_arms_service_ = n_.advertiseService("/" + name_ + "/get_arms", &ArmController::CB_get_arms, this);
+    get_arms_service_ = n_.advertiseService("/" + name_ + "/get_arms", &ArmController::CB_getArms, this);
 
     ROS_INFO_NAMED(ROS_NAME, "Done");
 }
@@ -246,7 +246,7 @@ vector<string> ArmController::generateJointNames(const std::string arm_name, con
 {
     vector<string> names;
     for ( int i = 0 ; i < nr_of_joints ; i++ )
-        names.push_back(arm_name + "_link" + std::to_string(i));
+        names.push_back(arm_name + "_link_" + std::to_string(i));
 
     return names;
 }
@@ -494,11 +494,12 @@ void ArmController::CB_updateJointStates()
     updateJointStates();
 }
 
-bool ArmController::CB_get_arms(rose_arm_controller_msgs::get_arms::Request &req,
+bool ArmController::CB_getArms(rose_arm_controller_msgs::get_arms::Request &req,
                                 rose_arm_controller_msgs::get_arms::Response &res )
 {
-    for ( const auto& arm_controller : arm_controllers_)
-        res.arms.push_back(arm_controller.first);
+    res.arms = getArms();
+
+    return true;
 }
 
 }; // namespace
