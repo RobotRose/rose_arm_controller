@@ -660,7 +660,7 @@ bool ArmControllerKinova::updateCollisions()
 bool ArmControllerKinova::showEndEffectorGoalPose( const geometry_msgs::Pose& pose )
 {
 	visualization_msgs::Marker marker;
-    marker.header.frame_id 	= name_"+_link_base";
+    marker.header.frame_id 	= name_ + "_link_base";
     marker.header.stamp 	= ros::Time();
     marker.ns 				= arm_prefix_;
     marker.id 				= 123;
