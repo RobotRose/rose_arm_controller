@@ -416,7 +416,7 @@ bool ArmControllerKinova::loadMoveitConfiguration()
 	move_group_->setNumPlanningAttempts (num_planning_attempts);
 	move_group_->setGoalTolerance(goal_tolerance);
 
-	addDummyRobot();
+	// addDummyRobot();
 
 	return true;
 }
