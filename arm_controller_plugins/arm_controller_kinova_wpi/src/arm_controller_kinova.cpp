@@ -163,7 +163,11 @@ bool ArmControllerKinova::setEndEffectorPose(const Pose& end_effector_pose)
 	moveit::planning_interface::MoveGroup::Plan plan;
 	move_group_->setPoseTarget(end_effector_pose);
 
-	move_group_->plan(plan);
+	if ( not move_group_->plan(plan) )
+	{
+		ROS_ERROR_NAMED("path-planning", "No plan found");
+		return false;
+	}
 
 	ROS_INFO("Planning took %f seconds", (ros::Time::now() - timer).toSec() );
 
@@ -172,7 +176,7 @@ bool ArmControllerKinova::setEndEffectorPose(const Pose& end_effector_pose)
 	if ( not move_group_->asyncExecute(plan) )
 	{
 		ROS_ERROR_NAMED("path-planning", "Could not execute plan");
-		return false; // Execution failed
+		return false;
 	}
 
 	ROS_INFO("Plan executed in %f seconds", (ros::Time::now() - timer).toSec() );
@@ -403,7 +407,7 @@ bool ArmControllerKinova::loadMoveitConfiguration()
 
 	//! @todo MdL [IMPR]: Make configurable.
 	std::string  planner_plugin_name 	= "RRTkConfigDefault";
-	double 		 planning_time 			= 0.5;
+	double 		 planning_time 			= 5.0;
 	double 	     goal_tolerance  		= 0.005;
 	unsigned int num_planning_attempts 	= 10;
 	
