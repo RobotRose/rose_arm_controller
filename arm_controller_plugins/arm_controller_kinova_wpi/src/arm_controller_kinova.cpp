@@ -163,11 +163,7 @@ bool ArmControllerKinova::setEndEffectorPose(const Pose& end_effector_pose)
 	moveit::planning_interface::MoveGroup::Plan plan;
 	move_group_->setPoseTarget(end_effector_pose);
 
-	if ( not move_group_->plan(plan) )
-	{
-		ROS_ERROR_NAMED("path-planning", "No plan found");
-		return false; // Planning failed
-	}
+	move_group_->plan(plan);
 
 	ROS_INFO("Planning took %f seconds", (ros::Time::now() - timer).toSec() );
 
