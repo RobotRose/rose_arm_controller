@@ -607,9 +607,6 @@ bool ArmControllerKinova::checkForCollisions()
 	collision_detection::CollisionRequest 	collision_request;
 	collision_detection::CollisionResult 	collision_result;
 
-	// collision_detection::AllowedCollisionMatrix acm = planning_scene_->getAllowedCollisionMatrix();  
-	// robot_state::RobotState copied_state 			= planning_scene_->getCurrentState();  
-
 	collision_request.contacts = true; // We would like to know where the contacts are
 	collision_request.verbose  = true; // We would like to know where the contacts are
 
