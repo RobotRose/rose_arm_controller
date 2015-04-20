@@ -19,6 +19,7 @@
 #include <actionlib/client/simple_action_client.h>
 #include <mutex>  
 #include <pluginlib/class_list_macros.h>
+#include <pluginlib/class_loader.h>
 #include <tf/tf.h>
 
 #include <moveit/kinematic_constraints/utils.h>
@@ -27,6 +28,9 @@
 #include <moveit/rdf_loader/rdf_loader.h>
 #include <moveit/robot_model_loader/robot_model_loader.h>
 #include <moveit_msgs/GetPlanningScene.h>
+#include <moveit/move_group_interface/move_group.h>
+
+#include <visualization_msgs/Marker.h>
 
 #include "arm_controller_base/arm_controller_base.hpp"
 
@@ -41,8 +45,8 @@
 #include "wpi_jaco_msgs/AngularCommand.h"
 #include "wpi_jaco_msgs/GetCartesianPosition.h"
 
-#define ARM_NAME            "jaco_arm" //! @todo MdL [CONF]: Make configurable, or dependend on roslaunch parameters.
-#define NR_JOINTS           6 // Jaco has three, Mico uses this software and sets properties of the third finger to 0.0
+#define NR_JOINTS               6           // Jaco has three, Mico uses this software and sets properties of the third finger to 0.0
+#define COLLISION_CHECK_TIMER   0.5         // collision updates in seconds
 
 namespace arm_controller_plugins {    
 
@@ -165,13 +169,16 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
     bool loadMoveitConfiguration();
 
     bool updatePlanningScene();
-    bool addWall();
+    bool addDummyRobot();
 
     bool setAngularJointValues(const vector<double>& values, const bool& position);
     void CB_joint_state_received(const sensor_msgs::JointState::ConstPtr& joint_state);
 
     bool inCollision();
+    bool checkForCollisions();
     bool updateCollisions();
+
+    bool showEndEffectorGoalPose( const geometry_msgs::Pose& pose );
 
     ros::NodeHandle     n_;
     std::string         name_;
@@ -195,6 +202,7 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
     bool                joint_states_initialized_;
 
     std::mutex          colision_mutex_;
+    std::mutex          planning_scene_mutex_;
     bool                in_collision_;
 
     // Parameters
@@ -207,6 +215,10 @@ class ArmControllerKinova : public arm_controller_base::ArmControllerBase {
     // MoveIt variables
     planning_scene::PlanningScene*                      planning_scene_;
     moveit::planning_interface::PlanningSceneInterface  planning_scene_interface_;
+    moveit::planning_interface::MoveGroup*              move_group_;
+
+    // Visualization
+    ros::Publisher visualization_pub_;
 };
 
 } //namespace

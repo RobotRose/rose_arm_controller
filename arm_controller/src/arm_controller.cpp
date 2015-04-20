@@ -301,8 +301,17 @@ void ArmController::CB_receivePositionGoal(const rose_arm_controller_msgs::set_p
     if ( not getArmController(goal->arm, arm_controller))
         return;
 
-    //! @todo MdL: Transform both to arm base link.
-    Pose goal_pose =        goal->required_pose.pose;
+
+    geometry_msgs::PoseStamped required_goal_pose = goal->required_pose;
+
+    if ( not rose_transformations::transformToFrame(tf_listener_, goal->arm + "_link_base", required_goal_pose, 0.2))
+    {
+        ROS_ERROR("Could not transform frame %s to arm frame %s_link_base", required_goal_pose.header.frame_id.c_str(), goal->arm.c_str());
+        return;
+    }
+    Pose goal_pose =        required_goal_pose.pose;
+
+    //! @todo MdL: Transform constrant to arm base link.
     Twist goal_constraint = goal->constraint.twist;
 
     arm_controller->setConstraints(goal_constraint);

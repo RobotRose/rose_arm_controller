@@ -32,18 +32,13 @@ ArmControllerKinova::~ArmControllerKinova()
 
 bool ArmControllerKinova::initialize( const std::string name )
 {
+	ros::NodeHandle n;
+
 	name_ = name;
+
 	ROS_INFO("Initializing arm <%s>", name.c_str());
 	loadParameters();
 	loadMoveitConfiguration();
-
-	ros::NodeHandle n;
-
-	// Register actionlib client for moveit
-	//! @todo MdL [IMPR]: Change to SMC?
-	// move_it_client_ = new MoveItClient(moveit_server_name_, true);
-	//! @todo MdL [QSTN]: Do I have to wait for the server to be up?
-	// move_it_client_->waitForServer();
 
 	// Register actionlib client to the wpi_jaco driver for the gripper
 	gripper_client_ = new GripperClient(arm_prefix_ + std::string("/fingers_controller/gripper"), true);
@@ -62,7 +57,10 @@ bool ArmControllerKinova::initialize( const std::string name )
 	get_cartesian_position_client_ 		= n.serviceClient<wpi_jaco_msgs::GetCartesianPosition>(arm_prefix_ + std::string("/get_cartesian_position"));
 
 	// Create all timers
-	collision_check_timer_ 				= n.createTimer(ros::Duration(0.1), boost::bind(&ArmControllerKinova::updateCollisions, this));
+	collision_check_timer_ 				= n.createTimer(ros::Duration(COLLISION_CHECK_TIMER), boost::bind(&ArmControllerKinova::updateCollisions, this));
+
+	// For visualization
+	visualization_pub_  				= n.advertise<visualization_msgs::Marker>(arm_prefix_ + std::string("/goal_pose"), 1);
 
 	return true;
 }
@@ -133,16 +131,57 @@ bool ArmControllerKinova::setEndEffectorPose(const Pose& end_effector_pose)
 {	
 	ROS_DEBUG("Setting end effector pose...");
 	
+	// Visualize goal pose
+	showEndEffectorGoalPose(end_effector_pose);
+
 	if (emergency_)
 		return false;
 
-	// rose_moveit_controller::arm_goalGoal goal;
-	// goal.goal_pose.pose = end_effector_pose;
+	if (planning_scene_ == NULL)
+	{
+		ROS_ERROR_NAMED("path-planning", "No planning scene set");
+		return false; 
+	}
 
-	// move_it_client_->sendGoal(goal);
-	// move_it_client_->waitForResult(ros::Duration(0.0)); // infinite?
+	if ( not updatePlanningScene() )
+	{
+		ROS_ERROR_NAMED("path-planning", "Could not update planning scene");
+		return false;
+	}
 
-	return false;
+	// Stop old movement, if needed
+	move_group_->stop();
+
+	robot_state::RobotState start_state(*move_group_->getCurrentState());
+	move_group_->setStartState(start_state);
+
+	// Timing planning and execution
+	ros::Time timer = ros::Time::now();
+
+	ROS_INFO("Computing plan");
+	// Compute plan
+	moveit::planning_interface::MoveGroup::Plan plan;
+	move_group_->setPoseTarget(end_effector_pose);
+
+	if ( not move_group_->plan(plan) )
+	{
+		ROS_ERROR_NAMED("path-planning", "No plan found");
+		return false;
+	}
+
+	ROS_INFO("Planning took %f seconds", (ros::Time::now() - timer).toSec() );
+
+	timer = ros::Time::now();
+	ROS_INFO("Executing plan");
+	if ( not move_group_->asyncExecute(plan) )
+	{
+		ROS_ERROR_NAMED("path-planning", "Could not execute plan");
+		return false;
+	}
+
+	ROS_INFO("Plan executed in %f seconds", (ros::Time::now() - timer).toSec() );
+
+	return true;
 }
 
 bool ArmControllerKinova::getEndEffectorVelocity(Twist& twist)
@@ -252,14 +291,6 @@ bool ArmControllerKinova::setGripperWidth(const double required_width)
 	gripper_width_ = result->position;
 
 	return result->reached_goal;
-
-	// The two fingers on the MICO have a range of 
-	// approximately 0 (fully open) to 6400 (fully closed). 
-	// (http://wiki.ros.org/jaco_ros)
-
-	// Limit to the min and max values (0, max_gripper_width_)
-	
-	return true;
 }
 
 bool ArmControllerKinova::getEndEffectorWrench(Wrench& wrench)
@@ -372,12 +403,29 @@ bool ArmControllerKinova::loadMoveitConfiguration()
 
 	ROS_INFO("MoveIt! configuration loaded");
 
-	addWall();
+	move_group_ = new moveit::planning_interface::MoveGroup(arm_prefix_);
+
+	//! @todo MdL [IMPR]: Make configurable.
+	std::string  planner_plugin_name 	= "RRTkConfigDefault";
+	double 		 planning_time 			= 5.0;
+	double 	     goal_tolerance  		= 0.005;
+	unsigned int num_planning_attempts 	= 10;
+	
+	move_group_->setPlannerId(planner_plugin_name);
+	move_group_->setPlanningTime(planning_time);
+	move_group_->setNumPlanningAttempts (num_planning_attempts);
+	move_group_->setGoalTolerance(goal_tolerance);
+
+	addDummyRobot();
+
 	return true;
 }
 
 bool ArmControllerKinova::updatePlanningScene()
 {	
+	std::lock_guard<std::mutex> lock(planning_scene_mutex_);
+
+	ROS_INFO("Update planning scene");
 	moveit_msgs::GetPlanningScene srv;
 	srv.request.components.components = 
 		srv.request.components.SCENE_SETTINGS |
@@ -394,7 +442,7 @@ bool ArmControllerKinova::updatePlanningScene()
 	// Make sure client is connected to server
 	if ( not planning_scene_service_client_.exists() )
 	{
-	  ROS_ERROR_ONCE("Service %s does not exist.", planning_scene_service_client_.getService().c_str());
+	  ROS_ERROR("Service %s does not exist.", planning_scene_service_client_.getService().c_str());
 	  return false;
 	}
 
@@ -403,42 +451,103 @@ bool ArmControllerKinova::updatePlanningScene()
    		planning_scene_->usePlanningSceneMsg(srv.response.scene);
 	else
 	{
-   		ROS_WARN_ONCE("Failed to call service %s", planning_scene_service_client_.getService().c_str());
+   		ROS_WARN("Failed to call service %s", planning_scene_service_client_.getService().c_str());
    		return false;
 	}
 
 	return true;
 }
 
-bool ArmControllerKinova::addWall()
+bool ArmControllerKinova::addDummyRobot()
 {
 	ROS_INFO("Adding box");
 
 	planning_scene_interface_.removeCollisionObjects(planning_scene_interface_.getKnownObjectNames(false));
 
-	moveit_msgs::CollisionObject 	collision_object;
+	// Helper variables
 	shape_msgs::SolidPrimitive 		primitive;
+	geometry_msgs::Pose 			box_pose;
+	
+	// Front side robot
+	moveit_msgs::CollisionObject 	robot_front;
+	robot_front.id 			= "robot_front";
 
-	collision_object.id 				= "box1";
-
-	primitive.type = primitive.BOX;
+	primitive.type 			= primitive.BOX;
 	primitive.dimensions.resize(3); 
-	primitive.dimensions[0] = 5.0;
-	primitive.dimensions[1] = 0.05;
-	primitive.dimensions[2] = 5.0;
+	primitive.dimensions[shape_msgs::SolidPrimitive::BOX_X] = 1.0;  // Breedte
+	primitive.dimensions[shape_msgs::SolidPrimitive::BOX_Y] = 0.00000001; // Dikte
+	primitive.dimensions[shape_msgs::SolidPrimitive::BOX_Z] = 2.0;  // Hoogte
 
-	geometry_msgs::Pose box_pose; //,box_pose1,box_pose2,box_pose3;
 	box_pose.orientation.w 	= 1.0;
-	box_pose.position.x 	= 0.0;
-	box_pose.position.y 	= 0.20;
-	box_pose.position.z 	= 0.0;
+	box_pose.position.x 	= -0.175;
+	box_pose.position.y 	= 0.05;
+	box_pose.position.z 	= 1.15;
 
-	collision_object.primitives.push_back(primitive);
-	collision_object.primitive_poses.push_back(box_pose);
-	collision_object.operation = collision_object.ADD;
+	robot_front.primitives.push_back(primitive);
+	robot_front.primitive_poses.push_back(box_pose);
+	robot_front.operation = robot_front.ADD;
+
+	// Screen robot
+	moveit_msgs::CollisionObject 	robot_screen;
+	robot_screen.id 		= "robot_screen";
+
+	primitive.type 		    = primitive.BOX;
+	primitive.dimensions.resize(3); 
+	primitive.dimensions[shape_msgs::SolidPrimitive::BOX_X] = 0.25;  // Breedte 
+	primitive.dimensions[shape_msgs::SolidPrimitive::BOX_Y] = 0.055;  // Dikte
+	primitive.dimensions[shape_msgs::SolidPrimitive::BOX_Z] = 0.18;  // Hoogte
+
+	box_pose.orientation.w 	= 1.0;
+	box_pose.position.x 	= -0.175; // Left
+	box_pose.position.y 	= -0.005 + primitive.dimensions[1]/2.0; // Subtract half of the depth to have the front be at 0.0
+	box_pose.position.z 	= 0.385 + primitive.dimensions[shape_msgs::SolidPrimitive::BOX_Z]/2.0;
+
+	robot_screen.primitives.push_back(primitive);
+	robot_screen.primitive_poses.push_back(box_pose);
+	robot_screen.operation = robot_screen.ADD;
+
+	// Camera possible locations
+	moveit_msgs::CollisionObject 	robot_camera;
+	robot_camera.id 		= "robot_camera";
+
+	primitive.type 		    = primitive.CONE;
+	primitive.dimensions.resize(3); 
+	primitive.dimensions[shape_msgs::SolidPrimitive::CONE_HEIGHT] = 0.40;  // Hoogte
+	primitive.dimensions[shape_msgs::SolidPrimitive::CONE_RADIUS] = 0.37;  // Dikte
+
+	box_pose.orientation.w 	= 1.0;
+	box_pose.position.x 	= -0.175; // Left
+	box_pose.position.y 	= 0.17;
+	box_pose.position.z 	= 0.67 + primitive.dimensions[shape_msgs::SolidPrimitive::CONE_HEIGHT]/2.0;
+
+	robot_camera.primitives.push_back(primitive);
+	robot_camera.primitive_poses.push_back(box_pose);
+	robot_camera.operation = robot_screen.ADD;
+
+	// Camera possible locations
+	moveit_msgs::CollisionObject 	robot_bakje;
+	robot_bakje.id 		= "robot_bakje";
+
+	primitive.type 		    = primitive.BOX;
+	primitive.dimensions.resize(3); 
+	primitive.dimensions[shape_msgs::SolidPrimitive::BOX_X] = 0.20;  // Breedte 
+	primitive.dimensions[shape_msgs::SolidPrimitive::BOX_Y] = 0.20;  // "naar voren"
+	primitive.dimensions[shape_msgs::SolidPrimitive::BOX_Z] = 0.05;  // Hoogte
+
+	box_pose.orientation.w 	= 1.0;
+	box_pose.position.x 	= -0.150; // Left
+	box_pose.position.y 	= -0.05;
+	box_pose.position.z 	= -0.015;
+
+	robot_bakje.primitives.push_back(primitive);
+	robot_bakje.primitive_poses.push_back(box_pose);
+	robot_bakje.operation = robot_screen.ADD;
 
 	std::vector<moveit_msgs::CollisionObject> collision_objects;  
-	collision_objects.push_back(collision_object);  
+	collision_objects.push_back(robot_front);  
+	collision_objects.push_back(robot_screen);  
+	collision_objects.push_back(robot_camera);
+	collision_objects.push_back(robot_bakje);
 
 	ROS_INFO("Add objects into the world");  
 	planning_scene_interface_.addCollisionObjects(collision_objects);
@@ -491,36 +600,82 @@ bool ArmControllerKinova::inCollision()
 	return in_collision_;
 }
 
-bool ArmControllerKinova::updateCollisions()
-{	
-	if (planning_scene_ == NULL)
-	{
-		ROS_ERROR("No planning scene set");
-		return false; 
-	}
-
-	if ( not updatePlanningScene() )
-		return false;
+bool ArmControllerKinova::checkForCollisions()
+{
+	std::lock_guard<std::mutex> lock(planning_scene_mutex_);
 
 	collision_detection::CollisionRequest 	collision_request;
 	collision_detection::CollisionResult 	collision_result;
 
-	collision_detection::AllowedCollisionMatrix acm = planning_scene_->getAllowedCollisionMatrix();  
-	robot_state::RobotState copied_state 			= planning_scene_->getCurrentState();  
+	collision_request.contacts = true; // We would like to know where the contacts are
+	collision_request.verbose  = true; // We would like to know where the contacts are
 
 	collision_result.clear();
-	planning_scene_->checkCollision(collision_request, collision_result, copied_state, acm);
+	planning_scene_->checkCollision(collision_request, collision_result/*, copied_state, acm*/);
 
 	colision_mutex_.lock();
 	in_collision_ = collision_result.collision;
 	colision_mutex_.unlock();
 
-	ROS_DEBUG_NAMED("Test: Current state is %s collision", (collision_result.collision ? "in" : "not in"));  
+	ROS_INFO_NAMED("collision-checking", "Test: Current state is %s collision", (collision_result.collision ? "in" : "not in"));  
 	
-	if ( collision_result.collision )
-		ROS_WARN("Collision detected!");
+	if ( inCollision() )
+	{
+		ROS_WARN_NAMED("collision-checking", "%d Collision(s) detected! Stopping execution if needed.", (int)collision_result.contact_count);
+		for ( const auto& contact : collision_result.contacts )
+			ROS_INFO_NAMED("collision-checking", "Collisions: %s - %s ", contact.first.first.c_str(), contact.first.second.c_str());
 
-	return true;
+		move_group_->stop();
+	}
+	else
+	{
+		ROS_INFO_NAMED("collision-checking", "No collision detected.");
+	}
+
+	return inCollision();
+}
+
+bool ArmControllerKinova::updateCollisions()
+{	
+
+	ROS_INFO_NAMED("collision-checking", "Checking for collision");
+	if (planning_scene_ == NULL)
+	{
+		ROS_ERROR_NAMED("collision-checking", "No planning scene set");
+		return false; 
+	}
+
+	if ( not updatePlanningScene() )
+	{
+		ROS_ERROR_NAMED("collision-checking", "Could not update planning scene");
+		return false;
+	}
+	
+	return checkForCollisions();
+}
+
+bool ArmControllerKinova::showEndEffectorGoalPose( const geometry_msgs::Pose& pose )
+{
+	visualization_msgs::Marker marker;
+    marker.header.frame_id 	= name_ + "_link_base";
+    marker.header.stamp 	= ros::Time();
+    marker.ns 				= arm_prefix_;
+    marker.id 				= 123;
+    marker.type 			= visualization_msgs::Marker::ARROW;
+    marker.action 			= visualization_msgs::Marker::ADD;
+    marker.pose 			= pose;
+	marker.scale.x 			= 0.1;
+	marker.scale.y 			= 0.1;
+	marker.scale.z 			= 0.1;
+	marker.color.a 			= 1.0; // Don't forget to set the alpha!
+	marker.color.r 			= 1.0;
+	marker.color.g 			= 0.0;
+	marker.color.b 			= 0.0;
+	marker.lifetime 		= ros::Duration(); // A value of ros::Duration() means never to auto-delete
+
+   visualization_pub_.publish(marker);
+
+   return true;
 }
 
 } // namespace
