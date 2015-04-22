@@ -416,7 +416,7 @@ bool ArmControllerKinova::loadMoveitConfiguration()
 
 	//! @todo MdL [IMPR]: Make configurable.
 	std::string  planner_plugin_name 	= "RRTkConfigDefault";
-	double 		 planning_time 			= 0.05;
+	double 		 planning_time 			= 0.1;
 	double 	     goal_tolerance  		= 0.005;
 	unsigned int num_planning_attempts 	= 10;
 	
