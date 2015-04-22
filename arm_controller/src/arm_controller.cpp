@@ -357,7 +357,11 @@ void ArmController::CB_receiveVelocityGoal(const rose_arm_controller_msgs::set_v
     if ( not getArmController(goal->arm, arm_controller))
         return;
 
-    velocity_watchdog_.reset();
+    if ( not velocity_watchdog_.reset(goal->required_velocity.header) )
+    {
+        ROS_WARN("Received velocity command is too old");
+        return;
+    }
 
     //! @todo MdL [IMPL]: description.: Transform both to arm base link.
     Twist goal_twist        = goal->required_velocity.twist;
