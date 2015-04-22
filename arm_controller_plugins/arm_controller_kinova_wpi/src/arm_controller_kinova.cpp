@@ -480,7 +480,7 @@ bool ArmControllerKinova::addDummyRobot()
 
 	box_pose.orientation.w 	= 1.0;
 	box_pose.position.x 	= -0.175;
-	box_pose.position.y 	= 0.05;
+	box_pose.position.y 	= 0.08;
 	box_pose.position.z 	= 1.15;
 
 	robot_front.primitives.push_back(primitive);
@@ -667,11 +667,11 @@ bool ArmControllerKinova::showEndEffectorGoalPose( const geometry_msgs::Pose& po
 	marker.scale.x 			= 0.1;
 	marker.scale.y 			= 0.1;
 	marker.scale.z 			= 0.1;
-	marker.color.a 			= 1.0; // Don't forget to set the alpha!
+	marker.color.a 			= 1.0; 				// Don't forget to set the alpha!
 	marker.color.r 			= 1.0;
 	marker.color.g 			= 0.0;
 	marker.color.b 			= 0.0;
-	marker.lifetime 		= ros::Duration(); // A value of ros::Duration() means never to auto-delete
+	marker.lifetime 		= ros::Duration(); 	// A value of ros::Duration() means never to auto-delete
 
    visualization_pub_.publish(marker);
 

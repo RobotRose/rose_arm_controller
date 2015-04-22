@@ -35,8 +35,6 @@ ArmController::ArmController( std::string name, ros::NodeHandle n )
     // Initialize all arm controllers
     initializeArmControllers();
 
-    // attach_item_service_    = n_.advertiseService("/" + name_ + "/set_item_attachment",      &ArmController::CB_attach_item,  this);
-    // query_attached_items_service_    = n_.advertiseService("/" + name_ + "/get_item_attachment",      &ArmController::CB_query_attached_items,  this);
     initializePublishersAndServices();
 
     // Register all shared variables
@@ -136,6 +134,7 @@ void ArmController::loadArmPlugins()
 
 void ArmController::initializeArmControllers()
 {
+    //! @todo MdL [IMPR]: Check for failing / handing arm controller initializations.
     ROS_INFO_NAMED(ROS_NAME, "Initializing arm controllers...");
     for (const auto& arm_controller : arm_controllers_ )
         if ( not arm_controller.second->initialize(arm_controller.first) )
@@ -147,9 +146,7 @@ void ArmController::initializeArmControllers()
 void ArmController::initializePublishersAndServices()
 {
     ROS_INFO_NAMED(ROS_NAME, "Initializing pub/sub");
-    // attach_item_service_    = n_.advertiseService("/" + name_ + "/set_item_attachment",      &ArmController::CB_attach_item,  this);
-    // query_attached_items_service_    = n_.advertiseService("/" + name_ + "/get_item_attachment",      &ArmController::CB_query_attached_items,  this);
-
+ 
     joint_state_publishers_.clear();
     for (const auto& arm_controller : arm_controllers_ )
     {
