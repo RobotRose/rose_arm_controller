@@ -47,6 +47,7 @@
 
 #define NR_JOINTS               6           // Jaco has three, Mico uses this software and sets properties of the third finger to 0.0
 #define COLLISION_CHECK_TIMER   0.5         // collision updates in seconds
+#define MAX_PLANNING_TRIES      30         //! @todo MdL [CONF]: Make this a configurable parameter.
 
 namespace arm_controller_plugins {    
 
