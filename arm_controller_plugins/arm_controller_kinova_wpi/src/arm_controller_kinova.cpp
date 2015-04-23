@@ -511,7 +511,7 @@ bool ArmControllerKinova::addDummyRobot()
 
 	box_pose.orientation.w 	= 1.0;
 	box_pose.position.x 	= -0.175; // Left
-	box_pose.position.y 	= -0.005 + primitive.dimensions[1]/2.0; // Subtract half of the depth to have the front be at 0.0
+	box_pose.position.y 	= -0.015 + primitive.dimensions[1]/2.0; // Subtract half of the depth to have the front be at 0.0
 	box_pose.position.z 	= 0.385 + primitive.dimensions[shape_msgs::SolidPrimitive::BOX_Z]/2.0;
 
 	robot_screen.primitives.push_back(primitive);
