@@ -36,7 +36,7 @@ bool ArmControllerKinova::initialize( const std::string name )
 
 	name_ = name;
 
-	ROS_INFO("Initializing arm <%s>", name.c_str());
+	ROS_INFO_NAMED("arm-initialization", "Initializing arm <%s>", name.c_str());
 	loadParameters();
 	loadMoveitConfiguration();
 
@@ -73,7 +73,7 @@ bool ArmControllerKinova::close()
 
 bool ArmControllerKinova::cancel()
 {
-	ROS_INFO("Cancel received");
+	ROS_DEBUG("Cancel received");
 
 	// Stop move_group if needed
 	move_group_->stop();
@@ -161,7 +161,7 @@ bool ArmControllerKinova::setEndEffectorPose(const Pose& end_effector_pose)
 	// Timing planning and execution
 	ros::Time timer = ros::Time::now();
 
-	ROS_INFO("Computing plan");
+	ROS_DEBUG("Computing plan");
 	// Compute plan
 	moveit::planning_interface::MoveGroup::Plan plan;
 	move_group_->setPoseTarget(end_effector_pose);
@@ -170,7 +170,7 @@ bool ArmControllerKinova::setEndEffectorPose(const Pose& end_effector_pose)
 	bool plan_found     = false;
 	while ( planning_tries < MAX_PLANNING_TRIES and not plan_found )
 	{
-		ROS_INFO_NAMED("path-planning", "Trying to find plan (%d/%d)", planning_tries, MAX_PLANNING_TRIES);
+		ROS_DEBUG_NAMED("path-planning", "Trying to find plan (%d/%d)", planning_tries, MAX_PLANNING_TRIES);
 		plan_found = move_group_->plan(plan);
 		planning_tries++;
 	}
@@ -181,17 +181,17 @@ bool ArmControllerKinova::setEndEffectorPose(const Pose& end_effector_pose)
 		return false;
 	}
 
-	ROS_INFO("Planning took %f seconds", (ros::Time::now() - timer).toSec() );
+	ROS_DEBUG("Planning took %f seconds", (ros::Time::now() - timer).toSec() );
 
 	timer = ros::Time::now();
-	ROS_INFO("Executing plan");
+	ROS_DEBUG("Executing plan");
 	if ( not move_group_->asyncExecute(plan) )
 	{
 		ROS_ERROR_NAMED("path-planning", "Could not execute plan");
 		return false;
 	}
 
-	ROS_INFO("Plan executed in %f seconds", (ros::Time::now() - timer).toSec() );
+	ROS_DEBUG("Plan executed in %f seconds", (ros::Time::now() - timer).toSec() );
 
 	return true;
 }
@@ -362,7 +362,7 @@ bool ArmControllerKinova::setJointEfforts(const vector<double>& joint_angular_fo
 
 bool ArmControllerKinova::loadParameters()
 {
-    ROS_INFO("Loading kinova arm parameters for <%s>", name_.c_str());
+    ROS_INFO_NAMED("arm-initialization", "Loading kinova arm parameters for <%s>", name_.c_str());
 
     n_.param("/" + name_ + "_configuration/arm_prefix", arm_prefix_, std::string("kinova_arm"));
     n_.param("/" + name_ + "_configuration/max_gripper_width", max_gripper_width_, 0.15);
@@ -371,7 +371,7 @@ bool ArmControllerKinova::loadParameters()
     n_.param("/" + name_ + "_configuration/nr_fingers", nr_fingers_, 3);
     // n_.param("/" + name_ + "_configuration/moveit_server_name", moveit_server_name_, std::string("rose_moveit_controller"));
 
-    ROS_INFO("Parameters loaded.");
+    ROS_INFO_NAMED("arm-initialization", "Parameters loaded.");
 
     //! @todo MdL [IMPR]: Return if values are all correctly loaded.
     return true;
@@ -379,7 +379,7 @@ bool ArmControllerKinova::loadParameters()
 
 bool ArmControllerKinova::loadMoveitConfiguration()
 {
-	ROS_INFO("Loading MoveIt! configuration for <%s>", name_.c_str());
+	ROS_INFO_NAMED("arm-initialization", "Loading MoveIt! configuration for <%s>", name_.c_str());
 
 	// Initialize service client
 	planning_scene_service_client_ 		= n_.serviceClient<moveit_msgs::GetPlanningScene>("/get_planning_scene");
@@ -413,7 +413,7 @@ bool ArmControllerKinova::loadMoveitConfiguration()
 	if ( not updatePlanningScene() )
 		return false;
 
-	ROS_INFO("MoveIt! configuration loaded");
+	ROS_DEBUG("MoveIt! configuration loaded");
 
 	move_group_ = new moveit::planning_interface::MoveGroup(arm_prefix_);
 
@@ -437,7 +437,7 @@ bool ArmControllerKinova::updatePlanningScene()
 {	
 	std::lock_guard<std::mutex> lock(planning_scene_mutex_);
 
-	ROS_INFO("Update planning scene");
+	ROS_DEBUG("Update planning scene");
 	moveit_msgs::GetPlanningScene srv;
 	srv.request.components.components = 
 		srv.request.components.SCENE_SETTINGS |
@@ -472,7 +472,7 @@ bool ArmControllerKinova::updatePlanningScene()
 
 bool ArmControllerKinova::addDummyRobot()
 {
-	ROS_INFO("Adding box");
+	ROS_DEBUG("Adding box");
 
 	planning_scene_interface_.removeCollisionObjects(planning_scene_interface_.getKnownObjectNames(false));
 
@@ -561,7 +561,7 @@ bool ArmControllerKinova::addDummyRobot()
 	collision_objects.push_back(robot_camera);
 	collision_objects.push_back(robot_bakje);
 
-	ROS_INFO("Add objects into the world");  
+	ROS_DEBUG("Add objects into the world");  
 	planning_scene_interface_.addCollisionObjects(collision_objects);
 
 	return true;
@@ -629,19 +629,19 @@ bool ArmControllerKinova::checkForCollisions()
 	in_collision_ = collision_result.collision;
 	colision_mutex_.unlock();
 
-	ROS_INFO_NAMED("collision-checking", "Test: Current state is %s collision", (collision_result.collision ? "in" : "not in"));  
+	ROS_DEBUG_NAMED("collision-checking", "Test: Current state is %s collision", (collision_result.collision ? "in" : "not in"));  
 	
 	if ( inCollision() )
 	{
 		ROS_WARN_NAMED("collision-checking", "%d Collision(s) detected! Stopping execution if needed.", (int)collision_result.contact_count);
 		for ( const auto& contact : collision_result.contacts )
-			ROS_INFO_NAMED("collision-checking", "Collisions: %s - %s ", contact.first.first.c_str(), contact.first.second.c_str());
+			ROS_DEBUG_NAMED("collision-checking", "Collisions: %s - %s ", contact.first.first.c_str(), contact.first.second.c_str());
 
 		move_group_->stop();
 	}
 	else
 	{
-		ROS_INFO_NAMED("collision-checking", "No collision detected.");
+		ROS_DEBUG_NAMED("collision-checking", "No collision detected.");
 	}
 
 	return inCollision();
@@ -650,7 +650,7 @@ bool ArmControllerKinova::checkForCollisions()
 bool ArmControllerKinova::updateCollisions()
 {	
 
-	ROS_INFO_NAMED("collision-checking", "Checking for collision");
+	ROS_DEBUG_NAMED("collision-checking", "Checking for collision");
 	if (planning_scene_ == NULL)
 	{
 		ROS_ERROR_NAMED("collision-checking", "No planning scene set");
