@@ -492,7 +492,7 @@ bool ArmControllerKinova::addDummyRobot()
 
 	box_pose.orientation.w 	= 1.0;
 	box_pose.position.x 	= -0.175;
-	box_pose.position.y 	= 0.08;
+	box_pose.position.y 	= 0.085;
 	box_pose.position.z 	= 1.15;
 
 	robot_front.primitives.push_back(primitive);
