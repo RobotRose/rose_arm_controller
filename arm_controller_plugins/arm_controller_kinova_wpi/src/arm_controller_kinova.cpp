@@ -76,7 +76,7 @@ bool ArmControllerKinova::cancel()
 	ROS_INFO("Cancel received");
 
 	// Stop move_group if needed
-	move_group_.stop();
+	move_group_->stop();
 	
 	return true;
 }
