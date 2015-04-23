@@ -522,7 +522,7 @@ bool ArmControllerKinova::addDummyRobot()
 	moveit_msgs::CollisionObject 	robot_camera;
 	robot_camera.id 		= "robot_camera";
 
-	primitive.type 		    = primitive.CONE;
+	primitive.type 		    = primitive.CYLINDER;
 	primitive.dimensions.resize(3); 
 	primitive.dimensions[shape_msgs::SolidPrimitive::CONE_HEIGHT] = 0.40;  // Hoogte
 	primitive.dimensions[shape_msgs::SolidPrimitive::CONE_RADIUS] = 0.37;  // Dikte
