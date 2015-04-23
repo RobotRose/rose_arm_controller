@@ -487,7 +487,7 @@ bool ArmControllerKinova::addDummyRobot()
 	primitive.type 			= primitive.BOX;
 	primitive.dimensions.resize(3); 
 	primitive.dimensions[shape_msgs::SolidPrimitive::BOX_X] = 1.0;  // Breedte
-	primitive.dimensions[shape_msgs::SolidPrimitive::BOX_Y] = 0.00000001; // Dikte
+	primitive.dimensions[shape_msgs::SolidPrimitive::BOX_Y] = 0.02; // Dikte
 	primitive.dimensions[shape_msgs::SolidPrimitive::BOX_Z] = 2.0;  // Hoogte
 
 	box_pose.orientation.w 	= 1.0;
@@ -524,8 +524,8 @@ bool ArmControllerKinova::addDummyRobot()
 
 	primitive.type 		    = primitive.CYLINDER;
 	primitive.dimensions.resize(3); 
-	primitive.dimensions[shape_msgs::SolidPrimitive::CONE_HEIGHT] = 0.40;  // Hoogte
-	primitive.dimensions[shape_msgs::SolidPrimitive::CONE_RADIUS] = 0.37;  // Dikte
+	primitive.dimensions[shape_msgs::SolidPrimitive::CYLINDER_HEIGHT] = 0.40;  // Hoogte
+	primitive.dimensions[shape_msgs::SolidPrimitive::CYLINDER_RADIUS] = 0.37;  // Dikte
 
 	box_pose.orientation.w 	= 1.0;
 	box_pose.position.x 	= -0.175; // Left
