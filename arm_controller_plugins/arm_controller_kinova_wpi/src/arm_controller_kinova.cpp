@@ -74,8 +74,11 @@ bool ArmControllerKinova::close()
 bool ArmControllerKinova::cancel()
 {
 	ROS_INFO("Cancel received");
-	//! @todo MdL [IMPL]: Implement this function.
-	return false;
+
+	// Stop move_group if needed
+	move_group_.stop();
+	
+	return true;
 }
 
 bool ArmControllerKinova::emergencyStop()
